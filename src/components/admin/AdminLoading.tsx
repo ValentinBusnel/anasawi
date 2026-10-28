@@ -4,7 +4,8 @@ import { AdminContent } from '@/components/admin/AdminContent'
  * Squelette d'attente d'un écran du CMS — rendu par les `loading.tsx` des
  * segments qui chargent leurs données depuis Neon (`force-dynamic`).
  *
- * Sobre : la place de l'en-tête, puis trois cartes grises qui pulsent.
+ * Trois points qui rebondissent au centre — le chargement de l'espace
+ * Qeeps.
  * Posé sur chaque segment du CMS, éditeur de page compris : un
  * `router.refresh()` (Publier / Annuler) ne repasse PAS par ce squelette
  * — Next garde l'écran en place le temps de la transition — et l'état
@@ -19,32 +20,21 @@ export function AdminLoading({
 }) {
   return (
     <AdminContent width={width}>
+      {/* Trois points qui rebondissent, comme sur l'espace Qeeps. */}
       <div
         role="status"
         aria-label="Chargement"
         aria-busy="true"
-        className="animate-pulse"
+        className="flex justify-center gap-1.5 py-20"
       >
-        {/* En-tête : titre + phrase d'accompagnement */}
-        <div className="mb-6">
-          <div className="h-9 w-64 rounded-[10px] bg-block" />
-          <div className="mt-3 h-4 w-96 max-w-full rounded-[6px] bg-block" />
-        </div>
-
-        {/* Trois cartes, comme les blocs blancs des écrans réels */}
-        <div className="space-y-4">
-          {[0, 1, 2].map((i) => (
-            <div
-              key={i}
-              className="rounded-[24px] bg-block p-6"
-            >
-              <div className="h-4 w-40 rounded-[6px] bg-white" />
-              <div className="mt-4 h-[42px] w-full rounded-[10px] bg-white" />
-              <div className="mt-3 h-[42px] w-4/5 rounded-[10px] bg-white" />
-            </div>
-          ))}
-        </div>
-
+        {[0, 0.15, 0.3].map((delai) => (
+          <span
+            key={delai}
+            aria-hidden="true"
+            className="h-2 w-2 rounded-full bg-primary motion-safe:animate-[adm-bounce_1s_ease-in-out_infinite]"
+            style={{ animationDelay: `${delai}s` }}
+          />
+        ))}
         <span className="sr-only">Chargement…</span>
       </div>
     </AdminContent>

@@ -31,7 +31,7 @@ export function AdminContent({
     <div
       className={cn('min-h-0 flex-1 overflow-y-auto bg-background', className)}
     >
-      <div className={cn('mx-auto flex flex-col gap-6 px-4 pb-16 pt-7 sm:px-6 sm:pt-10 lg:px-8 lg:pt-12', maxWidth)}>
+      <div className={cn('adm-page mx-auto flex flex-col gap-6 px-4 pb-16 pt-7 sm:px-6 sm:pt-10 lg:px-8 lg:pt-12', maxWidth)}>
         {children}
       </div>
     </div>

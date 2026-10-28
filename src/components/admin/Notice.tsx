@@ -23,7 +23,7 @@ export function Notice({
         className,
       )}
     >
-      <Info aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-[#46728a]" strokeWidth={1.75} />
+      <Info aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-[#176c79]" strokeWidth={1.75} />
       <span>{children}</span>
     </p>
   )

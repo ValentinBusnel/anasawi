@@ -5,7 +5,7 @@ import * as React from 'react'
 import { cn } from '@/lib/utils'
 
 const buttonVariants = cva(
-  "inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-[8px] text-[14px] font-medium transition-[background-color,box-shadow,color,opacity,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-[8px] text-[14px] font-medium transition-[opacity,background-color,box-shadow,transform] duration-[250ms] ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
@@ -14,13 +14,13 @@ const buttonVariants = cva(
            la matière sans effet décoratif. */
         /* Comme sur l'espace Qeeps : aplat plein, qui s'éclaircit au
            survol et s'enfonce d'un rien au clic. */
-        default: 'bg-primary text-primary-foreground hover:opacity-90',
-        destructive: 'bg-destructive text-destructive-foreground hover:opacity-90',
+        default: 'bg-primary text-primary-foreground hover:opacity-85',
+        destructive: 'bg-destructive text-destructive-foreground hover:opacity-85',
         /* Secondaire : un liseré, pas de fond. */
         outline:
-          'bg-transparent text-foreground shadow-[inset_0_0_0_1px_var(--color-border)] hover:bg-[rgba(33,58,71,0.04)]',
-        secondary: 'bg-white text-foreground shadow-field hover:shadow-[0_0_0_1px_#d3dcdf,0_1px_2px_rgba(33,58,71,0.05)]',
-        ghost: 'text-foreground hover:bg-[rgba(33,58,71,0.05)]',
+          'bg-transparent text-foreground shadow-[inset_0_0_0_1px_var(--color-border)] hover:bg-[rgba(22,73,81,0.04)]',
+        secondary: 'bg-white text-foreground shadow-field hover:shadow-[var(--admin-field-shadow),0_0_0_1px_#dfe5e7]',
+        ghost: 'text-foreground hover:bg-[rgba(22,73,81,0.05)]',
         link: 'text-primary underline-offset-4 hover:underline',
       },
       size: {

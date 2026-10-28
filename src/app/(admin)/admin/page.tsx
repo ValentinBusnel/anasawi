@@ -12,7 +12,6 @@ import {
 import Link from 'next/link'
 
 import { AdminContent } from '@/components/admin/AdminContent'
-import { PageHeader } from '@/components/admin/PageHeader'
 import { buttonVariants } from '@/components/ui/button'
 import { hasUnpublishedChanges } from '@/lib/publish'
 import { getDashboardCounts, getHomePageForAdmin, getSettings } from '@/server/queries'
@@ -140,37 +139,45 @@ export default async function DashboardPage() {
 
   return (
     <AdminContent width="default">
-      <PageHeader
-        title={prenom ? `Bonjour ${prenom}` : 'Bonjour'}
-        description="Voici où en est votre site aujourd’hui."
-        action={
+      {/* ── Le bandeau d'accueil — celui de l'espace Qeeps : un halo doux
+          qui dérive, le bonjour, l'état du site en pastilles, et l'action
+          principale. ───────────────────────────────────────────────── */}
+      <section
+        aria-label="État du site"
+        className="relative isolate flex flex-wrap items-end justify-between gap-6 overflow-hidden rounded-[24px] bg-[#f6f8f8] px-6 py-7 sm:px-8"
+      >
+        <div
+          aria-hidden="true"
+          className="absolute -inset-[40%] -z-10 bg-[radial-gradient(closest-side_at_18%_30%,rgba(221,247,247,1),transparent),radial-gradient(closest-side_at_62%_70%,rgba(209,237,224,0.8),transparent),radial-gradient(closest-side_at_92%_25%,rgba(243,221,226,0.85),transparent)] blur-[10px] motion-safe:animate-[adm-drift_18s_ease-in-out_infinite_alternate]"
+        />
+        <div className="min-w-0">
+          <p className="text-[14px] font-medium leading-[17px] text-[#8aa4a8]">Tableau de bord</p>
+          <h1 className="mt-1.5 text-[30px] font-semibold leading-[1.2] tracking-[-0.02em] sm:text-[36px] sm:leading-[44px]">
+            {prenom ? `Bonjour ${prenom}` : 'Bonjour'}{' '}
+            <span
+              aria-hidden="true"
+              className="inline-block origin-[70%_70%] text-[30px] motion-safe:animate-[adm-wave_2.2s_ease-in-out_0.4s_1]"
+            >
+              👋
+            </span>
+          </h1>
+          <p className="mt-1 text-[16px] leading-[22px] text-muted-foreground">{etat.titre}.</p>
+          <div className="mt-3.5 flex flex-wrap gap-2">
+            <span className="inline-flex h-[30px] items-center gap-[7px] rounded-full bg-white/70 px-3 text-[13px] font-medium text-foreground">
+              <span aria-hidden="true" className={`h-[7px] w-[7px] rounded-full ${pastille}`} />
+              {etatSite.texte}
+            </span>
+            <span className="inline-flex h-[30px] items-center rounded-full bg-white/70 px-3 text-[13px] font-medium text-muted-foreground">
+              {pluriel(stats.sections, 'section', 'sections')}
+            </span>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-2">
           <Link href="/" className={buttonVariants({ variant: 'secondary' })}>
             <Eye strokeWidth={1.75} />
             Voir le site
           </Link>
-        }
-      />
-
-      {/* ── L'état du site, et l'action principale ─────────────────── */}
-      <section
-        aria-label="État du site"
-        className="rounded-[24px] bg-block p-6 sm:p-7"
-      >
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-          <div className="min-w-0">
-            <p className="flex items-center gap-2 text-[13px] font-medium text-muted-foreground">
-              <span aria-hidden="true" className={`h-2 w-2 rounded-full ${pastille}`} />
-              {etatSite.texte}
-              <span aria-hidden="true">·</span>
-              {pluriel(stats.sections, 'section', 'sections')}
-            </p>
-            <h2 className="mt-2 text-[22px] leading-[28px]">{etat.titre}</h2>
-            <p className="mt-1 text-[15px] text-muted-foreground">{etat.texte}</p>
-          </div>
-          <Link
-            href="/admin/accueil"
-            className={`${buttonVariants({ size: 'lg' })} shrink-0`}
-          >
+          <Link href="/admin/accueil" className={buttonVariants()}>
             <PenLine strokeWidth={1.75} />
             Modifier mon site
           </Link>

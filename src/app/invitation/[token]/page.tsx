@@ -31,14 +31,14 @@ export default async function InvitationPage({
         title="Ce lien n’est plus valable."
         description="Il a peut-être déjà servi, ou il a plus de sept jours. Demandez un nouveau lien à la personne qui vous a invité·e."
         footer={
-          <Link href="/login" className="transition-colors hover:text-[#213a47]">
+          <Link href="/login" className="transition-colors hover:text-[#164951]">
             Vous avez déjà un mot de passe ? Se connecter
           </Link>
         }
       >
         <Link
           href="/login"
-          className="inline-flex h-11 w-full items-center justify-center rounded-[8px] bg-[#2f5a70] text-[15px] font-medium text-white transition-opacity hover:opacity-90"
+          className="inline-flex h-11 w-full items-center justify-center rounded-[8px] bg-[#164951] text-[15px] font-medium text-white transition-opacity hover:opacity-90"
         >
           Aller à la connexion
         </Link>

@@ -36,7 +36,7 @@ export function MessagesList({ messages }: { messages: ContactMessage[] }) {
         return (
           <li
             key={message.id}
-            className={cn(!message.isRead && 'ring-1 ring-[#46728a]/25')}
+            className={cn(!message.isRead && 'ring-1 ring-[#176c79]/25')}
           >
             <button
               type="button"
@@ -64,7 +64,7 @@ export function MessagesList({ messages }: { messages: ContactMessage[] }) {
                 }
               }}
               aria-expanded={open}
-              className="flex w-full items-center gap-3 rounded-[16px] px-5 py-3.5 text-left transition-colors duration-150 hover:bg-[rgba(33,58,71,0.03)]"
+              className="flex w-full items-center gap-3 rounded-[16px] px-5 py-3.5 text-left transition-colors duration-150 hover:bg-[rgba(22,73,81,0.03)]"
             >
               <span className="min-w-0 flex-1">
                 <span className="flex items-center gap-2">

@@ -57,7 +57,7 @@ function courant(href: string, pathname: string): boolean {
 }
 
 const FOCUS =
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#46728a] focus-visible:ring-offset-2'
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#176c79] focus-visible:ring-offset-2'
 
 /* ── Les espaces, en pilule ─────────────────────────────────────────── */
 
@@ -88,13 +88,13 @@ function Espaces({ nonLus }: { nonLus: number }) {
       className={cn(
         'relative flex items-center gap-0.5 rounded-[12px] bg-block p-1',
         /* Sous 1024 px : barre d'onglets fixe en bas de l'écran. */
-        'max-lg:fixed max-lg:inset-x-3 max-lg:bottom-3 max-lg:z-[70] max-lg:justify-between max-lg:rounded-[18px] max-lg:bg-white/95 max-lg:p-1.5 max-lg:shadow-[0_0_0_1px_rgba(33,58,71,0.06),0_12px_40px_rgba(33,58,71,0.16)] max-lg:backdrop-blur-xl',
+        'max-lg:fixed max-lg:inset-x-3 max-lg:bottom-3 max-lg:z-[70] max-lg:justify-between max-lg:rounded-[18px] max-lg:bg-white/95 max-lg:p-1.5 max-lg:shadow-[0_0_0_1px_rgba(22,73,81,0.06),0_12px_40px_rgba(22,73,81,0.16)] max-lg:backdrop-blur-xl',
       )}
     >
       {indicateur && (
         <span
           aria-hidden="true"
-          className="absolute bottom-1 top-1 rounded-[9px] bg-white shadow-[0_1px_2px_rgba(33,58,71,0.08),0_4px_12px_rgba(33,58,71,0.06)] transition-[left,width] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] max-lg:bottom-1.5 max-lg:top-1.5 max-lg:rounded-[12px] max-lg:bg-block max-lg:shadow-none"
+          className="absolute bottom-1 top-1 rounded-[9px] bg-white shadow-[0_1px_2px_rgba(22,73,81,0.08),0_4px_12px_rgba(22,73,81,0.06)] transition-[left,width] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] max-lg:bottom-1.5 max-lg:top-1.5 max-lg:rounded-[12px] max-lg:bg-block max-lg:shadow-none"
           style={{ left: indicateur.left, width: indicateur.width }}
         />
       )}
@@ -114,7 +114,13 @@ function Espaces({ nonLus }: { nonLus: number }) {
                 actif ? 'text-foreground' : 'text-muted-foreground hover:text-foreground',
               )}
             >
-              <Icone className="h-4 w-4 shrink-0 max-lg:h-[19px] max-lg:w-[19px]" strokeWidth={1.8} />
+              <Icone
+                className={cn(
+                  'h-4 w-4 shrink-0 transition-colors max-lg:h-[19px] max-lg:w-[19px]',
+                  actif && 'text-[#176c79]',
+                )}
+                strokeWidth={1.8}
+              />
               {/* Le nom : en entier sur ordinateur, sous l'icône sur
                   tablette, absent sur téléphone (l'icône et
                   `aria-label` suffisent, sept onglets ne tiennent pas). */}
@@ -124,7 +130,7 @@ function Espaces({ nonLus }: { nonLus: number }) {
               {espace.href === '/admin/messages' && nonLus > 0 && (
                 <span
                   aria-label={`${nonLus} non lu${nonLus > 1 ? 's' : ''}`}
-                  className="grid h-[18px] min-w-[18px] place-items-center rounded-full bg-primary px-[5px] text-[11px] font-semibold tabular-nums text-white max-lg:absolute max-lg:left-[calc(50%+6px)] max-lg:top-1"
+                  className="grid h-[18px] min-w-[18px] animate-[adm-pop_0.4s_cubic-bezier(0.22,1,0.36,1)] place-items-center rounded-full bg-primary px-[5px] text-[11px] font-semibold tabular-nums text-white max-lg:absolute max-lg:left-[calc(50%+6px)] max-lg:top-1"
                 >
                   {nonLus}
                 </span>
@@ -180,7 +186,7 @@ function Compte({ userName }: { userName: string }) {
           FOCUS,
         )}
       >
-        <span className="grid h-[34px] w-[34px] place-items-center rounded-full bg-gradient-to-br from-[#46728a] to-[#2f5a70] text-[14px] font-semibold text-white">
+        <span className="grid h-[34px] w-[34px] place-items-center rounded-full bg-gradient-to-br from-[#176c79] to-[#164951] text-[14px] font-semibold text-white">
           {initiale}
         </span>
         <ChevronDown
@@ -244,7 +250,7 @@ export function AdminTopBar({
         >
           <LogoMark className="h-8 w-8" />
           <span className="text-[18px] font-semibold tracking-[-0.02em] text-foreground">
-            Anasawi<span className="text-[#46728a]">.</span>
+            Anasawi<span className="text-[#176c79]">.</span>
           </span>
         </Link>
 
@@ -254,7 +260,7 @@ export function AdminTopBar({
           <Link
             href="/"
             className={cn(
-              'hidden h-8 items-center gap-2 rounded-[6px] px-3 text-[13px] font-medium text-foreground shadow-[inset_0_0_0_1px_var(--color-border)] transition-colors hover:bg-[rgba(33,58,71,0.04)] lg:inline-flex',
+              'hidden h-8 items-center gap-2 rounded-[6px] px-3 text-[13px] font-medium text-foreground shadow-[inset_0_0_0_1px_var(--color-border)] transition-colors hover:bg-[rgba(22,73,81,0.04)] lg:inline-flex',
               FOCUS,
             )}
           >
