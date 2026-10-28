@@ -193,14 +193,12 @@ export function ServiceRows({
                 </p>
               </div>
 
-              {/* La flèche dans une pastille, qui se remplit au survol. */}
-              <span className="mt-2 flex lg:col-span-1 lg:mt-0 lg:justify-end">
-                <span
-                  aria-hidden="true"
-                  className="grid size-11 place-items-center rounded-full border border-line-strong text-[17px] text-ink-soft transition-[background-color,border-color,color,transform] duration-300 ease-out group-hover:scale-105 group-hover:border-blue-deep group-hover:bg-blue-deep group-hover:text-white group-focus-visible:border-blue-deep group-focus-visible:bg-blue-deep group-focus-visible:text-white"
-                >
-                  →
-                </span>
+              {/* Une flèche seule, qui avance et prend le bleu au survol. */}
+              <span
+                aria-hidden="true"
+                className="mt-1 block text-left text-[20px] text-ink-soft transition-[color,transform] duration-300 ease-out group-hover:translate-x-1 group-hover:text-blue-deep group-focus-visible:translate-x-1 group-focus-visible:text-blue-deep lg:col-span-1 lg:mt-0 lg:text-right"
+              >
+                →
               </span>
             </>
           )
