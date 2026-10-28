@@ -10,7 +10,6 @@ import {
 } from '@/components/site/ServiceHoverPreview'
 import { ServicePanel } from '@/components/site/ServicePanel'
 import type { ServiceWithMedia } from '@/server/db/schema'
-import { numberWordFr } from '@/lib/format'
 
 /*
  * Liste des accompagnements — les rangées et la fiche qu'elles ouvrent.
@@ -154,8 +153,10 @@ export function ServiceRows({
 
           const inner = (
             <>
-              <span className="font-serif text-[16px] font-light italic text-blue-deep lg:col-span-1">
-                {numberWordFr(i)}
+              {/* Un tiret plutôt que « un, deux, trois » : il rythme la liste
+                  sans ajouter un mot à lire. */}
+              <span aria-hidden="true" className="font-serif text-[18px] font-light text-blue-deep lg:col-span-1">
+                —
               </span>
 
               {/* Plus petit que l'intitulé de famille : la hiérarchie se lit
