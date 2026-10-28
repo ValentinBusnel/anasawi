@@ -69,7 +69,21 @@ export default async function AdminLayout({
             menu du compte. */}
         <AdminPillShell name={userName} email={session.user.email ?? undefined} />
 
-        <Toaster position="bottom-right" richColors closeButton />
+        {/* Notifications sobres : une carte blanche, l'icône porte la
+            couleur (succès, erreur) — pas de fond vert ou rouge plein. */}
+        <Toaster
+          position="bottom-right"
+          closeButton
+          toastOptions={{
+            classNames: {
+              toast:
+                'admin-toast !rounded-[12px] !border !border-border !bg-card !text-foreground !shadow-pop !text-[13.5px] !font-sans',
+              description: '!text-muted-foreground',
+              success: '[&_[data-icon]]:!text-success',
+              error: '[&_[data-icon]]:!text-destructive',
+            },
+          }}
+        />
       </div>
     </PaletteProvider>
   )

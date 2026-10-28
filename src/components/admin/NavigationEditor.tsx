@@ -100,7 +100,7 @@ export function NavigationEditor({
               className="rounded-xl border border-border bg-white px-[18px] py-4"
             >
               <div className="mb-3 flex items-center justify-between gap-3">
-                <p className="text-[12px] font-medium uppercase tracking-[0.08em] text-muted-foreground">
+                <p className="text-[13px] font-semibold text-foreground">
                   {i + 1}. {nom}
                 </p>
                 <ActionMenu
@@ -172,7 +172,7 @@ export function NavigationEditor({
       {/* Ajouter : les sections de l'accueil pas encore dans le menu, et
           un lien libre. */}
       <div>
-        <p className="mb-2 text-[12px] font-medium uppercase tracking-[0.08em] text-muted-foreground">
+        <p className="mb-2 text-[13px] font-semibold text-foreground">
           Ajouter au menu
         </p>
         <div className="flex flex-wrap gap-2">

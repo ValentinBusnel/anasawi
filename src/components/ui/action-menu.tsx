@@ -158,13 +158,13 @@ export function ActionMenu({
         item.onSelect()
       }}
       className={cn(
-        'flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-left text-[13px] transition-colors',
+        'flex w-full items-center gap-2.5 rounded-[8px] px-2.5 py-2 text-left text-[13.5px] transition-colors',
         /* Au clavier : le fond ET un anneau — le fond seul se confond
            avec le survol, et l'on ne voit plus où l'on est. */
-        'focus-visible:outline-none focus-visible:bg-blue-mist/60 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-deep/60',
+        'focus-visible:outline-none focus-visible:bg-secondary',
         item.danger
           ? 'text-red-700 hover:bg-red-50 focus-visible:bg-red-50 focus-visible:ring-destructive/50'
-          : 'text-foreground hover:bg-blue-mist/60',
+          : 'text-foreground hover:bg-secondary',
         item.disabled && 'cursor-default opacity-40 hover:bg-transparent',
       )}
     >
@@ -200,9 +200,9 @@ export function ActionMenu({
         }}
         onPointerDown={(e) => e.stopPropagation()}
         className={cn(
-          'flex shrink-0 items-center justify-center rounded-md text-ink-soft transition-colors hover:bg-blue-mist/70 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-deep/50',
+          'flex shrink-0 items-center justify-center rounded-[8px] text-ink-soft transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/30',
           size === 'sm' ? 'h-7 w-7' : 'h-9 w-9',
-          open && 'bg-blue-mist/70 text-foreground',
+          open && 'bg-secondary text-foreground',
           className,
         )}
       >
@@ -224,7 +224,7 @@ export function ActionMenu({
                 ? { top: position.top, right: position.right }
                 : { top: position.top, left: position.left }
             }
-            className="fixed z-[300] min-w-[200px] rounded-[10px] border border-border bg-white p-1.5 shadow-[0_10px_30px_rgba(28,32,30,0.16)]"
+            className="fixed z-[300] min-w-[210px] rounded-[12px] border border-border bg-white p-1 shadow-pop"
           >
             {ordinary.map((item, i) => rendre(item, i))}
             {dangerous.length > 0 && ordinary.length > 0 && (

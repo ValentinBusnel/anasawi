@@ -16,6 +16,7 @@ import { toast } from 'sonner'
 
 import { useActionForm } from './hooks/useActionForm'
 import { useSortableSensors } from './hooks/useSortableSensors'
+import { Notice } from './Notice'
 import { useServiceArrangement } from './services/hooks/useServiceArrangement'
 import {
   emptyServiceDraft,
@@ -67,9 +68,9 @@ const dropAnimation: DropAnimation = {
 /** Rappel commun aux écrans de contenus : ici, pas d'étape « publier ». */
 function NoteEnLigne() {
   return (
-    <p className="mb-4 rounded-lg border border-blue-deep/20 bg-blue-mist/30 px-3.5 py-2.5 text-[12.5px] leading-[1.5] text-foreground">
+    <Notice className="mb-5">
       Les modifications sont visibles sur le site dès que vous enregistrez.
-    </p>
+    </Notice>
   )
 }
 
@@ -346,7 +347,7 @@ export function ServicesManager({
           <DragOverlay dropAnimation={dropAnimation}>
             {draggedGroup ? (
               <div className="w-full overflow-hidden rounded-lg border border-blue-deep/50 bg-white shadow-xl">
-                <p className="border-b border-border bg-ivory/60 px-4 py-2.5 text-[12px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                <p className="border-b border-border bg-ivory/60 px-4 py-2.5 text-[13px] font-semibold text-foreground">
                   {draggedGroup.label}
                 </p>
                 <p className="px-4 py-3 text-[12.5px] text-muted-foreground">

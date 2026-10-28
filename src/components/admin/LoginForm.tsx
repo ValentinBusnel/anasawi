@@ -3,19 +3,18 @@
 import { useActionState } from 'react'
 import { useFormStatus } from 'react-dom'
 
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { signInAction } from '@/server/actions/auth'
 
 function SubmitButton() {
   const { pending } = useFormStatus()
 
   return (
-    <button
-      type="submit"
-      disabled={pending}
-      className="w-full rounded-[2px] bg-ink px-6 py-3.5 text-[0.8rem] uppercase tracking-[0.14em] text-ivory transition-opacity duration-400 hover:opacity-88 disabled:opacity-60"
-    >
+    <Button type="submit" size="lg" disabled={pending} aria-busy={pending} className="w-full">
       {pending ? 'Connexion…' : 'Se connecter'}
-    </button>
+    </Button>
   )
 }
 
@@ -23,43 +22,33 @@ export function LoginForm() {
   const [state, formAction] = useActionState(signInAction, {})
 
   return (
-    <form action={formAction} className="space-y-6">
+    <form action={formAction} className="space-y-5">
       <div>
-        <label
-          htmlFor="email"
-          className="block text-[0.72rem] uppercase tracking-[0.16em] text-stone"
-        >
+        <Label htmlFor="email" className="mb-2 block">
           E-mail
-        </label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          required
-          autoComplete="username"
-          className="mt-2 w-full border-0 border-b border-line bg-transparent pb-2.5 pt-1.5 text-[0.95rem] outline-none transition-colors duration-200 focus:border-blue-deep"
-        />
+        </Label>
+        <Input id="email" name="email" type="email" required autoComplete="username" className="h-11" />
       </div>
 
       <div>
-        <label
-          htmlFor="password"
-          className="block text-[0.72rem] uppercase tracking-[0.16em] text-stone"
-        >
+        <Label htmlFor="password" className="mb-2 block">
           Mot de passe
-        </label>
-        <input
+        </Label>
+        <Input
           id="password"
           name="password"
           type="password"
           required
           autoComplete="current-password"
-          className="mt-2 w-full border-0 border-b border-line bg-transparent pb-2.5 pt-1.5 text-[0.95rem] outline-none transition-colors duration-200 focus:border-blue-deep"
+          className="h-11"
         />
       </div>
 
       {state?.error && (
-        <p role="alert" className="text-[0.82rem] text-danger">
+        <p
+          role="alert"
+          className="rounded-[10px] border border-destructive/20 bg-danger-soft px-3.5 py-2.5 text-[13.5px] text-destructive"
+        >
           {state.error}
         </p>
       )}

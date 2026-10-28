@@ -11,6 +11,7 @@ import {
   type NavigationEditorProps,
   type NavigationItem,
 } from './NavigationEditor'
+import { Notice } from './Notice'
 import { PageHeader } from './PageHeader'
 import { PaletteProvider } from './PaletteProvider'
 import {
@@ -350,10 +351,9 @@ export function SettingsWorkbench({
             title="Réglages"
             description="Tout ce qui vaut pour le site entier : qui vous êtes, comment on vous joint, vos couleurs, votre menu et ce que Google affiche."
           />
-          <p className="-mt-3 mb-6 flex items-start gap-2 rounded-lg border border-border bg-white px-3.5 py-2.5 text-[13px] text-ink-soft">
-            <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+          <Notice className="-mt-3 mb-6">
             Les réglages sont visibles sur le site dès que vous enregistrez.
-          </p>
+          </Notice>
 
           {/* Onglets */}
           <div

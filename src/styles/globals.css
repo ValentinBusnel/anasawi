@@ -98,55 +98,98 @@
   --button-radius: 999px;
 }
 
-/* ── shadcn/ui — utilisé uniquement dans /admin ───────────────────── */
+/* ══════════════════════════════════════════════════════════════════════
+   ADMINISTRATION — système de design
+
+   Un outil, pas une page du site : un fond neutre très clair, des
+   surfaces blanches, des filets fins, une seule couleur d'action (le bleu
+   profond du site), une police sans-serif à 14 px. Les ombres sont
+   presque absentes ; la profondeur vient des surfaces.
+
+   Les variables shadcn ci-dessous ne servent qu'à l'admin. Les jetons du
+   SITE (ivoire, pierre, filets…) y sont aussi recalés en neutres (voir
+   `:root:has(.admin-shell)`), pour que les composants partagés ne
+   ramènent pas l'ivoire jauni dans l'outil — SAUF dans `.site-tokens`,
+   les aperçus de templates, qui doivent montrer le site tel quel.
+   ══════════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* Le rayon de TOUS les contrôles de l'administration (boutons, champs,
-     cartes) — une seule valeur, pour que rien ne jure. */
-  --radius: 0.5rem;
+  /* Arrondi de tous les contrôles de l'admin (boutons, champs, cartes). */
+  --radius: 0.625rem;
 
-  /* Trois plans, du plus chaud au plus clair : la colonne latérale porte
-     l'ivoire de la marque, le contenu s'éclaircit, les surfaces sont
-     blanches. C'est ce dégradé qui donne de la profondeur — pas des ombres.
-     Sans lui, une pastille blanche active sur un fond déjà blanc n'a aucun
-     sens : c'est ce qui rendait la sidebar terne. */
-  --sidebar: #f4f1ea;
-  --sidebar-border: #e6e0d5;
-  --background: #fdfcfa;
-  --foreground: #1c201e;
+  /* Trois plans : la navigation, le canevas, les surfaces. */
+  --sidebar: #f6f6f4;
+  --sidebar-border: #e9e9e6;
+  --background: #fbfbfa;
+  --foreground: #191b1a;
   --card: #ffffff;
-  --card-foreground: #1c201e;
+  --card-foreground: #191b1a;
   --popover: #ffffff;
-  --popover-foreground: #1c201e;
-  /* L'action principale porte le bleu profond du site : le même bleu que
-     les boutons qu'Anne voit sur sa page. Avant, l'admin mélangeait un
-     noir « primaire » et dix boutons bleus refaits à la main. */
+  --popover-foreground: #191b1a;
+  /* Une seule action principale : le bleu profond du site. */
   --primary: #46728a;
   --primary-foreground: #ffffff;
-  --secondary: #f2f0ec;
-  --secondary-foreground: #1c201e;
-  --muted: #f4f2ee;
-  /* 5,5:1 sur le fond de l'admin : avec l'ancien gris (#85817a, 3,8:1),
-     les libellés secondaires en 12-13px passaient sous le seuil AA. */
-  --muted-foreground: #6b675f;
-  --accent: #eef1f0;
-  --accent-foreground: #1c201e;
-  --destructive: #a8352d;
+  --secondary: #f2f2f0;
+  --secondary-foreground: #191b1a;
+  --muted: #f4f4f2;
+  /* 5,6:1 sur le canevas : les textes secondaires restent lisibles. */
+  --muted-foreground: #696a65;
+  --accent: #f0f0ee;
+  --accent-foreground: #191b1a;
+  --destructive: #b4342c;
   --destructive-foreground: #ffffff;
-
-  /* Deux valeurs de trait : `border` pour les séparations internes,
-     `input` un peu plus marqué pour les champs, qui doivent se détacher
-     du fond sans pour autant être encadrés. */
-  --border: #eae7e1;
-  --input: #dcd8d1;
+  --border: #e9e9e6;
+  --input: #dededa;
   --ring: #46728a;
+
+  /* Ombres : presque rien, et toujours la même famille. */
+  --admin-shadow-xs: 0 1px 2px rgba(17, 20, 18, 0.05);
+  --admin-shadow-sm: 0 1px 3px rgba(17, 20, 18, 0.06), 0 1px 2px rgba(17, 20, 18, 0.04);
+  --admin-shadow-pop: 0 16px 40px -12px rgba(17, 20, 18, 0.18), 0 4px 10px -4px rgba(17, 20, 18, 0.08);
 }
 
-/* Densité propre au CMS : 13px de base. Une interface d'édition se lit de
-   près et se parcourt vite — la taille du site public y paraît lourde. */
+/* Les jetons du site, recalés en neutres dans tout le document de
+   l'admin (portails des fenêtres compris). La scène de l'éditeur est un
+   cadre (iframe) : elle n'est pas concernée. */
+:root:has(.admin-shell) {
+  --color-ivory: #fbfbfa;
+  --color-ivory-warm: #f2f2f0;
+  --color-ivory-deep: #e7e7e4;
+  --color-sand: #f2f2f0;
+  --color-cream: #f7f7f5;
+  --color-ink: #191b1a;
+  --color-ink-soft: #464845;
+  --color-soft: #464845;
+  --color-stone: #696a65;
+  --color-line: #e9e9e6;
+  --color-line-strong: #dededa;
+  --color-blue-mist: #ecf2f5;
+}
+
+/* Aperçus de templates rendus dans le document de l'admin : les jetons
+   d'origine du site, à l'identique. */
+.site-tokens {
+  --color-ivory: #fbf8f2;
+  --color-ivory-warm: #f4eee3;
+  --color-ivory-deep: #eae2d2;
+  --color-sand: #f4eee3;
+  --color-cream: #f8f4ea;
+  --color-ink: #2b2f2c;
+  --color-ink-soft: #454945;
+  --color-soft: #454945;
+  --color-stone: #5f635e;
+  --color-line: rgba(43, 47, 44, 0.09);
+  --color-line-strong: rgba(43, 47, 44, 0.18);
+  --color-blue-mist: #eaf1f4;
+  font-size: 16px;
+  letter-spacing: normal;
+}
+
+/* Densité de l'outil : 14 px, lisible sans être lourd. */
 .admin-shell {
-  font-size: 13px;
+  font-size: 14px;
   letter-spacing: -0.006em;
+  font-feature-settings: 'ss01', 'cv11';
 }
 
 @theme inline {
@@ -174,6 +217,10 @@
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --shadow-xs: var(--admin-shadow-xs);
+  --shadow-sm: var(--admin-shadow-sm);
+  --shadow-pop: var(--admin-shadow-pop);
 }
 
 /* ══════════════════════════════════════════════════════════════════════
@@ -230,6 +277,17 @@
 
   p {
     text-wrap: pretty;
+  }
+
+  /* Dans l'admin, les titres sont ceux d'un outil : sans-serif, semi-gras.
+     Les aperçus de templates (`.site-tokens`) gardent ceux du site. Dans
+     la couche `base`, donc toute classe utilitaire posée sur un titre
+     reste prioritaire. */
+  :root:has(.admin-shell) :is(h1, h2, h3, h4):not(.site-tokens *) {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: -0.012em;
   }
 
   /* Focus visible dédié — jamais outline:none */

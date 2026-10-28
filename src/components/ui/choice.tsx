@@ -43,14 +43,14 @@ export function Choice<T extends string>({
       <Label
         htmlFor={id}
         className={cn(
-          'mb-[5px] block text-[12px] font-normal text-ink-soft',
+          'mb-2 block text-[13px] font-medium text-foreground/80',
           hideLabel && 'sr-only',
         )}
       >
         {label}
       </Label>
       <Select value={value} onValueChange={(v) => onChange(v as T)}>
-        <SelectTrigger id={id} aria-label={hideLabel ? label : undefined} className="h-9 w-full">
+        <SelectTrigger id={id} aria-label={hideLabel ? label : undefined} className="w-full">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils'
 
 /**
- * Une carte de formulaire : un titre en capitales, une note qui dit à
+ * Une carte de formulaire : un titre net, une note qui dit à
  * quoi servent les champs, puis les champs — en grille de deux colonnes
  * par défaut, ou libres (`layout="stack"`) quand la carte compose sa
  * propre mise en page.
@@ -27,7 +27,7 @@ export function SectionCard({
   return (
     <section
       id={id}
-      className="scroll-mt-6 rounded-xl border border-border bg-white px-[22px] py-5"
+      className="scroll-mt-6 rounded-[14px] border border-border bg-card p-5 shadow-xs sm:p-6"
     >
       <div
         className={cn(
@@ -35,18 +35,18 @@ export function SectionCard({
         )}
       >
         <div>
-          <h2 className="text-[12px] font-medium uppercase tracking-[0.08em] text-muted-foreground">
+          <h2 className="text-[15px] font-semibold tracking-[-0.01em] text-foreground">
             {title}
           </h2>
           {note && (
-            <p className="mt-1.5 max-w-[62ch] text-[12px] leading-[1.6] text-muted-foreground">
+            <p className="mt-1 max-w-[62ch] text-[13.5px] leading-[1.55] text-muted-foreground">
               {note}
             </p>
           )}
         </div>
         {actions && <div className="flex flex-wrap gap-1.5">{actions}</div>}
       </div>
-      <div className={cn('mt-4', layout === 'grid' && 'grid gap-4 sm:grid-cols-2')}>
+      <div className={cn('mt-5', layout === 'grid' && 'grid gap-x-5 gap-y-5 sm:grid-cols-2')}>
         {children}
       </div>
     </section>

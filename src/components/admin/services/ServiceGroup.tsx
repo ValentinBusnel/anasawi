@@ -84,7 +84,7 @@ export function Famille({
           onDelete={onDelete}
         />
       ) : (
-        <p className="border-b border-border bg-muted/40 px-4 py-2.5 text-[12px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+        <p className="border-b border-border bg-muted/40 px-4 py-2.5 text-[13px] font-semibold text-foreground">
           Sans titre — présentés seuls
         </p>
       )}
@@ -204,7 +204,7 @@ function TitreFamille({
             title="Cliquer pour renommer"
             className="flex h-9 min-w-0 flex-1 items-center gap-2 rounded-lg px-1 text-left transition-colors hover:bg-white/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
           >
-            <span className="truncate text-[12px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+            <span className="truncate text-[13.5px] font-semibold text-foreground">
               {label}
             </span>
             <Pencil className="h-3.5 w-3.5 shrink-0 text-muted-foreground/60" />

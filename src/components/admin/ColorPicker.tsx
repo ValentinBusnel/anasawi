@@ -45,7 +45,7 @@ export function ColorPicker({
       <div className="space-y-[9px]">
         {groups.map((group) => (
           <div key={group.label}>
-            <span className="mb-[3px] block text-xs uppercase tracking-[0.1em] text-stone">
+            <span className="mb-1 block text-[12.5px] font-medium text-muted-foreground">
               {group.label}
             </span>
             <div className="flex flex-wrap gap-[7px]">
@@ -76,7 +76,7 @@ export function ColorPicker({
         {/* Hors palette : le sélecteur natif — gratuit, accessible au
             clavier et identique aux habitudes du système. */}
         <div>
-          <span className="mb-[3px] block text-xs uppercase tracking-[0.1em] text-stone">
+          <span className="mb-1 block text-[12.5px] font-medium text-muted-foreground">
             Autre
           </span>
           <label

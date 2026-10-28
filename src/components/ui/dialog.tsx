@@ -21,7 +21,7 @@ const DialogOverlay = React.forwardRef<
        `tailwindcss-animate`, qui n'est pas installé. Tailwind v4 les ignore
        silencieusement — autant ne pas laisser du code mort qui laisse croire
        à une animation. */
-    className={cn('fixed inset-0 z-50 bg-black/40', className)}
+    className={cn('fixed inset-0 z-50 bg-[rgba(17,20,18,0.32)] backdrop-blur-[2px]', className)}
     {...props}
   />
 ))
@@ -36,13 +36,13 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        'fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-[8px] border border-border bg-popover p-5 shadow-[0_16px_48px_-12px_rgba(28,32,30,0.25),0_4px_12px_-4px_rgba(28,32,30,0.12)]',
+        'fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-[16px] border border-border bg-popover p-6 shadow-pop max-sm:max-w-[calc(100vw-24px)]',
         className,
       )}
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring">
+      <DialogPrimitive.Close className="absolute right-3.5 top-3.5 grid h-8 w-8 place-items-center rounded-[8px] text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/30">
         <X className="h-4 w-4" />
         <span className="sr-only">Fermer</span>
       </DialogPrimitive.Close>
@@ -64,7 +64,7 @@ function DialogFooter({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
       className={cn(
-        'flex flex-col-reverse gap-2 sm:flex-row sm:justify-end',
+        'mt-2 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end',
         className,
       )}
       {...props}
@@ -78,7 +78,7 @@ const DialogTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Title
     ref={ref}
-    className={cn('text-base font-semibold leading-none', className)}
+    className={cn('text-[17px] font-semibold leading-snug tracking-[-0.015em]', className)}
     {...props}
   />
 ))
@@ -90,7 +90,7 @@ const DialogDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Description
     ref={ref}
-    className={cn('text-sm text-muted-foreground', className)}
+    className={cn('text-[14px] leading-[1.55] text-muted-foreground', className)}
     {...props}
   />
 ))

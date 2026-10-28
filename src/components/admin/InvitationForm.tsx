@@ -4,6 +4,9 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 import { useActionForm } from './hooks/useActionForm'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { setPasswordFromInvitation } from '@/server/actions/users'
 
 /**
@@ -21,30 +24,23 @@ export function InvitationForm({ token, email }: { token: string; email: string 
   const [erreur, setErreur] = useState<string | null>(null)
   const [fait, setFait] = useState(false)
 
-  const champ =
-    'mt-2 w-full border-0 border-b border-line bg-transparent pb-2.5 pt-1.5 text-[0.95rem] outline-none transition-colors duration-200 focus:border-blue-deep'
-  const libelle = 'block text-[0.72rem] uppercase tracking-[0.16em] text-stone'
 
   if (fait) {
     return (
-      <div role="status" className="space-y-6">
-        <p className="text-[0.9rem] leading-relaxed text-ink">
+      <div role="status" className="space-y-5">
+        <p className="rounded-[10px] border border-success/20 bg-success-soft px-3.5 py-3 text-[14px] leading-relaxed text-success-ink">
           Votre mot de passe est enregistré. Vous pouvez vous connecter.
         </p>
-        <button
-          type="button"
-          onClick={() => router.push('/login')}
-          className="w-full rounded-[2px] bg-ink px-6 py-3.5 text-[0.8rem] uppercase tracking-[0.14em] text-ivory transition-opacity duration-400 hover:opacity-88"
-        >
+        <Button type="button" size="lg" onClick={() => router.push('/login')} className="w-full">
           Se connecter
-        </button>
+        </Button>
       </div>
     )
   }
 
   return (
     <form
-      className="space-y-6"
+      className="space-y-5"
       onSubmit={(e) => {
         e.preventDefault()
         setErreur(null)
@@ -59,10 +55,10 @@ export function InvitationForm({ token, email }: { token: string; email: string 
       <input type="hidden" name="username" autoComplete="username" value={email} readOnly />
 
       <div>
-        <label htmlFor="password" className={libelle}>
+        <Label htmlFor="password" className="mb-2 block">
           Mot de passe
-        </label>
-        <input
+        </Label>
+        <Input
           id="password"
           name="password"
           type="password"
@@ -73,18 +69,18 @@ export function InvitationForm({ token, email }: { token: string; email: string 
           aria-invalid={erreurs.password ? true : undefined}
           aria-describedby="password-aide"
           onChange={(e) => setPassword(e.target.value)}
-          className={champ}
+          className="h-11"
         />
-        <p id="password-aide" className={`mt-2 text-[0.78rem] ${erreurs.password ? 'text-danger' : 'text-stone'}`} role={erreurs.password ? 'alert' : undefined}>
+        <p id="password-aide" className={`mt-2 text-[12.5px] leading-[1.5] ${erreurs.password ? 'text-destructive' : 'text-[#696a65]'}`} role={erreurs.password ? 'alert' : undefined}>
           {erreurs.password?.[0] ?? 'Au moins 10 caractères. Une phrase facile à retenir fait un bon mot de passe.'}
         </p>
       </div>
 
       <div>
-        <label htmlFor="confirmation" className={libelle}>
+        <Label htmlFor="confirmation" className="mb-2 block">
           Le même, une seconde fois
-        </label>
-        <input
+        </Label>
+        <Input
           id="confirmation"
           name="confirmation"
           type="password"
@@ -94,28 +90,27 @@ export function InvitationForm({ token, email }: { token: string; email: string 
           aria-invalid={erreurs.confirmation ? true : undefined}
           aria-describedby={erreurs.confirmation ? 'confirmation-erreur' : undefined}
           onChange={(e) => setConfirmation(e.target.value)}
-          className={champ}
+          className="h-11"
         />
         {erreurs.confirmation && (
-          <p id="confirmation-erreur" role="alert" className="mt-2 text-[0.78rem] text-danger">
+          <p id="confirmation-erreur" role="alert" className="mt-2 text-[12.5px] text-destructive">
             {erreurs.confirmation[0]}
           </p>
         )}
       </div>
 
       {erreur && (
-        <p role="alert" className="text-[0.82rem] text-danger">
+        <p
+          role="alert"
+          className="rounded-[10px] border border-destructive/20 bg-danger-soft px-3.5 py-2.5 text-[13.5px] text-destructive"
+        >
           {erreur}
         </p>
       )}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="w-full rounded-[2px] bg-ink px-6 py-3.5 text-[0.8rem] uppercase tracking-[0.14em] text-ivory transition-opacity duration-400 hover:opacity-88 disabled:opacity-60"
-      >
+      <Button type="submit" size="lg" disabled={pending} aria-busy={pending} className="w-full">
         {pending ? 'Enregistrement…' : 'Enregistrer mon mot de passe'}
-      </button>
+      </Button>
     </form>
   )
 }

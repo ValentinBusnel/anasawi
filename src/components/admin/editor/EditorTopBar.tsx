@@ -92,17 +92,17 @@ export function EditorTopBar({
     <header
       role="region"
       aria-label="Barre de l’éditeur"
-      className="flex shrink-0 flex-wrap items-center gap-x-3 gap-y-2 border-b border-border bg-ivory px-4 py-2.5 lg:h-[54px] lg:flex-nowrap lg:py-0"
+      className="flex shrink-0 flex-wrap items-center gap-x-3 gap-y-2 border-b border-border bg-card px-4 py-2.5 lg:h-[60px] lg:flex-nowrap lg:px-5 lg:py-0"
     >
       {/* 1. Où l'on est, et dans quel état : le nom de la page, l'état de
           publication, et — en clair — ce qu'il advient des modifications.
           C'est LA phrase qui répond à « est-ce que c'est enregistré ?
           est-ce que c'est en ligne ? ». */}
       <div className="flex min-w-0 items-center gap-3">
-        <span className="max-w-48 truncate font-serif text-[15px]">{pageTitle}</span>
+        <span className="max-w-48 truncate text-[14px] font-semibold tracking-[-0.01em]">{pageTitle}</span>
         <span
           className={cn(
-            'flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-[3px] text-[12.5px]',
+            'flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-[12.5px] font-medium',
             status.pill,
           )}
         >
@@ -110,7 +110,7 @@ export function EditorTopBar({
           {status.label}
         </span>
         <span
-          className="hidden text-[12.5px] leading-none text-stone xl:block"
+          className="hidden text-[13px] leading-none text-muted-foreground xl:block"
           aria-live="polite"
         >
           {saving
@@ -136,7 +136,7 @@ export function EditorTopBar({
             aria-label="Annuler la dernière modification"
             title="Annuler (⌘Z / Ctrl+Z)"
             className={cn(
-              'flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-white/90 hover:text-foreground disabled:opacity-30',
+              'flex h-9 w-9 items-center justify-center rounded-[9px] text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground disabled:opacity-30',
               FOCUS_RING,
             )}
           >
@@ -149,7 +149,7 @@ export function EditorTopBar({
             aria-label="Rétablir la modification annulée"
             title="Rétablir (⌘⇧Z / Ctrl+⇧Z)"
             className={cn(
-              'flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-white/90 hover:text-foreground disabled:opacity-30',
+              'flex h-9 w-9 items-center justify-center rounded-[9px] text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground disabled:opacity-30',
               FOCUS_RING,
             )}
           >
@@ -163,7 +163,7 @@ export function EditorTopBar({
         <div
           role="group"
           aria-label="Écran simulé"
-          className="hidden items-center gap-px rounded-md border border-foreground/15 p-[2px] sm:flex"
+          className="hidden items-center gap-0.5 rounded-[10px] bg-secondary p-[3px] sm:flex"
         >
           {VIEWPORT_ICONS.map(({ bp, icon: Icon, label }) => (
             <button
@@ -174,10 +174,10 @@ export function EditorTopBar({
               title={label}
               onClick={() => setViewport(bp)}
               className={cn(
-                'flex h-[30px] w-9 items-center justify-center rounded-[5px] transition-colors',
+                'flex h-[30px] w-9 items-center justify-center rounded-[7px] transition-[background-color,color,box-shadow]',
                 FOCUS_RING,
                 viewport === bp
-                  ? 'bg-foreground text-ivory'
+                  ? 'bg-card text-foreground shadow-xs ring-1 ring-black/[0.04]'
                   : 'text-muted-foreground hover:text-foreground',
               )}
             >

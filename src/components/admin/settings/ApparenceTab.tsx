@@ -238,7 +238,7 @@ function PalettePreview({
 
   return (
     <div className="mt-4">
-      <p className="mb-1.5 text-xs uppercase tracking-[0.1em] text-muted-foreground">
+      <p className="mb-2 text-[12.5px] font-medium text-muted-foreground">
         Aperçu
       </p>
       <div

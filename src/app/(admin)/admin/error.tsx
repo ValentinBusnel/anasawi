@@ -27,7 +27,7 @@ export default function AdminError({
   return (
     <div className="min-h-0 flex-1 overflow-y-auto bg-ivory">
       <div className="mx-auto max-w-[600px] px-8 py-11 pb-24">
-        <h1 className="font-serif text-2xl font-normal leading-tight tracking-[-0.01em]">
+        <h1 className="text-[24px] font-semibold leading-tight tracking-[-0.025em]">
           Une erreur est survenue
         </h1>
         <p className="mt-1.5 text-[13px] text-muted-foreground">

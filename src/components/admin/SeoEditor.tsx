@@ -268,7 +268,7 @@ function Card({
 }) {
   return (
     <section className="rounded-xl border border-border bg-white px-[22px] py-5">
-      <h2 className="text-[12px] font-medium uppercase tracking-[0.08em] text-muted-foreground">
+      <h2 className="text-[15px] font-semibold tracking-[-0.01em] text-foreground">
         {title}
       </h2>
       {note && (

@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 
+import { AuthShell } from '@/components/admin/AuthShell'
 import { InvitationForm } from '@/components/admin/InvitationForm'
-import { LogoMark } from '@/components/site/Logo'
 import { readInvitation } from '@/server/queries/users'
 
 export const metadata: Metadata = {
@@ -25,43 +25,38 @@ export default async function InvitationPage({
   const { token } = await params
   const invitation = await readInvitation(token)
 
-  return (
-    <main className="grain flex min-h-svh items-center justify-center px-6">
-      <div className="w-full max-w-sm">
-        <div className="mb-10 flex flex-col items-center text-center">
-          <LogoMark className="h-10 w-10 text-ink" />
-          <p className="mt-5 font-serif text-[0.95rem] tracking-[0.28em] text-ink">ANASAWI</p>
-          <p className="mt-2 text-[0.78rem] uppercase tracking-[0.16em] text-stone">Administration</p>
-        </div>
+  if (!invitation) {
+    return (
+      <AuthShell
+        title="Ce lien n’est plus valable."
+        description="Il a peut-être déjà servi, ou il a plus de sept jours. Demandez un nouveau lien à la personne qui vous a invité·e."
+        footer={
+          <Link href="/login" className="font-medium text-[#46728a] underline-offset-4 hover:underline">
+            Vous avez déjà un mot de passe ? Se connecter
+          </Link>
+        }
+      >
+        <Link
+          href="/login"
+          className="inline-flex h-11 w-full items-center justify-center rounded-[9px] border border-[#dededa] bg-white text-[14px] font-medium transition-colors hover:bg-[#f2f2f0]"
+        >
+          Aller à la connexion
+        </Link>
+      </AuthShell>
+    )
+  }
 
-        {invitation ? (
-          <>
-            <h1 className="font-serif text-[1.5rem] leading-tight text-ink">
-              Bienvenue, {invitation.name}.
-            </h1>
-            <p className="mt-2 text-[0.9rem] leading-relaxed text-ink-soft">
-              Choisissez le mot de passe qui vous servira à vous connecter avec
-              l’adresse <strong className="font-medium text-ink">{invitation.email}</strong>.
-            </p>
-            <div className="mt-8">
-              <InvitationForm token={token} email={invitation.email} />
-            </div>
-          </>
-        ) : (
-          <>
-            <h1 className="font-serif text-[1.5rem] leading-tight text-ink">Ce lien n’est plus valable.</h1>
-            <p className="mt-2 text-[0.9rem] leading-relaxed text-ink-soft">
-              Il a peut-être déjà servi, ou il a plus de sept jours. Demandez un
-              nouveau lien à la personne qui vous a invité·e.
-            </p>
-            <p className="mt-8 text-[0.85rem]">
-              <Link href="/login" className="text-blue-deep underline-offset-4 hover:underline">
-                Vous avez déjà un mot de passe ? Se connecter
-              </Link>
-            </p>
-          </>
-        )}
-      </div>
-    </main>
+  return (
+    <AuthShell
+      title={`Bienvenue, ${invitation.name}.`}
+      description={
+        <>
+          Choisissez le mot de passe qui vous servira à vous connecter avec
+          l’adresse <strong className="font-medium text-[#191b1a]">{invitation.email}</strong>.
+        </>
+      }
+    >
+      <InvitationForm token={token} email={invitation.email} />
+    </AuthShell>
   )
 }

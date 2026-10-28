@@ -27,9 +27,9 @@ type Payload = Record<string, unknown>
 
 /* Les valeurs exactes de la maquette (`.f`) : label 11,5 px encre douce,
    champ blanc bordé, rayon 8, texte 12,5 px, focus bleu profond. */
-const LABEL_CLASS = 'mb-[5px] block text-[12.5px] font-normal text-ink-soft'
+const LABEL_CLASS = 'mb-1.5 block text-[13px] font-medium text-foreground/80'
 const FIELD_CLASS =
-  'h-auto min-h-0 rounded-[8px] border-line-strong bg-white px-2.5 py-2 text-[12.5px] focus-visible:border-blue-deep focus-visible:ring-0'
+  'h-auto min-h-0 rounded-[9px] px-2.5 py-2 text-[13.5px]'
 
 /**
  * Formulaire généré à partir des descripteurs de champs du bloc.
@@ -134,7 +134,7 @@ function FieldControl({
         <div className="flex items-center justify-between gap-3 py-0.5">
           <Label
             htmlFor={id}
-            className="cursor-pointer text-[12.5px] font-normal text-ink-soft"
+            className="cursor-pointer text-[13px] font-normal text-foreground/80"
           >
             {field.label}
           </Label>
@@ -192,7 +192,7 @@ function FieldControl({
           >
             <SelectTrigger
               id={id}
-              className="h-auto rounded-[8px] border-line-strong bg-white px-2.5 py-2 text-[12.5px]"
+              className="h-auto rounded-[9px] px-2.5 py-2 text-[13.5px]"
             >
               <SelectValue placeholder="Choisir…" />
             </SelectTrigger>
@@ -395,7 +395,7 @@ function ListField({
   return (
     <div>
       <div className="mb-2 flex items-center justify-between">
-        <Label className="text-[12.5px] font-normal text-ink-soft">
+        <Label className="text-[13px] font-medium text-foreground/80">
           {field.label}
         </Label>
         <Button
@@ -441,7 +441,7 @@ function ListField({
                     copy[index] = { ...item, [sub.name]: e.target.value }
                     onChange(copy)
                   }}
-                  className="h-8 min-w-0 flex-1 rounded-[8px] border border-line-strong bg-white px-2.5 text-[12.5px] outline-none transition-colors focus:border-blue-deep"
+                  className="h-9 min-w-0 flex-1 rounded-[9px] border border-input bg-card px-2.5 text-[13.5px] shadow-xs outline-none transition-[border-color,box-shadow] focus:border-ring focus:ring-[3px] focus:ring-ring/25"
                 />
                 <RowControls
                   index={index}
@@ -562,7 +562,7 @@ function MediaListField({
   return (
     <div>
       <div className="mb-2 flex items-center justify-between">
-        <Label className="text-[12.5px] font-normal text-ink-soft">
+        <Label className="text-[13px] font-medium text-foreground/80">
           {field.label}
         </Label>
         <Button

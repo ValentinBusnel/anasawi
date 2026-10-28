@@ -25,7 +25,7 @@ export function LogoPreview({ url }: { url?: string | null }) {
 
   return (
     <div className="mt-3">
-      <p className="mb-2 text-[12px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+      <p className="mb-2 text-[13px] font-medium text-foreground/80">
         Ce que verront vos visiteurs
       </p>
 

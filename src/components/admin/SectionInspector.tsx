@@ -410,12 +410,12 @@ export function SectionInspector({
 
   return (
     <>
-      <div className="flex shrink-0 items-start justify-between gap-2 border-b border-border px-4 py-3">
+      <div className="flex shrink-0 items-start justify-between gap-2 border-b border-border bg-card px-4 py-3.5">
         <div className="min-w-0">
           {/* Le nom de LA section (celui de la liste), puis le modèle dont
               elle vient — pas l'inverse : « Hero — L'arche » ne dit pas
               à Anne qu'elle est en train de modifier son ouverture. */}
-          <h2 className="truncate font-serif text-[15px]">{section.name ?? block.label}</h2>
+          <h2 className="truncate text-[15px] font-semibold tracking-[-0.01em]">{section.name ?? block.label}</h2>
           {section.name && (
             <p className="truncate text-[12.5px] text-muted-foreground">Modèle : {block.label}</p>
           )}
@@ -424,7 +424,7 @@ export function SectionInspector({
           type="button"
           onClick={onClose}
           aria-label="Fermer le panneau"
-          className="shrink-0 rounded-md p-1 text-stone transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-deep/50"
+          className="-mr-1 grid h-8 w-8 shrink-0 place-items-center rounded-[8px] text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/30"
         >
           <X className="h-[15px] w-[15px]" strokeWidth={1.7} />
         </button>

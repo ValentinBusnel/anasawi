@@ -31,7 +31,7 @@ export function DiscardDialog({
     >
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="font-serif text-[1.05rem] font-normal">
+          <DialogTitle>
             Annuler les modifications non publiées ?
           </DialogTitle>
           <DialogDescription className="text-[0.82rem] leading-relaxed">

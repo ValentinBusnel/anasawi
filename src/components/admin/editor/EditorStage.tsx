@@ -91,7 +91,7 @@ export function EditorStage({
       {editing && roots.length === 0 && (
         <div className="flex h-full min-h-[360px] items-center justify-center">
           <div className="max-w-sm rounded-[14px] border border-dashed border-line-strong bg-ivory/80 px-8 py-9 text-center">
-            <p className="font-serif text-[1.15rem] text-foreground">
+            <p className="text-[17px] font-semibold tracking-[-0.015em] text-foreground">
               Cette page est vide.
             </p>
             <p className="mt-2 text-[12.5px] leading-relaxed text-ink-soft">

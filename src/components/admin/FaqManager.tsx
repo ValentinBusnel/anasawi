@@ -18,6 +18,7 @@ import { ConfirmDelete } from './ConfirmDelete'
 import { FieldError } from './form/FieldError'
 import { useActionForm } from './hooks/useActionForm'
 import { useSortableSensors } from './hooks/useSortableSensors'
+import { Notice } from './Notice'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -144,9 +145,9 @@ export function FaqManager({ items: initial }: { items: FaqItem[] }) {
 
   return (
     <>
-      <p className="mb-4 rounded-lg border border-blue-deep/20 bg-blue-mist/30 px-3.5 py-2.5 text-[12.5px] leading-[1.5] text-foreground">
+      <Notice className="mb-5">
         Les modifications sont visibles sur le site dès que vous enregistrez.
-      </p>
+      </Notice>
 
       {/* Sur téléphone, le texte et le bouton passent l'un sous l'autre. */}
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

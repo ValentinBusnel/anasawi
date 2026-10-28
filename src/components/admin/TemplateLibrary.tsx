@@ -129,27 +129,27 @@ export function TemplateLibrary({
       aria-label={`Ajouter la section « ${option.label} »`}
       onClick={() => void pick(() => onPick(option.type, option.label), option.type)}
       className={cn(
-        'group relative rounded-[11px] border border-border p-2.5 text-left transition-[border-color,transform] duration-150',
-        'hover:-translate-y-0.5 hover:border-blue-deep focus-visible:border-blue-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-deep/40',
+        'group relative rounded-[14px] border border-border bg-card p-2 text-left shadow-xs transition-[border-color,box-shadow] duration-150',
+        'hover:border-primary/40 hover:shadow-pop focus-visible:border-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/30',
         busy === option.type && 'opacity-60',
       )}
     >
       <TemplatePreview type={option.type} data={data} />
-      <div className="mt-2.5 flex items-start gap-2">
+      <div className="flex items-start gap-3 px-2 pb-1.5 pt-3">
         <div className="min-w-0 flex-1">
-          <p className="text-[13px] font-medium text-foreground">{option.label}</p>
-          <p className="mt-0.5 line-clamp-2 text-[12px] leading-[1.5] text-muted-foreground">
+          <p className="text-[14px] font-medium text-foreground">{option.label}</p>
+          <p className="mt-0.5 line-clamp-2 text-[13px] leading-[1.5] text-muted-foreground">
             {option.description}
           </p>
         </div>
         {/* L'action, écrite : on ajoute, on ne « sélectionne » pas. */}
         <span
           aria-hidden="true"
-          className="mt-0.5 flex shrink-0 items-center gap-1 rounded-md border border-line-strong px-2 py-1 text-[12px] text-ink-soft transition-colors group-hover:border-blue-deep group-hover:bg-blue-deep group-hover:text-white group-focus-visible:border-blue-deep group-focus-visible:bg-blue-deep group-focus-visible:text-white"
+          className="mt-0.5 flex h-8 shrink-0 items-center gap-1.5 rounded-[8px] bg-secondary px-3 text-[13px] font-medium text-foreground transition-colors group-hover:bg-primary group-hover:text-white group-focus-visible:bg-primary group-focus-visible:text-white"
         >
           {busy === option.type ? 'Ajout…' : (
             <>
-              <Plus className="h-3 w-3" strokeWidth={2} /> Ajouter
+              <Plus className="h-3.5 w-3.5" strokeWidth={2} /> Ajouter
             </>
           )}
         </span>
@@ -161,7 +161,7 @@ export function TemplateLibrary({
     <div
       key={model.id}
       className={cn(
-        'group relative rounded-[11px] border border-border p-2.5 transition-[border-color,transform] duration-150 hover:-translate-y-0.5 hover:border-blue-deep',
+        'group relative rounded-[14px] border border-border bg-card p-2 shadow-xs transition-[border-color,box-shadow] duration-150 hover:border-primary/40 hover:shadow-pop',
         busy === model.id && 'opacity-60',
       )}
     >
@@ -177,11 +177,11 @@ export function TemplateLibrary({
           payloadOverride={model.payload}
           backgroundColor={model.backgroundColor}
         />
-        <p className="mt-2.5 flex items-center gap-1.5 text-[0.82rem] font-medium text-foreground">
+        <p className="mt-3 flex items-center gap-1.5 px-2 text-[14px] font-medium text-foreground">
           <Bookmark className="h-3 w-3 text-blue-deep" />
           {model.name}
         </p>
-        <p className="mt-0.5 text-[0.72rem] text-muted-foreground">
+        <p className="mt-0.5 px-2 pb-1.5 text-[13px] text-muted-foreground">
           {getBlock(model.type)?.label ?? model.type}
         </p>
       </button>
@@ -236,20 +236,20 @@ export function TemplateLibrary({
       {/* Large et haute : on choisit un modèle à ce qu'on voit, pas à son
           nom — les aperçus ont besoin de place. */}
       <DialogContent className="flex h-[90vh] w-[94vw] max-w-[1480px] flex-col gap-0 overflow-hidden p-0">
-        <DialogHeader className="shrink-0 space-y-0 border-b border-border px-5 py-3">
+        <DialogHeader className="shrink-0 space-y-0 border-b border-border px-6 py-4">
           <div className="flex items-center justify-between gap-6 pr-8">
-            <DialogTitle className="shrink-0 font-serif text-[1.05rem] font-normal">
+            <DialogTitle className="shrink-0">
               Que voulez-vous ajouter ?
             </DialogTitle>
-            <div className="relative w-64">
-              <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+            <div className="relative w-72 max-w-[45vw]">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <input
                 autoFocus
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Rechercher… (ex. photo, contact)"
                 aria-label="Rechercher un modèle"
-                className="h-8 w-full rounded-md border border-border bg-transparent pl-8 pr-3 text-[0.8rem] outline-none transition-colors placeholder:text-muted-foreground focus:border-foreground/40"
+                className="h-10 w-full rounded-[9px] border border-input bg-card pl-9 pr-3 text-[14px] shadow-xs outline-none transition-[border-color,box-shadow] placeholder:text-muted-foreground/80 focus:border-ring focus:ring-[3px] focus:ring-ring/25"
               />
             </div>
           </div>
@@ -258,8 +258,8 @@ export function TemplateLibrary({
         <div className="flex min-h-0 flex-1">
           {/* Catégories */}
           {!searching && (
-            <nav className="w-44 shrink-0 space-y-0.5 overflow-y-auto border-r border-border p-2.5">
-              <p className="px-2.5 pb-1 pt-2 text-[12px] uppercase tracking-[0.09em] text-muted-foreground">
+            <nav className="w-56 shrink-0 space-y-px overflow-y-auto border-r border-border bg-sidebar p-3">
+              <p className="px-2.5 pb-1 pt-2 text-[12px] font-medium text-muted-foreground">
                 Une section pour…
               </p>
               {templateLibrary.map((group) => (
@@ -268,38 +268,38 @@ export function TemplateLibrary({
                   type="button"
                   onClick={() => setActive(group.category)}
                   className={cn(
-                    'flex w-full items-center justify-between rounded-md px-2.5 py-1.5 text-left text-[0.78rem] transition-colors',
+                    'flex h-9 w-full items-center justify-between rounded-[9px] px-2.5 text-left text-[13.5px] transition-colors',
                     active === group.category
-                      ? 'bg-white text-foreground shadow-[0_1px_2px_rgba(28,32,30,0.05)]'
-                      : 'text-muted-foreground hover:text-foreground',
+                      ? 'bg-card font-medium text-foreground shadow-xs ring-1 ring-border'
+                      : 'text-ink-soft hover:bg-black/[0.04] hover:text-foreground',
                   )}
                 >
                   {group.category}
-                  <span className="text-[12px] text-muted-foreground">
+                  <span className="text-[12px] tabular-nums text-muted-foreground">
                     {group.options.length}
                   </span>
                 </button>
               ))}
               {saved.length > 0 && (
                 <>
-                  <p className="px-2.5 pb-1 pt-3 text-[12px] uppercase tracking-[0.09em] text-muted-foreground">
+                  <p className="px-2.5 pb-1 pt-3 text-[12px] font-medium text-muted-foreground">
                     Personnel
                   </p>
                   <button
                     type="button"
                     onClick={() => setActive(MINE)}
                     className={cn(
-                      'flex w-full items-center justify-between rounded-md px-2.5 py-1.5 text-left text-[0.78rem] transition-colors',
+                      'flex h-9 w-full items-center justify-between rounded-[9px] px-2.5 text-left text-[13.5px] transition-colors',
                       active === MINE
-                        ? 'bg-white text-foreground shadow-[0_1px_2px_rgba(28,32,30,0.05)]'
-                        : 'text-muted-foreground hover:text-foreground',
+                        ? 'bg-card font-medium text-foreground shadow-xs ring-1 ring-border'
+                        : 'text-ink-soft hover:bg-black/[0.04] hover:text-foreground',
                     )}
                   >
                     <span className="flex items-center gap-1.5">
                       <Bookmark className="h-3 w-3" />
                       Mes modèles
                     </span>
-                    <span className="text-[12px] text-muted-foreground">
+                    <span className="text-[12px] tabular-nums text-muted-foreground">
                       {saved.length}
                     </span>
                   </button>
@@ -309,7 +309,7 @@ export function TemplateLibrary({
           )}
 
           {/* Previews */}
-          <div className="min-h-0 flex-1 overflow-y-auto p-4">
+          <div className="min-h-0 flex-1 overflow-y-auto bg-background p-6">
             {searching && results ? (
               results.options.length + results.mine.length === 0 ? (
                 <div className="py-16 text-center">
@@ -332,7 +332,7 @@ export function TemplateLibrary({
               )
             ) : active === MINE ? (
               <>
-                <p className="mb-4 text-[13px] text-muted-foreground">
+                <p className="mb-5 text-[14px] text-muted-foreground">
                   Les sections que vous avez enregistrées comme modèles, avec
                   leur contenu — pour les réutiliser telles quelles.
                 </p>
@@ -344,7 +344,7 @@ export function TemplateLibrary({
               <>
                 {/* Ce que la catégorie sert à faire, en une phrase : on
                     cherche « une section pour… », pas un nom de modèle. */}
-                <p className="mb-4 text-[13px] text-muted-foreground">
+                <p className="mb-5 text-[14px] text-muted-foreground">
                   {CATEGORY_HINT[active as TemplateCategory]}
                 </p>
                 <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
@@ -492,12 +492,15 @@ function TemplatePreview({
   return (
     <div
       ref={frameRef}
-      className="pointer-events-none relative overflow-hidden rounded-md border border-border bg-white"
+      className="pointer-events-none relative overflow-hidden rounded-[10px] bg-white ring-1 ring-black/[0.05]"
       style={{ height: box.height }}
       aria-hidden="true"
     >
+      {/* `site-tokens` : l'aperçu garde les couleurs et la typographie du
+          site, pas celles de l'outil. */}
       <div
         ref={innerRef}
+        className="site-tokens bg-ivory"
         style={{
           width: PREVIEW_WIDTH,
           transform: `scale(${box.scale})`,

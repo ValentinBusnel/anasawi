@@ -248,7 +248,7 @@ export function SectionRail({
     >
       <div data-rail-scroll className="min-h-0 flex-1 overflow-y-auto px-3 pb-4 pt-4">
         <div className="flex items-center justify-between px-2 pb-2.5">
-          <h3 className="text-[12px] font-medium uppercase tracking-[0.1em] text-stone">
+          <h3 className="text-[13px] font-semibold text-foreground">
             Sections de la page
           </h3>
           {floating && onCollapse && (
