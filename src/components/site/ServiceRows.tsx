@@ -104,9 +104,9 @@ export function ServiceRows({
 
   return (
     <>
-      {/* Survol réduit à l'essentiel : le titre prend le bleu, la flèche
-          avance. Plus de carte flottante, plus de rangée qui s'assombrit,
-          s'arrondit et passe en italique — un clic ouvre la fiche. */}
+      {/* Survol franc mais sobre : la rangée prend le fond sable, le titre
+          passe au bleu et glisse, la pastille de la flèche se remplit. Pas
+          de carte flottante — un clic ouvre la fiche. */}
       <div className="mt-10 md:mt-12">
         {items.map((service, i) => {
           const last = i === items.length - 1
@@ -119,20 +119,20 @@ export function ServiceRows({
             service.groupId && service.groupId !== items[i - 1]?.groupId
               ? service.group?.label.trim() || null
               : null
-          const rowClass = `group grid grid-cols-1 gap-y-2 border-line px-[var(--spacing-gutter)] py-7 text-left md:py-9 lg:grid-cols-12 lg:items-baseline lg:gap-x-5 ${
+          const rowClass = `group relative grid grid-cols-1 gap-y-2 border-line px-[var(--spacing-gutter)] py-7 text-left transition-colors duration-300 ease-out hover:bg-sand md:py-9 lg:grid-cols-12 lg:items-center lg:gap-x-5 ${
             /* L'intitulé de famille porte déjà le filet du dessus. */
             groupStart ? '' : 'border-t'
           } ${last ? 'border-b' : ''}`
 
           const inner = (
             <>
-              <span className="font-serif text-[16px] font-light italic text-stone lg:col-span-1">
+              <span className="font-serif text-[16px] font-light italic text-stone transition-colors duration-300 group-hover:text-blue-deep lg:col-span-1">
                 {numberWordFr(i)}
               </span>
 
               {/* Plus petit que l'intitulé de famille : la hiérarchie se lit
                   à la taille, puisqu'il n'y a plus de filet pour la marquer. */}
-              <h3 className="font-serif text-[clamp(23px,2.5vw,35px)] font-light leading-[1.15] transition-colors duration-200 group-hover:text-blue-deep lg:col-span-7">
+              <h3 className="font-serif text-[clamp(23px,2.5vw,35px)] font-light leading-[1.15] transition-[color,transform] duration-300 ease-out group-hover:translate-x-2 group-hover:text-blue-deep lg:col-span-7">
                 {service.title}
               </h3>
 
@@ -141,7 +141,7 @@ export function ServiceRows({
                   résumé ne s'affiche qu'en petit écran, sous le titre. */}
               <div className="lg:col-span-3">
                 {service.method && (
-                  <span className="hidden text-[10px] font-semibold uppercase tracking-[0.18em] text-stone lg:block lg:text-right">
+                  <span className="hidden text-[10px] font-semibold uppercase tracking-[0.18em] text-stone transition-colors duration-300 group-hover:text-blue-deep lg:block lg:text-right">
                     {service.method}
                   </span>
                 )}
@@ -156,11 +156,17 @@ export function ServiceRows({
                 </p>
               </div>
 
-              <span
-                aria-hidden="true"
-                className="mt-1 block text-left font-serif text-[22px] text-stone transition-[transform,color] duration-200 ease-out group-hover:translate-x-1 group-hover:text-blue-deep lg:mt-0 lg:col-span-1 lg:text-right"
-              >
-                →
+              {/* La flèche dans une pastille qui se remplit au survol :
+                  le signal « ouvrir » se voit de loin, sans décor ajouté. */}
+              <span className="mt-2 flex lg:col-span-1 lg:mt-0 lg:justify-end">
+                <span
+                  aria-hidden="true"
+                  className="grid size-11 place-items-center rounded-full border border-line-strong font-serif text-[19px] text-stone transition-colors duration-300 ease-out group-hover:border-blue-deep group-hover:bg-blue-deep group-hover:text-ivory group-focus-visible:border-blue-deep group-focus-visible:bg-blue-deep group-focus-visible:text-ivory"
+                >
+                  <span className="block transition-transform duration-300 ease-out group-hover:translate-x-0.5">
+                    →
+                  </span>
+                </span>
               </span>
             </>
           )
