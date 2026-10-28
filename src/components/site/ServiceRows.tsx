@@ -107,8 +107,8 @@ export function ServiceRows({
       {/* Survol : le bleu profond du site balaie la rangée de gauche à
           droite (un fond en dégradé dont la largeur s'anime — aucun calque
           ajouté, le texte reste au-dessus), le texte passe en ivoire, le
-          titre glisse et la pastille s'éclaire. Un seul mouvement, lent et
-          doux. Un clic ouvre la fiche. */}
+          titre glisse et la pastille s'éclaire. Un seul mouvement, lent, à
+          départ et arrivée adoucis (in-out) : rien ne claque. Un clic ouvre la fiche. */}
       <div className="mt-10 md:mt-12">
         {items.map((service, i) => {
           const last = i === items.length - 1
@@ -121,20 +121,20 @@ export function ServiceRows({
             service.groupId && service.groupId !== items[i - 1]?.groupId
               ? service.group?.label.trim() || null
               : null
-          const rowClass = `group relative grid grid-cols-1 gap-y-2 border-line px-[var(--spacing-gutter)] py-7 text-left bg-[linear-gradient(var(--color-blue-deep),var(--color-blue-deep))] bg-[length:0%_100%] bg-left bg-no-repeat transition-[background-size] duration-500 ease-[var(--ease)] hover:bg-[length:100%_100%] focus-visible:bg-[length:100%_100%] md:py-9 lg:grid-cols-12 lg:items-center lg:gap-x-5 ${
+          const rowClass = `group relative grid grid-cols-1 gap-y-2 border-line px-[var(--spacing-gutter)] py-7 text-left bg-[linear-gradient(var(--color-blue-deep),var(--color-blue-deep))] bg-[length:0%_100%] bg-left bg-no-repeat transition-[background-size] duration-[850ms] ease-[cubic-bezier(0.65,0,0.35,1)] hover:bg-[length:100%_100%] focus-visible:bg-[length:100%_100%] md:py-9 lg:grid-cols-12 lg:items-center lg:gap-x-5 ${
             /* L'intitulé de famille porte déjà le filet du dessus. */
             groupStart ? '' : 'border-t'
           } ${last ? 'border-b' : ''}`
 
           const inner = (
             <>
-              <span className="font-serif text-[16px] font-light italic text-stone transition-colors duration-500 ease-[var(--ease)] group-hover:text-ivory/70 group-focus-visible:text-ivory/70 lg:col-span-1">
+              <span className="font-serif text-[16px] font-light italic text-stone transition-colors duration-700 ease-[cubic-bezier(0.65,0,0.35,1)] group-hover:text-ivory/70 group-focus-visible:text-ivory/70 lg:col-span-1">
                 {numberWordFr(i)}
               </span>
 
               {/* Plus petit que l'intitulé de famille : la hiérarchie se lit
                   à la taille, puisqu'il n'y a plus de filet pour la marquer. */}
-              <h3 className="font-serif text-[clamp(23px,2.5vw,35px)] font-light leading-[1.15] transition-[color,transform] duration-500 ease-[var(--ease)] group-hover:translate-x-2 group-hover:text-ivory group-focus-visible:text-ivory lg:col-span-7">
+              <h3 className="font-serif text-[clamp(23px,2.5vw,35px)] font-light leading-[1.15] transition-[color,transform] duration-700 ease-[cubic-bezier(0.65,0,0.35,1)] group-hover:translate-x-1.5 group-hover:text-ivory group-focus-visible:text-ivory lg:col-span-7">
                 {service.title}
               </h3>
 
@@ -143,12 +143,12 @@ export function ServiceRows({
                   résumé ne s'affiche qu'en petit écran, sous le titre. */}
               <div className="lg:col-span-3">
                 {service.method && (
-                  <span className="hidden text-[10px] font-semibold uppercase tracking-[0.18em] text-stone transition-colors duration-500 ease-[var(--ease)] group-hover:text-ivory/75 group-focus-visible:text-ivory/75 lg:block lg:text-right">
+                  <span className="hidden text-[10px] font-semibold uppercase tracking-[0.18em] text-stone transition-colors duration-700 ease-[cubic-bezier(0.65,0,0.35,1)] group-hover:text-ivory/75 group-focus-visible:text-ivory/75 lg:block lg:text-right">
                     {service.method}
                   </span>
                 )}
 
-                <p className="mt-1 max-w-[40ch] text-[14.5px] leading-[1.75] text-stone transition-colors duration-500 group-hover:text-ivory/80 lg:hidden">
+                <p className="mt-1 max-w-[40ch] text-[14.5px] leading-[1.75] text-stone transition-colors duration-700 ease-[cubic-bezier(0.65,0,0.35,1)] group-hover:text-ivory/80 lg:hidden">
                   {service.excerpt}
                   {service.duration ? (
                     <span className="mt-2 block text-[10.5px] font-semibold uppercase tracking-[0.2em] opacity-80">
@@ -163,9 +163,9 @@ export function ServiceRows({
               <span className="mt-2 flex lg:col-span-1 lg:mt-0 lg:justify-end">
                 <span
                   aria-hidden="true"
-                  className="grid size-11 place-items-center rounded-full border border-line-strong font-serif text-[19px] text-stone transition-colors duration-500 ease-[var(--ease)] group-hover:border-ivory group-hover:bg-ivory group-hover:text-blue-deep group-focus-visible:border-ivory group-focus-visible:bg-ivory group-focus-visible:text-blue-deep"
+                  className="grid size-11 place-items-center rounded-full border border-line-strong font-serif text-[19px] text-stone transition-colors duration-700 ease-[cubic-bezier(0.65,0,0.35,1)] group-hover:border-ivory group-hover:bg-ivory group-hover:text-blue-deep group-focus-visible:border-ivory group-focus-visible:bg-ivory group-focus-visible:text-blue-deep"
                 >
-                  <span className="block transition-transform duration-500 ease-[var(--ease)] group-hover:translate-x-0.5">
+                  <span className="block transition-transform duration-700 ease-[cubic-bezier(0.65,0,0.35,1)] group-hover:translate-x-0.5">
                     →
                   </span>
                 </span>
