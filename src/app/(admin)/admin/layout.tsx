@@ -3,8 +3,7 @@ import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
 import { Toaster } from 'sonner'
 
-import { AdminPillShell } from '@/components/admin/AdminPillShell'
-import { AdminSidebar } from '@/components/admin/AdminSidebar'
+import { AdminTopBar } from '@/components/admin/AdminTopBar'
 import { NavigationProgress } from '@/components/admin/NavigationProgress'
 import { PaletteProvider } from '@/components/admin/PaletteProvider'
 import { auth } from '@/lib/auth'
@@ -49,7 +48,7 @@ export default async function AdminLayout({
 
   return (
     <PaletteProvider palette={paletteFromIdentity(settings.identity)}>
-      <div className="admin-shell relative flex h-svh flex-col overflow-hidden bg-background text-foreground antialiased lg:flex-row">
+      <div className="admin-shell relative flex h-svh flex-col overflow-hidden bg-background text-foreground antialiased">
         {/* Le fil de progression lit l'adresse (`useSearchParams`) : la
             frontière Suspense est exigée par Next, même sur un layout
             déjà dynamique. */}
@@ -57,27 +56,24 @@ export default async function AdminLayout({
           <NavigationProgress />
         </Suspense>
 
-        <AdminSidebar userName={userName} nonLus={nonLus} />
+        <AdminTopBar userName={userName} nonLus={nonLus} />
 
         {/* Repère « contenu principal » pour les lecteurs d'écran : la
-            barre latérale est la navigation, ceci est l'écran. */}
-        <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
+            barre du haut est la navigation, ceci est l'écran. */}
+        <main className="flex min-w-0 flex-1 flex-col overflow-hidden max-lg:pb-[80px]">
           {children}
         </main>
-
-        {/* La pastille flottante, sur tous les écrans : voir le site,
-            menu du compte. */}
-        <AdminPillShell name={userName} email={session.user.email ?? undefined} />
 
         {/* Notifications sobres : une carte blanche, l'icône porte la
             couleur (succès, erreur) — pas de fond vert ou rouge plein. */}
         <Toaster
-          position="bottom-right"
+          position="top-right"
+          offset={84}
           closeButton
           toastOptions={{
             classNames: {
               toast:
-                'admin-toast !rounded-[12px] !border !border-border !bg-card !text-foreground !shadow-pop !text-[13.5px] !font-sans',
+                'admin-toast !rounded-[12px] !border-0 !bg-white !text-foreground !shadow-pop !text-[14px] !font-medium',
               description: '!text-muted-foreground',
               success: '[&_[data-icon]]:!text-success',
               error: '[&_[data-icon]]:!text-destructive',

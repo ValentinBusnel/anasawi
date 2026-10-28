@@ -43,7 +43,7 @@ export function Choice<T extends string>({
       <Label
         htmlFor={id}
         className={cn(
-          'mb-2 block text-[13px] font-medium text-foreground/80',
+          'mb-[7px] block text-[12.5px] font-medium text-muted-foreground',
           hideLabel && 'sr-only',
         )}
       >

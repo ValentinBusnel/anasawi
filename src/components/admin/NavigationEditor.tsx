@@ -97,7 +97,7 @@ export function NavigationEditor({
           return (
             <li
               key={i}
-              className="rounded-xl border border-border bg-white px-[18px] py-4"
+              className="rounded-[24px] bg-block p-6"
             >
               <div className="mb-3 flex items-center justify-between gap-3">
                 <p className="text-[13px] font-semibold text-foreground">

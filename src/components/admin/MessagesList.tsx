@@ -19,7 +19,7 @@ export function MessagesList({ messages }: { messages: ContactMessage[] }) {
 
   if (items.length === 0) {
     return (
-      <div className="rounded-xl border border-border bg-white px-6 py-14 text-center">
+      <div className="rounded-[24px] bg-block px-6 py-16 text-center">
         <p className="text-[13px] text-muted-foreground">
           Aucun message pour l’instant — ils arriveront ici quand un visiteur
           vous écrira.
@@ -29,14 +29,14 @@ export function MessagesList({ messages }: { messages: ContactMessage[] }) {
   }
 
   return (
-    <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-white">
+    <ul className="list-block">
       {items.map((message) => {
         const open = openId === message.id
 
         return (
           <li
             key={message.id}
-            className={cn(!message.isRead && 'bg-blue-mist/30')}
+            className={cn(!message.isRead && 'ring-1 ring-[#46728a]/25')}
           >
             <button
               type="button"
@@ -64,11 +64,11 @@ export function MessagesList({ messages }: { messages: ContactMessage[] }) {
                 }
               }}
               aria-expanded={open}
-              className="flex w-full items-center gap-3 px-5 py-3.5 text-left transition-colors duration-150 hover:bg-ivory/50"
+              className="flex w-full items-center gap-3 rounded-[16px] px-5 py-3.5 text-left transition-colors duration-150 hover:bg-[rgba(33,58,71,0.03)]"
             >
               <span className="min-w-0 flex-1">
                 <span className="flex items-center gap-2">
-                  <span className="truncate text-[13px] font-medium">
+                  <span className="truncate text-[14px] font-medium">
                     {message.name}
                   </span>
                   {!message.isRead && <Badge>Nouveau</Badge>}

@@ -26,9 +26,9 @@ export function AdminLoading({
         className="animate-pulse"
       >
         {/* En-tête : titre + phrase d'accompagnement */}
-        <div className="mb-8">
-          <div className="h-7 w-52 rounded-[8px] bg-foreground/[0.07]" />
-          <div className="mt-3 h-4 w-80 max-w-full rounded-[6px] bg-foreground/[0.05]" />
+        <div className="mb-6">
+          <div className="h-9 w-64 rounded-[10px] bg-block" />
+          <div className="mt-3 h-4 w-96 max-w-full rounded-[6px] bg-block" />
         </div>
 
         {/* Trois cartes, comme les blocs blancs des écrans réels */}
@@ -36,11 +36,11 @@ export function AdminLoading({
           {[0, 1, 2].map((i) => (
             <div
               key={i}
-              className="rounded-[14px] border border-border bg-card p-6 shadow-xs"
+              className="rounded-[24px] bg-block p-6"
             >
-              <div className="h-4 w-40 rounded-[6px] bg-foreground/[0.07]" />
-              <div className="mt-4 h-3 w-full rounded-[6px] bg-foreground/[0.045]" />
-              <div className="mt-2.5 h-3 w-4/5 rounded-[6px] bg-foreground/[0.045]" />
+              <div className="h-4 w-40 rounded-[6px] bg-white" />
+              <div className="mt-4 h-[42px] w-full rounded-[10px] bg-white" />
+              <div className="mt-3 h-[42px] w-4/5 rounded-[10px] bg-white" />
             </div>
           ))}
         </div>

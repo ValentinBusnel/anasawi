@@ -16,7 +16,7 @@ export default async function LoginPage() {
 
   return (
     <AuthShell
-      title="Connexion"
+      title="Bienvenue"
       description="Connectez-vous pour modifier votre site."
     >
       <LoginForm />

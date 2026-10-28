@@ -53,7 +53,7 @@ export function Field({
       />
       <FieldError id={errorId} messages={error} />
       {help && (
-        <p id={helpId} className="mt-1.5 text-[12.5px] leading-[1.5] text-muted-foreground">
+        <p id={helpId} className="mt-1.5 text-[12px] leading-[17px] text-muted-foreground">
           {help}
         </p>
       )}

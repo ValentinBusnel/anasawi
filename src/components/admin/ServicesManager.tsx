@@ -284,7 +284,7 @@ export function ServicesManager({
       </div>
 
       {vide ? (
-        <div className="rounded-lg border border-border bg-white px-6 py-14 text-center">
+        <div className="rounded-[24px] bg-block px-6 py-16 text-center">
           <p className="text-[13px] leading-[1.6] text-muted-foreground">
             Aucun accompagnement pour l’instant. Créez le premier pour le
             présenter sur votre site.

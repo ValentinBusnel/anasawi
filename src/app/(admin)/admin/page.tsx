@@ -144,7 +144,7 @@ export default async function DashboardPage() {
         title={prenom ? `Bonjour ${prenom}` : 'Bonjour'}
         description="Voici où en est votre site aujourd’hui."
         action={
-          <Link href="/" className={buttonVariants({ variant: 'outline' })}>
+          <Link href="/" className={buttonVariants({ variant: 'secondary' })}>
             <Eye strokeWidth={1.75} />
             Voir le site
           </Link>
@@ -154,7 +154,7 @@ export default async function DashboardPage() {
       {/* ── L'état du site, et l'action principale ─────────────────── */}
       <section
         aria-label="État du site"
-        className="rounded-[16px] border border-border bg-card p-6 shadow-xs sm:p-7"
+        className="rounded-[24px] bg-block p-6 sm:p-7"
       >
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
@@ -164,8 +164,8 @@ export default async function DashboardPage() {
               <span aria-hidden="true">·</span>
               {pluriel(stats.sections, 'section', 'sections')}
             </p>
-            <h2 className="mt-2 text-[19px] tracking-[-0.02em]">{etat.titre}</h2>
-            <p className="mt-1 text-[14px] text-muted-foreground">{etat.texte}</p>
+            <h2 className="mt-2 text-[22px] leading-[28px]">{etat.titre}</h2>
+            <p className="mt-1 text-[15px] text-muted-foreground">{etat.texte}</p>
           </div>
           <Link
             href="/admin/accueil"
@@ -178,26 +178,26 @@ export default async function DashboardPage() {
       </section>
 
       {/* ── À faire ────────────────────────────────────────────────── */}
-      <section aria-labelledby="a-faire" className="mt-10">
-        <h2 id="a-faire" className="text-[15px] tracking-[-0.01em]">
+      <section aria-labelledby="a-faire">
+        <h2 id="a-faire" className="text-[16px]">
           À faire
         </h2>
         {aFaire.length === 0 ? (
-          <p className="mt-3 flex items-center gap-2.5 rounded-[14px] border border-dashed border-border px-5 py-4 text-[14px] text-muted-foreground">
+          <p className="mt-3 flex items-center gap-2.5 rounded-[24px] bg-block px-6 py-5 text-[14px] font-medium text-muted-foreground">
             <CheckCircle2 className="h-[18px] w-[18px] text-success" strokeWidth={1.75} />
             Rien d’urgent — tout est à jour.
           </p>
         ) : (
-          <ul className="mt-3 divide-y divide-border overflow-hidden rounded-[14px] border border-border bg-card shadow-xs">
+          <ul className="list-block mt-3">
             {aFaire.map((item) => {
               const Icone = item.icone
               return (
                 <li key={item.href + item.texte}>
                   <Link
                     href={item.href}
-                    className="group flex items-center gap-4 px-5 py-4 transition-colors hover:bg-secondary/60 focus-visible:bg-secondary/60 focus-visible:outline-none"
+                    className="group flex items-center gap-4 rounded-[16px] px-4 py-3.5 transition-shadow hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
-                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[10px] bg-primary/10 text-primary">
+                    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[12px] bg-accent text-primary">
                       <Icone className="h-[18px] w-[18px]" strokeWidth={1.75} />
                     </span>
                     <span className="min-w-0 flex-1">
@@ -214,20 +214,20 @@ export default async function DashboardPage() {
       </section>
 
       {/* ── Accès ─────────────────────────────────────────────────── */}
-      <section aria-labelledby="acces" className="mt-10">
-        <h2 id="acces" className="text-[15px] tracking-[-0.01em]">
+      <section aria-labelledby="acces">
+        <h2 id="acces" className="text-[16px]">
           Gérer le contenu
         </h2>
-        <ul className="mt-3 divide-y divide-border overflow-hidden rounded-[14px] border border-border bg-card shadow-xs">
+        <ul className="list-block mt-3">
           {acces.map((item) => {
             const Icone = item.icone
             return (
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="group flex items-center gap-4 px-5 py-3.5 transition-colors hover:bg-secondary/60 focus-visible:bg-secondary/60 focus-visible:outline-none"
+                  className="group flex items-center gap-4 rounded-[16px] px-4 py-3 transition-shadow hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
-                  <Icone className="h-[18px] w-[18px] shrink-0 text-muted-foreground transition-colors group-hover:text-primary" strokeWidth={1.75} />
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[12px] bg-block text-muted-foreground transition-colors group-hover:text-primary"><Icone className="h-[18px] w-[18px]" strokeWidth={1.75} /></span>
                   <span className="flex-1 text-[14px] font-medium text-foreground">{item.label}</span>
                   <span className="hidden text-[13px] text-muted-foreground sm:block">{item.detail}</span>
                   <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />

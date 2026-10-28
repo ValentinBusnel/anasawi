@@ -88,7 +88,7 @@ export function UsersManager({ initial }: { initial: UtilisateurListe[] }) {
       </div>
 
       {initial.length === 0 ? (
-        <div className="rounded-lg border border-border bg-white px-6 py-14 text-center">
+        <div className="rounded-[24px] bg-block px-6 py-16 text-center">
           <p className="text-[13px] text-muted-foreground">Aucun utilisateur pour l’instant.</p>
           <Button className="mt-4" onClick={() => setDraft(VIDE)}>
             <UserPlus />
@@ -96,7 +96,7 @@ export function UsersManager({ initial }: { initial: UtilisateurListe[] }) {
           </Button>
         </div>
       ) : (
-        <ul className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-white">
+        <ul className="list-block">
           {initial.map((u) => (
             <li key={u.id} className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3.5 sm:px-5">
               <span

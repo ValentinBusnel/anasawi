@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Cormorant_Garamond, Karla } from 'next/font/google'
+import { Cormorant_Garamond, Karla, Poppins } from 'next/font/google'
 
 import '@/styles/globals.css'
 import { SITE_URL } from '@/lib/utils'
@@ -24,6 +24,17 @@ const karla = Karla({
   preload: true,
 })
 
+/* La police de l'ADMINISTRATION (même famille que l'espace de la
+   candidature Qeeps). Non préchargée : le site public ne la demande
+   jamais, seul l'outil l'utilise. */
+const poppins = Poppins({
+  subsets: ['latin', 'latin-ext'],
+  display: 'swap',
+  variable: '--font-poppins',
+  weight: ['400', '500', '600'],
+  preload: false,
+})
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: { default: 'ANASAWI', template: '%s' },
@@ -46,7 +57,7 @@ export default function RootLayout({
   return (
     <html
       lang="fr"
-      className={`${cormorant.variable} ${karla.variable}`}
+      className={`${cormorant.variable} ${karla.variable} ${poppins.variable}`}
       suppressHydrationWarning
     >
       <body>{children}</body>

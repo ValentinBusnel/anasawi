@@ -165,12 +165,12 @@ test.describe('Déconnexion', () => {
     await page.getByRole('button', { name: 'Se connecter' }).click()
     await page.waitForURL(/\/admin/, { timeout: 20_000 })
 
-    /* « Se déconnecter » est un bouton nommé de la barre latérale — pas
-       un menu à ouvrir d'abord. */
-    await page
-      .getByRole('navigation', { name: 'Administration', exact: true })
-      .getByRole('button', { name: 'Se déconnecter' })
-      .click()
+    /* « Se déconnecter » vit dans le menu du compte de la barre du haut
+       (comme sur l'espace de la candidature Qeeps) : on l'ouvre, puis on
+       choisit l'entrée nommée. */
+    const barre = page.getByRole('navigation', { name: 'Administration', exact: true })
+    await barre.getByRole('button', { name: 'Mon compte' }).click()
+    await barre.getByRole('button', { name: 'Se déconnecter' }).click()
 
     await page.waitForURL(/\/login/, { timeout: 20_000 })
 

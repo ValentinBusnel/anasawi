@@ -5,30 +5,30 @@ import * as React from 'react'
 import { cn } from '@/lib/utils'
 
 const buttonVariants = cva(
-  "inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-[9px] text-[13.5px] font-medium tracking-[-0.005em] transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-out active:translate-y-px focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/30 disabled:pointer-events-none disabled:opacity-45 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-[8px] text-[14px] font-medium transition-[background-color,box-shadow,color,opacity,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
         /* Une seule action principale par écran : bleu plein. */
         /* Un liseré clair en haut, une ombre d'un pixel : le bouton a de
            la matière sans effet décoratif. */
-        default:
-          'bg-primary text-primary-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.14),0_1px_2px_rgba(17,20,18,0.12)] hover:bg-[#3e667c]',
-        destructive:
-          'bg-destructive text-destructive-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.14),0_1px_2px_rgba(17,20,18,0.12)] hover:bg-[#9e2c25]',
-        /* Les actions secondaires : contour, fond blanc. */
+        /* Comme sur l'espace Qeeps : aplat plein, qui s'éclaircit au
+           survol et s'enfonce d'un rien au clic. */
+        default: 'bg-primary text-primary-foreground hover:opacity-90',
+        destructive: 'bg-destructive text-destructive-foreground hover:opacity-90',
+        /* Secondaire : un liseré, pas de fond. */
         outline:
-          'border border-input bg-card text-foreground shadow-xs hover:border-[#cfcfca] hover:bg-secondary',
-        secondary: 'bg-secondary text-secondary-foreground hover:bg-[#e9e9e6]',
-        ghost: 'text-ink-soft hover:bg-secondary hover:text-foreground',
+          'bg-transparent text-foreground shadow-[inset_0_0_0_1px_var(--color-border)] hover:bg-[rgba(33,58,71,0.04)]',
+        secondary: 'bg-white text-foreground shadow-field hover:shadow-[0_0_0_1px_#d3dcdf,0_1px_2px_rgba(33,58,71,0.05)]',
+        ghost: 'text-foreground hover:bg-[rgba(33,58,71,0.05)]',
         link: 'text-primary underline-offset-4 hover:underline',
       },
       size: {
         /* 36 px : une cible confortable au doigt comme à la souris. */
-        default: 'h-9 px-3.5',
-        sm: 'h-8 rounded-[8px] px-3 text-[13px]',
-        lg: 'h-11 px-5 text-[14px]',
-        icon: 'h-9 w-9',
+        default: 'h-10 px-4',
+        sm: 'h-8 rounded-[6px] px-3 text-[13px]',
+        lg: 'h-11 px-5 text-[15px]',
+        icon: 'h-9 w-9 rounded-[9px]',
         'icon-sm': 'h-8 w-8 rounded-[8px]',
       },
     },

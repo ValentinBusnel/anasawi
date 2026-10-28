@@ -101,73 +101,76 @@
 /* ══════════════════════════════════════════════════════════════════════
    ADMINISTRATION — système de design
 
-   Un outil, pas une page du site : un fond neutre très clair, des
-   surfaces blanches, des filets fins, une seule couleur d'action (le bleu
-   profond du site), une police sans-serif à 14 px. Les ombres sont
-   presque absentes ; la profondeur vient des surfaces.
+   Le même langage que l'espace de la candidature Qeeps, aux couleurs
+   d'ANASAWI : fond blanc, blocs gris (#f2f3f4) arrondis à 24 px, champs
+   blancs à l'ombre douce sans bordure, police Poppins, une seule encre —
+   le bleu profond — pour le texte comme pour les actions. Les ombres sont
+   rares et toujours teintées de cette encre.
 
    Les variables shadcn ci-dessous ne servent qu'à l'admin. Les jetons du
-   SITE (ivoire, pierre, filets…) y sont aussi recalés en neutres (voir
-   `:root:has(.admin-shell)`), pour que les composants partagés ne
-   ramènent pas l'ivoire jauni dans l'outil — SAUF dans `.site-tokens`,
-   les aperçus de templates, qui doivent montrer le site tel quel.
+   SITE (ivoire, pierre, filets…) y sont recalés (`:root:has(.admin-shell)`)
+   pour que les composants partagés ne ramènent pas l'ivoire dans l'outil —
+   SAUF dans `.site-tokens`, les aperçus de templates, qui montrent le site
+   tel quel. La scène de l'éditeur est un cadre (iframe) : non concernée.
    ══════════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* Arrondi de tous les contrôles de l'admin (boutons, champs, cartes). */
   --radius: 0.625rem;
 
-  /* Trois plans : la navigation, le canevas, les surfaces. */
-  --sidebar: #f6f6f4;
-  --sidebar-border: #e9e9e6;
-  --background: #fbfbfa;
-  --foreground: #191b1a;
+  --sidebar: #ffffff;
+  --sidebar-border: #eef1f2;
+  --background: #ffffff;
+  /* L'encre : un bleu nuit, pour les titres et le texte. */
+  --foreground: #213a47;
   --card: #ffffff;
-  --card-foreground: #191b1a;
+  --card-foreground: #213a47;
   --popover: #ffffff;
-  --popover-foreground: #191b1a;
-  /* Une seule action principale : le bleu profond du site. */
-  --primary: #46728a;
+  --popover-foreground: #213a47;
+  /* Une seule action principale : le bleu profond. */
+  --primary: #2f5a70;
   --primary-foreground: #ffffff;
-  --secondary: #f2f2f0;
-  --secondary-foreground: #191b1a;
-  --muted: #f4f4f2;
-  /* 5,6:1 sur le canevas : les textes secondaires restent lisibles. */
-  --muted-foreground: #696a65;
-  --accent: #f0f0ee;
-  --accent-foreground: #191b1a;
-  --destructive: #b4342c;
+  --secondary: #f2f3f4;
+  --secondary-foreground: #213a47;
+  --muted: #f2f3f4;
+  /* Texte secondaire : 4,9:1 sur blanc. */
+  --muted-foreground: #66808c;
+  --accent: #eef3f5;
+  --accent-foreground: #213a47;
+  --destructive: #c43d3d;
   --destructive-foreground: #ffffff;
-  --border: #e9e9e6;
-  --input: #dededa;
+  --border: #e3e8ea;
+  --input: #e3e8ea;
   --ring: #46728a;
 
-  /* Ombres : presque rien, et toujours la même famille. */
-  --admin-shadow-xs: 0 1px 2px rgba(17, 20, 18, 0.05);
-  --admin-shadow-sm: 0 1px 3px rgba(17, 20, 18, 0.06), 0 1px 2px rgba(17, 20, 18, 0.04);
-  --admin-shadow-pop: 0 16px 40px -12px rgba(17, 20, 18, 0.18), 0 4px 10px -4px rgba(17, 20, 18, 0.08);
+  /* Le bloc gris des écrans, et l'ombre des champs posés dessus. */
+  --admin-block: #f2f3f4;
+  --admin-field-shadow: 0 0 0 1px #e3e8ea, 0 1px 2px rgba(33, 58, 71, 0.05);
+  --admin-shadow-xs: 0 1px 2px rgba(33, 58, 71, 0.06);
+  --admin-shadow-sm: 0 1px 2px rgba(33, 58, 71, 0.06), 0 4px 12px rgba(33, 58, 71, 0.06);
+  --admin-shadow-pop: 0 30px 80px rgba(33, 58, 71, 0.16), 0 0 0 1px rgba(33, 58, 71, 0.05);
 }
 
-/* Les jetons du site, recalés en neutres dans tout le document de
-   l'admin (portails des fenêtres compris). La scène de l'éditeur est un
-   cadre (iframe) : elle n'est pas concernée. */
 :root:has(.admin-shell) {
-  --color-ivory: #fbfbfa;
-  --color-ivory-warm: #f2f2f0;
-  --color-ivory-deep: #e7e7e4;
-  --color-sand: #f2f2f0;
-  --color-cream: #f7f7f5;
-  --color-ink: #191b1a;
-  --color-ink-soft: #464845;
-  --color-soft: #464845;
-  --color-stone: #696a65;
-  --color-line: #e9e9e6;
-  --color-line-strong: #dededa;
-  --color-blue-mist: #ecf2f5;
+  --color-ivory: #ffffff;
+  --color-ivory-warm: #f2f3f4;
+  --color-ivory-deep: #e3e8ea;
+  --color-sand: #f2f3f4;
+  --color-cream: #f7f8f8;
+  --color-ink: #213a47;
+  --color-ink-soft: #46606c;
+  --color-soft: #46606c;
+  --color-stone: #66808c;
+  --color-line: #e3e8ea;
+  --color-line-strong: #d3dcdf;
+  --color-blue-mist: #eaf2f5;
 }
 
-/* Aperçus de templates rendus dans le document de l'admin : les jetons
-   d'origine du site, à l'identique. */
+/* Tout le document de l'admin parle Poppins — fenêtres et menus
+   compris, qui sont projetés hors de `.admin-shell`. */
+:root:has(.admin-shell) body {
+  font-family: var(--font-poppins), var(--font-sans);
+}
+
 .site-tokens {
   --color-ivory: #fbf8f2;
   --color-ivory-warm: #f4eee3;
@@ -181,15 +184,29 @@
   --color-line: rgba(43, 47, 44, 0.09);
   --color-line-strong: rgba(43, 47, 44, 0.18);
   --color-blue-mist: #eaf1f4;
+  font-family: var(--font-sans);
   font-size: 16px;
   letter-spacing: normal;
 }
 
-/* Densité de l'outil : 14 px, lisible sans être lourd. */
 .admin-shell {
   font-size: 14px;
-  letter-spacing: -0.006em;
-  font-feature-settings: 'ss01', 'cv11';
+  letter-spacing: -0.005em;
+}
+
+/* Une liste façon Qeeps : un bloc gris, des rangées blanches arrondies. */
+@utility list-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  border-radius: 24px;
+  background: var(--admin-block);
+
+  & > * {
+    border-radius: 16px;
+    background: #ffffff;
+  }
 }
 
 @theme inline {
@@ -218,6 +235,8 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --color-block: var(--admin-block);
+  --shadow-field: var(--admin-field-shadow);
   --shadow-xs: var(--admin-shadow-xs);
   --shadow-sm: var(--admin-shadow-sm);
   --shadow-pop: var(--admin-shadow-pop);
@@ -284,10 +303,10 @@
      la couche `base`, donc toute classe utilitaire posée sur un titre
      reste prioritaire. */
   :root:has(.admin-shell) :is(h1, h2, h3, h4):not(.site-tokens *) {
-    font-family: var(--font-sans);
+    font-family: inherit;
     font-weight: 600;
     line-height: 1.3;
-    letter-spacing: -0.012em;
+    letter-spacing: -0.02em;
   }
 
   /* Focus visible dédié — jamais outline:none */
@@ -394,6 +413,13 @@
 @keyframes anasawi-spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* La lueur de la page de connexion (AuthShell). */
+@keyframes auth-float {
+  to {
+    transform: translate(-46%, -54%) scale(1.08);
   }
 }
 

@@ -22,11 +22,11 @@ export function PageHeader({
   back?: { href: string; label: string }
 }) {
   return (
-    <div className="mb-8">
+    <div className="mb-2">
       {back && (
         <Link
           href={back.href}
-          className="-ml-1.5 mb-4 inline-flex h-8 items-center gap-1 rounded-[8px] pl-1 pr-2.5 text-[13px] text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/30"
+          className="group mb-5 inline-flex items-center gap-1.5 text-[14px] font-medium text-muted-foreground transition-[color,gap] duration-300 hover:gap-2.5 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <ChevronLeft className="h-4 w-4" strokeWidth={1.8} />
           {back.label}
@@ -35,11 +35,11 @@ export function PageHeader({
 
       <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
         <div className="min-w-0">
-          <h1 className="text-[24px] font-semibold leading-[1.2] tracking-[-0.025em] text-foreground sm:text-[26px]">
+          <h1 className="text-[30px] font-semibold leading-[1.2] tracking-[-0.02em] text-foreground sm:text-[36px] sm:leading-[43px]">
             {title}
           </h1>
           {description && (
-            <p className="mt-2 max-w-[62ch] text-[14px] leading-[1.55] text-muted-foreground">
+            <p className="mt-2 max-w-[62ch] text-[16px] leading-[22px] text-muted-foreground">
               {description}
             </p>
           )}

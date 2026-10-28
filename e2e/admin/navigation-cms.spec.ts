@@ -24,7 +24,7 @@ const rail = (page: import('@playwright/test').Page) =>
   page.getByRole('navigation', { name: 'Administration', exact: true })
 
 test.describe('Navigation dans le CMS', () => {
-  test('un clic dans la barre latérale répond tout de suite', async ({
+  test('un clic dans la barre de navigation répond tout de suite', async ({
     page,
   }) => {
     await page.goto('/admin/medias', { waitUntil: 'domcontentloaded' })
@@ -64,7 +64,7 @@ test.describe('Navigation dans le CMS', () => {
     ).toBeVisible({ timeout: 20_000 })
 
     const ongletsAvant = context.pages().length
-    /* « Voir le site » vit dans la barre latérale de l'administration. */
+    /* « Voir le site » vit dans la barre du haut de l'administration. */
     await rail(page).getByRole('link', { name: 'Voir le site' }).click()
 
     /* Le site, ICI — pas dans un nouvel onglet. */
@@ -89,8 +89,8 @@ test.describe('Navigation dans le CMS', () => {
     context,
   }) => {
     await page.goto('/admin', { waitUntil: 'domcontentloaded' })
-    /* Le lien du tableau de bord lui-même — pas celui de la barre
-       latérale, qui a le même nom. */
+    /* Le lien du tableau de bord lui-même — pas celui de la barre du
+       haut, qui a le même nom. */
     const lien = page.getByRole('main').getByRole('link', { name: 'Voir le site' })
     await expect(lien).toBeVisible({ timeout: 20_000 })
 

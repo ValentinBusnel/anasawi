@@ -3,9 +3,9 @@ import { LogoMark } from '@/components/site/Logo'
 /**
  * La porte d'entrée de l'administration — connexion, lien d'invitation.
  *
- * Le même langage que l'outil : un canevas neutre, une carte blanche au
- * centre, la marque au-dessus, un titre net et une phrase qui dit ce
- * qu'on attend. Rien d'autre à l'écran.
+ * Le même geste que l'espace de la candidature Qeeps : un fond blanc, une
+ * lueur bleue très douce qui respire derrière, une carte translucide au
+ * centre avec la marque, un titre, une phrase, le formulaire.
  */
 export function AuthShell({
   title,
@@ -16,33 +16,37 @@ export function AuthShell({
   title: React.ReactNode
   description?: React.ReactNode
   children: React.ReactNode
-  /** Sous la carte : un lien de repli, une mention. */
+  /** Sous le formulaire : un lien de repli, une mention. */
   footer?: React.ReactNode
 }) {
   return (
-    <main className="flex min-h-svh flex-col items-center justify-center bg-[#f6f6f4] px-5 py-12 font-sans text-[#191b1a]">
-      <div className="w-full max-w-[400px]">
-        <div className="mb-8 flex items-center justify-center gap-2.5">
-          <LogoMark className="h-9 w-9" />
-          <span className="leading-tight">
-            <span className="block text-[14px] font-semibold tracking-[0.12em]">ANASAWI</span>
-            <span className="block text-[12px] text-[#696a65]">Administration</span>
-          </span>
-        </div>
+    <main className="relative grid min-h-svh place-items-center overflow-hidden bg-white px-6 py-12 font-[family-name:var(--font-poppins)] text-[#213a47]">
+      {/* La lueur : deux halos flous, immobiles sous prefers-reduced-motion. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute left-1/2 top-1/2 h-[600px] w-[900px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side_at_35%_45%,rgba(234,242,245,0.95),transparent),radial-gradient(closest-side_at_70%_60%,rgba(70,114,138,0.16),transparent)] blur-[30px] motion-safe:animate-[auth-float_10s_ease-in-out_infinite_alternate]"
+      />
 
-        <div className="rounded-[18px] border border-[#e9e9e6] bg-white p-7 shadow-[0_1px_3px_rgba(17,20,18,0.06),0_12px_32px_-16px_rgba(17,20,18,0.12)] sm:p-8">
-          <h1 className="font-sans text-[22px] font-semibold leading-tight tracking-[-0.02em]">
+      <div className="relative flex w-full max-w-[400px] flex-col gap-5 rounded-[28px] bg-white/85 p-9 shadow-[0_0_0_1px_rgba(33,58,71,0.05),0_30px_80px_rgba(33,58,71,0.16)] backdrop-blur-[12px] max-sm:p-7">
+        <p className="flex items-center gap-2.5">
+          <LogoMark className="h-8 w-8" />
+          <span className="text-[22px] font-semibold tracking-[-0.02em]">
+            Anasawi<span className="text-[#46728a]">.</span>
+          </span>
+        </p>
+
+        <div>
+          <h1 className="font-[family-name:var(--font-poppins)] text-[24px] font-semibold leading-tight tracking-[-0.02em]">
             {title}
           </h1>
           {description && (
-            <p className="mt-2 text-[14px] leading-[1.55] text-[#696a65]">{description}</p>
+            <p className="mt-1.5 text-[15px] leading-[21px] text-[#66808c]">{description}</p>
           )}
-          <div className="mt-7">{children}</div>
         </div>
 
-        {footer && (
-          <div className="mt-6 text-center text-[13.5px] text-[#696a65]">{footer}</div>
-        )}
+        {children}
+
+        {footer && <div className="text-center text-[13px] text-[#66808c]">{footer}</div>}
       </div>
     </main>
   )

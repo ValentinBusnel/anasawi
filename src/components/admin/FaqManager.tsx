@@ -162,7 +162,7 @@ export function FaqManager({ items: initial }: { items: FaqItem[] }) {
       </div>
 
       {items.length === 0 ? (
-        <div className="rounded-lg border border-border bg-white px-6 py-14 text-center">
+        <div className="rounded-[24px] bg-block px-6 py-16 text-center">
           <p className="text-[13px] leading-[1.6] text-muted-foreground">
             Aucune question pour l’instant. Commencez par celles qu’on vous
             pose le plus souvent.
@@ -190,7 +190,7 @@ export function FaqManager({ items: initial }: { items: FaqItem[] }) {
             items={items.map((i) => i.id)}
             strategy={verticalListSortingStrategy}
           >
-            <ul className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-white">
+            <ul className="list-block">
               {items.map((item) => (
                 <FaqRow
                   key={item.id}

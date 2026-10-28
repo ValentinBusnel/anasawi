@@ -27,7 +27,7 @@ export function SectionCard({
   return (
     <section
       id={id}
-      className="scroll-mt-6 rounded-[14px] border border-border bg-card p-5 shadow-xs sm:p-6"
+      className="scroll-mt-6 rounded-[24px] bg-block p-6"
     >
       <div
         className={cn(
@@ -35,18 +35,18 @@ export function SectionCard({
         )}
       >
         <div>
-          <h2 className="text-[15px] font-semibold tracking-[-0.01em] text-foreground">
+          <h2 className="text-[16px] font-semibold leading-[22px] text-foreground">
             {title}
           </h2>
           {note && (
-            <p className="mt-1 max-w-[62ch] text-[13.5px] leading-[1.55] text-muted-foreground">
+            <p className="mt-0.5 max-w-[62ch] text-[13px] leading-[19px] text-muted-foreground">
               {note}
             </p>
           )}
         </div>
         {actions && <div className="flex flex-wrap gap-1.5">{actions}</div>}
       </div>
-      <div className={cn('mt-5', layout === 'grid' && 'grid gap-x-5 gap-y-5 sm:grid-cols-2')}>
+      <div className={cn('mt-5', layout === 'grid' && 'grid gap-3.5 sm:grid-cols-2')}>
         {children}
       </div>
     </section>

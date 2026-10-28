@@ -158,7 +158,7 @@ export function ActionMenu({
         item.onSelect()
       }}
       className={cn(
-        'flex w-full items-center gap-2.5 rounded-[8px] px-2.5 py-2 text-left text-[13.5px] transition-colors',
+        'flex w-full items-center gap-2.5 rounded-[10px] px-2.5 py-[9px] text-left text-[14px] font-medium transition-colors',
         /* Au clavier : le fond ET un anneau — le fond seul se confond
            avec le survol, et l'on ne voit plus où l'on est. */
         'focus-visible:outline-none focus-visible:bg-secondary',
@@ -224,7 +224,7 @@ export function ActionMenu({
                 ? { top: position.top, right: position.right }
                 : { top: position.top, left: position.left }
             }
-            className="fixed z-[300] min-w-[210px] rounded-[12px] border border-border bg-white p-1 shadow-pop"
+            className="fixed z-[300] min-w-[230px] rounded-[16px] bg-white p-2 shadow-pop"
           >
             {ordinary.map((item, i) => rendre(item, i))}
             {dangerous.length > 0 && ordinary.length > 0 && (

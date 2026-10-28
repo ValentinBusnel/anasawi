@@ -22,16 +22,16 @@ export function AdminContent({
   width?: 'narrow' | 'default' | 'wide'
 }) {
   const maxWidth = {
-    narrow: 'max-w-[640px]',
-    default: 'max-w-[760px]',
-    wide: 'max-w-[960px]',
+    narrow: 'max-w-[720px]',
+    default: 'max-w-[880px]',
+    wide: 'max-w-[1080px]',
   }[width]
 
   return (
     <div
       className={cn('min-h-0 flex-1 overflow-y-auto bg-background', className)}
     >
-      <div className={cn('mx-auto px-5 pb-28 pt-8 sm:px-8 sm:pt-10 lg:px-12 lg:pt-14', maxWidth)}>
+      <div className={cn('mx-auto flex flex-col gap-6 px-4 pb-16 pt-7 sm:px-6 sm:pt-10 lg:px-8 lg:pt-12', maxWidth)}>
         {children}
       </div>
     </div>

@@ -15,7 +15,7 @@ const AlertDialogOverlay = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Overlay>
 >(({ className, ...props }, ref) => (
   <AlertDialogPrimitive.Overlay
-    className={cn('fixed inset-0 z-50 bg-[rgba(17,20,18,0.32)] backdrop-blur-[2px]', className)}
+    className={cn('fixed inset-0 z-50 bg-[rgba(33,58,71,0.25)] backdrop-blur-[8px]', className)}
     {...props}
     ref={ref}
   />
@@ -31,7 +31,7 @@ const AlertDialogContent = React.forwardRef<
     <AlertDialogPrimitive.Content
       ref={ref}
       className={cn(
-        'fixed left-1/2 top-1/2 z-50 grid w-full max-w-md -translate-x-1/2 -translate-y-1/2 gap-4 rounded-[16px] border border-border bg-popover p-6 shadow-pop max-sm:max-w-[calc(100vw-24px)]',
+        'fixed left-1/2 top-1/2 z-50 grid w-full max-w-md -translate-x-1/2 -translate-y-1/2 gap-4 rounded-[24px] border-0 bg-popover p-7 shadow-pop max-sm:max-w-[calc(100vw-24px)]',
         className,
       )}
       {...props}
@@ -48,7 +48,7 @@ function AlertDialogFooter({ className, ...props }: React.ComponentProps<'div'>)
   return (
     <div
       className={cn(
-        'mt-2 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end',
+        'mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end',
         className,
       )}
       {...props}
@@ -62,7 +62,7 @@ const AlertDialogTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <AlertDialogPrimitive.Title
     ref={ref}
-    className={cn('text-[17px] font-semibold leading-snug tracking-[-0.015em]', className)}
+    className={cn('text-[20px] font-semibold leading-snug tracking-[-0.02em]', className)}
     {...props}
   />
 ))
