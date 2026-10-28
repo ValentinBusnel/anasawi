@@ -1,7 +1,7 @@
 'use client'
 
 import { closestCenter, DndContext, type DragEndEvent } from '@dnd-kit/core'
-import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
+import { restrictToParentElement, restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import {
   arrayMove,
   SortableContext,
@@ -179,7 +179,10 @@ export function FaqManager({ items: initial }: { items: FaqItem[] }) {
           id="faq-sortable"
           sensors={sensors}
           collisionDetection={closestCenter}
-          modifiers={[restrictToVerticalAxis]}
+          /* Bornée à la liste : celle-ci rogne ses bords arrondis
+             (`overflow-hidden`), et une ligne tirée au-delà disparaissait
+             à moitié sous le bord. */
+          modifiers={[restrictToVerticalAxis, restrictToParentElement]}
           onDragEnd={handleDragEnd}
         >
           <SortableContext
@@ -351,12 +354,15 @@ function FaqRow({
   return (
     <li
       ref={setNodeRef}
-      style={{ transform: CSS.Transform.toString(transform), transition }}
+      style={{ transform: CSS.Translate.toString(transform), transition }}
       className={cn(
         /* `flex-wrap` : sur téléphone, les commandes passent sous le texte
            plutôt que de l'écraser. */
         'flex flex-wrap items-center gap-x-3 gap-y-2 bg-white px-3 py-3 transition-colors duration-150 hover:bg-ivory/50 sm:px-4',
-        isDragging && 'relative z-10 rounded-lg border border-border shadow-sm',
+        /* Un anneau et une ombre, pas une bordure : une bordure ajoutée
+           au départ du glisser grandissait la ligne de 2 px, et toute la
+           liste sautait sous le pointeur. */
+        isDragging && 'relative z-10 rounded-lg shadow-md ring-1 ring-border',
         !item.isActive && 'opacity-60',
       )}
     >

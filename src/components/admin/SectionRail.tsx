@@ -135,42 +135,98 @@ export function SectionRail({
     e.preventDefault()
     const list = listRef.current
     if (!list) return
+    /* Le rail défile (`overflow-y-auto`) : c'est lui qu'on fait défiler
+       quand le pointeur approche d'un bord. */
+    const scroller = list.closest<HTMLElement>('[data-rail-scroll]')
 
-    const listTop = list.getBoundingClientRect().top
+    /* Repères EN COORDONNÉES DE LA LISTE : ils restent justes même si le
+       rail défile pendant le glisser. Avant, ils étaient figés en
+       coordonnées d'écran — une molette pendant le glisser, et le trait
+       d'insertion ne correspondait plus à rien. */
+    const listTop0 = list.getBoundingClientRect().top
     const rows = roots.map((r) => {
       const el = rowRefs.current.get(r.id)
       const rect = el?.getBoundingClientRect()
       return rect
-        ? { top: rect.top - listTop, height: rect.height }
+        ? { top: rect.top - listTop0, height: rect.height }
         : { top: 0, height: 0 }
     })
-    frozen.current = { listTop, rows }
+    frozen.current = { listTop: listTop0, rows }
 
-    const startY = e.clientY
+    const startInList = e.clientY - listTop0
+    let clientY = e.clientY
     let activated = false
+    let frame = 0
 
-    const boundaryAt = (clientY: number) => {
-      const y = clientY - listTop
+    const yInList = () => clientY - list.getBoundingClientRect().top
+    const boundaryAt = () => {
+      const y = yInList()
       let boundary = 0
       for (const row of rows) if (y > row.top + row.height / 2) boundary++
       return boundary
     }
+    const update = () =>
+      setDrag({ id, boundary: boundaryAt(), delta: yInList() - startInList })
 
-    const onMove = (ev: PointerEvent) => {
-      const delta = ev.clientY - startY
-      if (!activated && Math.abs(delta) < 4) return
-      activated = true
-      setDrag({ id, boundary: boundaryAt(ev.clientY), delta })
+    /* Défilement automatique près des bords du rail : sans lui, une
+       section ne pouvait pas être amenée au-delà de la partie visible. */
+    const autoScroll = () => {
+      frame = 0
+      if (!activated || !scroller) return
+      const box = scroller.getBoundingClientRect()
+      const ZONE = 48
+      const pas =
+        clientY < box.top + ZONE
+          ? -Math.ceil((box.top + ZONE - clientY) / 4)
+          : clientY > box.bottom - ZONE
+            ? Math.ceil((clientY - (box.bottom - ZONE)) / 4)
+            : 0
+      if (pas === 0) return
+      const avant = scroller.scrollTop
+      scroller.scrollTop += pas
+      if (scroller.scrollTop !== avant) update()
+      frame = requestAnimationFrame(autoScroll)
     }
-    const onUp = (ev: PointerEvent) => {
-      window.removeEventListener('pointermove', onMove)
+
+    const handle = e.currentTarget as HTMLElement
+    /* Capture : le relâché nous parvient même hors de la fenêtre. */
+    try {
+      handle.setPointerCapture(e.pointerId)
+    } catch {
+      /* Pointeur déjà relâché : rien à capturer. */
+    }
+
+    const finish = (commit: boolean) => {
+      handle.removeEventListener('pointermove', onMove)
+      handle.removeEventListener('pointerup', onUp)
+      handle.removeEventListener('pointercancel', onCancel)
+      window.removeEventListener('keydown', onKey)
+      if (frame) cancelAnimationFrame(frame)
+      const boundary = boundaryAt()
       frozen.current = null
       setDrag(null)
-      if (!activated) return
-      void reorderTo(id, from, boundaryAt(ev.clientY))
+      if (commit && activated) void reorderTo(id, from, boundary)
     }
-    window.addEventListener('pointermove', onMove)
-    window.addEventListener('pointerup', onUp, { once: true })
+
+    const onMove = (ev: PointerEvent) => {
+      clientY = ev.clientY
+      if (!activated && Math.abs(clientY - e.clientY) < 4) return
+      activated = true
+      update()
+      if (!frame) frame = requestAnimationFrame(autoScroll)
+    }
+    const onUp = () => finish(true)
+    /* Geste interrompu (appel entrant, défilement système…) : avant, les
+       écouteurs restaient posés et la ligne restait « tenue ». */
+    const onCancel = () => finish(false)
+    const onKey = (ev: KeyboardEvent) => {
+      if (ev.key === 'Escape') finish(false)
+    }
+
+    handle.addEventListener('pointermove', onMove)
+    handle.addEventListener('pointerup', onUp)
+    handle.addEventListener('pointercancel', onCancel)
+    window.addEventListener('keydown', onKey)
   }
 
   /* Position du trait bleu d'insertion, en coordonnées de la liste. */
@@ -190,7 +246,7 @@ export function SectionRail({
         floating && 'shadow-[8px_0_28px_rgba(28,32,30,0.14)]',
       )}
     >
-      <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-4 pt-4">
+      <div data-rail-scroll className="min-h-0 flex-1 overflow-y-auto px-3 pb-4 pt-4">
         <div className="flex items-center justify-between px-2 pb-2.5">
           <h3 className="text-[12px] font-medium uppercase tracking-[0.1em] text-stone">
             Sections de la page
@@ -255,7 +311,9 @@ export function SectionRail({
                   <span
                     aria-hidden="true"
                     onPointerDown={(e) => beginDrag(e, section.id, index)}
-                    className="flex h-6 w-4 shrink-0 cursor-grab items-center justify-center text-stone/60 active:cursor-grabbing"
+                    /* `touch-none` : au doigt, le navigateur ne prend plus
+                       le geste pour un défilement (qui annulait le glisser). */
+                    className="flex h-6 w-4 shrink-0 cursor-grab touch-none items-center justify-center text-stone/60 active:cursor-grabbing"
                   >
                     <GripVertical className="h-[13px] w-[13px]" strokeWidth={1.7} />
                   </span>

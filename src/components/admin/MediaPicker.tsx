@@ -364,6 +364,27 @@ export const UploadField = forwardRef<
 
   useImperativeHandle(ref, () => ({ choisir: () => inputRef.current?.click() }), [])
 
+  /* Un fichier lâché À CÔTÉ de la zone était ouvert par le navigateur à
+     la place de l'administration : on quittait l'écran, et ce qui était
+     en cours de saisie était perdu. Tant que ce champ est affiché, un
+     dépôt de fichier hors de la zone ne fait simplement rien. */
+  useEffect(() => {
+    const ignorer = (event: DragEvent) => {
+      if (!event.dataTransfer?.types.includes('Files')) return
+      /* Déjà traité par la zone de dépôt (l'écouteur de la fenêtre passe
+         après elle) : on ne touche à rien. */
+      if (event.defaultPrevented) return
+      event.preventDefault()
+      if (event.type === 'dragover') event.dataTransfer.dropEffect = 'none'
+    }
+    window.addEventListener('dragover', ignorer)
+    window.addEventListener('drop', ignorer)
+    return () => {
+      window.removeEventListener('dragover', ignorer)
+      window.removeEventListener('drop', ignorer)
+    }
+  }, [])
+
   /* Aperçu : une URL locale, libérée dès que le fichier change. */
   useEffect(() => {
     if (!file) {
@@ -517,9 +538,18 @@ export const UploadField = forwardRef<
         <div
           onDragOver={(e) => {
             e.preventDefault()
+            e.dataTransfer.dropEffect = 'copy'
             setSurvol(true)
           }}
-          onDragLeave={() => setSurvol(false)}
+          /* `dragleave` est aussi émis en passant au-dessus d'un ENFANT de
+             la zone (le bouton, le texte) : la zone clignotait et perdait
+             son état « prête à recevoir ». On ne l'éteint que si le
+             pointeur la quitte vraiment. */
+          onDragLeave={(e) => {
+            const vers = e.relatedTarget
+            if (vers instanceof Node && e.currentTarget.contains(vers)) return
+            setSurvol(false)
+          }}
           onDrop={(e) => {
             e.preventDefault()
             setSurvol(false)

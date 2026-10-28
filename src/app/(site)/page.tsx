@@ -16,6 +16,7 @@ import {
 import { absoluteUrl } from '@/lib/utils'
 import {
   getActiveFaq,
+  getActiveServices,
   getMediaByIds,
   getPublishedHome,
   getSettings,
@@ -39,10 +40,13 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-  const [page, settings, faqItems] = await Promise.all([
+  const [page, settings, faqItems, services] = await Promise.all([
     getPublishedHome(),
     getSettings(),
     getActiveFaq(),
+    /* Pour le catalogue de services du JSON-LD : la même requête (mise en
+       cache) que la section Accompagnements. */
+    getActiveServices(),
   ])
 
   if (!page) notFound()
@@ -52,8 +56,8 @@ export default async function HomePage() {
   /* L'image du cabinet : l'icône 180 px (fond ivoire plein), pas celle de
      l'onglet en 64 px sur fond transparent — Google la refuse trop petite. */
   const graph = buildGraph([
-    buildOrganizationJsonLd(settings, absoluteUrl('/apple-icon')),
-    buildPersonJsonLd(settings),
+    buildOrganizationJsonLd(settings, absoluteUrl('/apple-icon'), services),
+    buildPersonJsonLd(settings, undefined, services),
     buildWebSiteJsonLd(settings),
     buildWebPageJsonLd(page, '/'),
     buildFaqJsonLd(faqItems),

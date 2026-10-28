@@ -30,7 +30,7 @@ export function ServiceRow({
   return (
     <li
       ref={setNodeRef}
-      style={{ transform: CSS.Transform.toString(transform), transition }}
+      style={{ transform: CSS.Translate.toString(transform), transition }}
       className={cn(
         /* `flex-wrap` : sur téléphone, les commandes passent sous le texte
            plutôt que de l'écraser. */

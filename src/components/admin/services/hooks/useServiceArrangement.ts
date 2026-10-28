@@ -154,8 +154,23 @@ export function useServiceArrangement({
     const element = items[from]
     if (from < 0 || !element) return
 
-    /* Retiré puis réinséré : devant l'accompagnement survolé, ou en fin de
-       bloc quand c'est le bloc lui-même qui est visé (zone vide). */
+    /* ── Dans le même bloc : exactement ce que l'aperçu montrait ─────
+       Pendant le glisser, les voisins s'écartent comme si l'élément
+       prenait la place du survolé (`arrayMove`). Le relâché le posait
+       pourtant DEVANT lui : en descendant, l'élément retombait une place
+       trop haut, et paraissait « ne pas vouloir aller » où on le mettait. */
+    const to = items.findIndex((s) => s.id === surId)
+    if (depart === cible && to >= 0) {
+      if (to === from) return
+      persister(arrayMove(items, from, to), items)
+      return
+    }
+
+    /* ── Vers un autre bloc : avant ou après l'accompagnement visé ────
+       selon que le centre de l'élément tiré est au-dessus ou au-dessous
+       du centre de la cible. Avant, toujours « devant » : impossible de
+       déposer en dernière position d'un bloc non vide. Bloc lui-même
+       visé (zone vide ou en-tête) : en fin de bloc. */
     const sans = items.filter((s) => s.id !== actifId)
     const deplace: ServiceWithMedia = {
       ...element,
@@ -164,7 +179,12 @@ export function useServiceArrangement({
     }
 
     let index = sans.findIndex((s) => s.id === surId)
-    if (index < 0) {
+    if (index >= 0) {
+      const tire = active.rect.current.translated
+      if (tire && tire.top + tire.height / 2 > over.rect.top + over.rect.height / 2) {
+        index += 1
+      }
+    } else {
       const dernier = sans.reduce(
         (acc, s, i) => (conteneurDe(s.id) === cible ? i : acc),
         -1,
@@ -172,10 +192,7 @@ export function useServiceArrangement({
       index = dernier + 1
     }
 
-    const prochain = [...sans.slice(0, index), deplace, ...sans.slice(index)]
-    if (depart === cible && from === index) return
-
-    persister(prochain, items)
+    persister([...sans.slice(0, index), deplace, ...sans.slice(index)], items)
   }
 
   /* Ce que le calque doit représenter pendant le glisser. */

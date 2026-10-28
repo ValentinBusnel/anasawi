@@ -36,14 +36,14 @@ export function LogoMark({
   return (
     <Image
       src={src || logoAnasawi}
-      width={72}
-      height={72}
+      width={128}
+      height={128}
       alt=""
       aria-hidden="true"
       priority={priority}
-      /* 72px : le double de la plus grande taille d'affichage (36px dans
-         l'en-tête), pour rester net sur écran à haute densité. */
-      sizes="72px"
+      /* 128px : le double de la plus grande taille d'affichage (64px au
+         pied de page), pour rester net sur écran à haute densité. */
+      sizes="128px"
       className={cn('h-9 w-9 select-none object-contain', className)}
     />
   )

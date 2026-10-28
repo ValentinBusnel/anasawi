@@ -1,7 +1,14 @@
 import type { Metadata } from 'next'
 
 import { SITE_URL, absoluteUrl, stripHtml, toE164, truncate } from './utils'
-import type { FaqItem, Media, OpeningHour, Settings } from '@/server/db/schema'
+import type {
+  FaqItem,
+  Media,
+  OpeningHour,
+  ServiceWithMedia,
+  Settings,
+} from '@/server/db/schema'
+import type { SocialLink } from '@/types/content'
 import type { PageWithSections } from '@/server/queries'
 
 /**
@@ -62,10 +69,18 @@ export function buildMetadata({
       ]
     : [{ url: absoluteUrl('/opengraph-image'), width: 1200, height: 630 }]
 
+  /* Auteur et éditeur : la praticienne, puis le cabinet. Lu par les
+     moteurs pour rattacher la page à une personne réelle — un signal de
+     confiance qui compte dans le domaine du soin. */
+  const auteur = settings.practitionerName?.trim() || settings.siteName
+
   return {
     title,
     ...(description ? { description } : {}),
-    alternates: { canonical },
+    alternates: { canonical, languages: { 'fr-FR': canonical } },
+    applicationName: settings.siteName,
+    ...(auteur ? { authors: [{ name: auteur, url: absoluteUrl('/') }], creator: auteur, publisher: settings.siteName } : {}),
+    category: 'health',
     keywords: seo?.keywords?.length ? seo.keywords : undefined,
     robots: {
       index: seo?.robotsIndex ?? true,
@@ -232,14 +247,59 @@ function buildLogo(): Json {
   }
 }
 
+/** Les profils publics (réseaux, annuaires) : adresses absolues seulement. */
+function sameAs(settings: Settings): string[] {
+  const liens = (settings.socialLinks as SocialLink[] | null) ?? []
+  return liens
+    .map((l) => l.url?.trim())
+    .filter((url): url is string => !!url && /^https?:\/\//i.test(url))
+}
+
+/** L'adresse d'un accompagnement : la page, fiche ouverte. */
+function serviceUrl(slug: string): string {
+  return absoluteUrl(`/?accompagnement=${encodeURIComponent(slug)}`)
+}
+
+/**
+ * Le catalogue des accompagnements, rattaché au cabinet. Chaque entrée
+ * est un `Service` nommé, décrit, et relié à sa fiche. Aucun prix n'est
+ * déclaré : la durée et le tarif sont saisis en texte libre (« 1 h 15 ·
+ * 90 € »), et un prix mal lu serait affiché tel quel par Google.
+ */
+function buildOfferCatalog(services: ServiceWithMedia[], settings: Settings): Json | null {
+  if (services.length === 0) return null
+  return {
+    '@type': 'OfferCatalog',
+    name: 'Accompagnements',
+    itemListElement: services.map((service) =>
+      prune({
+        '@type': 'Offer',
+        itemOffered: prune({
+          '@type': 'Service',
+          name: service.title,
+          description: truncate(stripHtml(service.excerpt || service.body), 300),
+          serviceType: service.method,
+          url: serviceUrl(service.slug),
+          areaServed: settings.addressCity,
+          provider: { '@id': absoluteUrl('/#business') },
+        }),
+      }),
+    ),
+  }
+}
+
 export function buildOrganizationJsonLd(
   settings: Settings,
   imageUrl?: string,
+  services: ServiceWithMedia[] = [],
 ): Json {
   const address = buildAddress(settings)
 
   return prune({
-    '@type': 'HealthAndBeautyBusiness',
+    /* Un cabinet de thérapeute est un service professionnel local. Le
+       type précédent (`HealthAndBeautyBusiness`) est celui des instituts
+       de beauté et des spas : Google classait le cabinet à côté d'eux. */
+    '@type': ['LocalBusiness', 'ProfessionalService'],
     '@id': absoluteUrl('/#business'),
     name: settings.siteName,
     url: absoluteUrl('/'),
@@ -261,6 +321,8 @@ export function buildOrganizationJsonLd(
       (settings.openingHours as OpeningHour[]) ?? [],
     ),
     areaServed: settings.addressCity,
+    sameAs: sameAs(settings),
+    hasOfferCatalog: buildOfferCatalog(services, settings),
     /* Le graphe se lit dans les deux sens : le cabinet a une fondatrice,
        la praticienne travaille pour le cabinet — par référence, pas par
        copie. */
@@ -268,8 +330,23 @@ export function buildOrganizationJsonLd(
   })
 }
 
-export function buildPersonJsonLd(settings: Settings, image?: string): Json {
+export function buildPersonJsonLd(
+  settings: Settings,
+  image?: string,
+  services: ServiceWithMedia[] = [],
+): Json {
   if (!settings.practitionerName) return {}
+
+  /* Ce que la praticienne pratique — les méthodes et les accompagnements,
+     sans doublon. C'est ce qui relie son nom aux recherches
+     (« gestalt-thérapie Cesson-Sévigné »). */
+  const domaines = [
+    ...new Set(
+      services.flatMap((s) => [s.method?.trim(), s.title.trim()]).filter(
+        (v): v is string => !!v,
+      ),
+    ),
+  ]
 
   return prune({
     '@type': 'Person',
@@ -281,6 +358,8 @@ export function buildPersonJsonLd(settings: Settings, image?: string): Json {
     telephone: settings.contactPhone ? toE164(settings.contactPhone) : null,
     email: settings.contactEmail,
     address: buildAddress(settings),
+    knowsAbout: domaines,
+    sameAs: sameAs(settings),
     worksFor: { '@id': absoluteUrl('/#business') },
   })
 }
@@ -316,6 +395,10 @@ export function buildWebPageJsonLd(page: PageWithSections, path: string): Json {
     name: page.seo?.title || page.title,
     description: page.seo?.description,
     inLanguage: 'fr-FR',
+    /* La fraîcheur est un signal : la date de la dernière publication. */
+    /* `new Date(…)` : passée par le cache de Next, la date arrive parfois
+       sérialisée en texte. */
+    dateModified: isoDate(page.publishedAt ?? page.updatedAt),
     isPartOf: { '@id': absoluteUrl('/#website') },
     /* De quoi parle la page : du cabinet — c'est lui que Google doit
        rattacher à cette adresse. */
@@ -332,6 +415,12 @@ export function buildWebSiteJsonLd(settings: Settings): Json {
     inLanguage: 'fr-FR',
     publisher: { '@id': absoluteUrl('/#business') },
   })
+}
+
+function isoDate(valeur: Date | string | null | undefined): string | undefined {
+  if (!valeur) return undefined
+  const date = new Date(valeur)
+  return Number.isNaN(date.getTime()) ? undefined : date.toISOString()
 }
 
 /** Assemble un unique graphe — préférable à cinq balises séparées. */

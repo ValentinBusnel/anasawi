@@ -271,8 +271,15 @@ export function Header({
               qui en tenait lieu. Pas de rotation au survol : un
               astérisque qui tourne est un clin d'œil, une ombelle qui
               tourne est une image à l'envers. */}
-          <LogoMark src={logoUrl} priority className="h-7 w-7" />
-          <span className="font-serif text-[16.5px] font-light tracking-[0.26em]">
+          {/* 38 px (34 sur téléphone) au lieu de 28 : la marque se perdait
+              à côté du nom. Elle déborde un peu du padding de la capsule,
+              compensé par des marges négatives : la capsule ne grandit pas. */}
+          <LogoMark
+            src={logoUrl}
+            priority
+            className="-my-1.5 h-[34px] w-[34px] lg:h-[38px] lg:w-[38px]"
+          />
+          <span className="font-serif text-[17px] font-light tracking-[0.26em]">
             ANASAWI
           </span>
         </Link>

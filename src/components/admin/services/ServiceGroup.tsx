@@ -63,7 +63,7 @@ export function Famille({
       style={
         group
           ? {
-              transform: CSS.Transform.toString(sortable.transform),
+              transform: CSS.Translate.toString(sortable.transform),
               transition: sortable.transition,
             }
           : undefined

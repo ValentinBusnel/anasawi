@@ -85,7 +85,7 @@ export default async function SiteLayout({
         <main id="contenu" tabIndex={-1} className="outline-none">
           {children}
         </main>
-        <Footer settings={settings} items={navItems} />
+        <Footer settings={settings} items={navItems} logoUrl={logo?.url ?? null} />
       </SmoothScroll>
       <AdminBar />
     </MotionProvider>

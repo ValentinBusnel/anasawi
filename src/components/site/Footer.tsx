@@ -2,6 +2,7 @@ import { addressLines } from '@/lib/settings-helpers'
 import { navHref, toE164 } from '@/lib/utils'
 import type { Settings, SocialLink } from '@/server/db/schema'
 import type { NavItem } from './Header'
+import { LogoMark } from './Logo'
 
 /**
  * Pied de page — style M de la planche V8.
@@ -13,9 +14,12 @@ import type { NavItem } from './Header'
 export function Footer({
   settings,
   items,
+  logoUrl = null,
 }: {
   settings: Settings
   items: NavItem[]
+  /** Logo choisi dans les Réglages (absent : celui livré avec le site). */
+  logoUrl?: string | null
 }) {
   const year = new Date().getFullYear()
   const socials = (settings.socialLinks as SocialLink[]) ?? []
@@ -110,8 +114,11 @@ export function Footer({
           </p>
         )}
 
-        {/* ── Grande signature ────────────────────────────────────── */}
-        <p className="mt-10 max-w-full overflow-hidden pl-[0.3em] font-serif text-[clamp(36px,4.8vw,76px)] font-light leading-none tracking-[0.3em] text-ink md:mt-12">
+        {/* ── Grande signature ──────────────────────────────────────
+            L'ombelle au-dessus du nom : la marque n'apparaissait que dans
+            la capsule, en 28 px — on ne la voyait pas. */}
+        <LogoMark src={logoUrl} className="mx-auto mt-12 h-14 w-14 md:mt-14 md:h-16 md:w-16" />
+        <p className="mt-6 max-w-full overflow-hidden pl-[0.3em] font-serif text-[clamp(36px,4.8vw,76px)] font-light leading-none tracking-[0.3em] text-ink md:mt-7">
           ANASAWI
         </p>
         {signatureLine && (
