@@ -36,9 +36,9 @@ export function FaqAccordion({ items }: { items: FaqItem[] }) {
                 aria-expanded={isOpen}
                 aria-controls={panelId}
                 onClick={() => setOpenId(isOpen ? null : item.id)}
-                className="group flex w-full items-start justify-between gap-6 py-6 text-left transition-colors duration-500 hover:text-blue-deep sm:gap-10 sm:py-8"
+                className="group flex w-full items-start justify-between gap-6 py-6 text-left transition-colors duration-300 hover:text-blue-deep sm:gap-10 sm:py-8"
               >
-                <span className="font-serif text-[1.1rem] leading-[1.4] text-ink transition-colors duration-500 group-hover:text-blue-deep md:text-[1.25rem]">
+                <span className="font-serif text-[1.1rem] leading-[1.4] text-ink transition-colors duration-300 group-hover:text-blue-deep md:text-[1.25rem]">
                   {item.question}
                 </span>
 
@@ -47,9 +47,9 @@ export function FaqAccordion({ items }: { items: FaqItem[] }) {
                   aria-hidden="true"
                   className="relative mt-2 block h-3 w-3 shrink-0"
                 >
-                  <span className="absolute left-0 top-1/2 h-px w-3 -translate-y-1/2 bg-ink transition-colors duration-500 group-hover:bg-blue-deep" />
+                  <span className="absolute left-0 top-1/2 h-px w-3 -translate-y-1/2 bg-ink transition-colors duration-300 group-hover:bg-blue-deep" />
                   <span
-                    className="absolute left-1/2 top-0 h-3 w-px -translate-x-1/2 bg-ink transition-[transform,background-color] duration-500 ease-[var(--ease-out-soft)] group-hover:bg-blue-deep"
+                    className="absolute left-1/2 top-0 h-3 w-px -translate-x-1/2 bg-ink transition-[transform,background-color] duration-300 ease-[var(--ease-out-soft)] group-hover:bg-blue-deep"
                     style={{
                       transform: `translateX(-50%) rotate(${isOpen ? 90 : 0}deg)`,
                     }}

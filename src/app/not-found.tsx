@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
-
+import { ActionLink } from '@/components/site/ActionLink'
 import { LogoMark } from '@/components/site/Logo'
 
 /* Une page d'erreur indexée serait une page de plus offerte à Google —
@@ -27,18 +26,10 @@ export default function NotFound() {
         comporte une erreur.
       </p>
 
-      <Link
-        href="/"
-        className="group mt-12 inline-flex items-center gap-3 rounded-[2px] border border-line px-7 py-4 text-[0.8rem] uppercase tracking-[0.14em] text-ink transition-colors duration-500 hover:border-ink hover:bg-ink hover:text-ivory"
-      >
+      {/* Le bouton du site — pilule, encre liquide — et non un style à part. */}
+      <ActionLink href="/" variant="outline" className="mt-12">
         Retour à l’accueil
-        <span
-          aria-hidden="true"
-          className="transition-transform duration-500 group-hover:translate-x-1"
-        >
-          →
-        </span>
-      </Link>
+      </ActionLink>
     </main>
   )
 }

@@ -432,8 +432,10 @@ function Stagger({
   if (!on) return <div>{children}</div>
   return (
     <m.div
-      initial={{ opacity: 0, y: 18, filter: 'blur(4px)' }}
-      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+      /* Même geste que `Reveal`, sans flou animé (repeint à chaque image,
+         pendant que le panneau glisse : la fiche saccadait à l'ouverture). */
+      initial={{ opacity: 0, y: 18 }}
+      animate={{ opacity: 1, y: 0 }}
       /* Les délais des fiches sont écrits en absolu (0.2, 0.48, 0.54…) :
          ramenés de moitié, l'ordre reste, le bouton arrive avant qu'on
          ne le cherche. */

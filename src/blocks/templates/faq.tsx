@@ -61,7 +61,7 @@ function FaqEditoriale({
                     italique, le filet suffit à marquer la ligne active. */}
                 <details className="group border-b border-line">
                   <summary className="flex cursor-pointer list-none items-baseline justify-between gap-4 px-1.5 py-6 text-left sm:gap-5 md:py-7 [&::-webkit-details-marker]:hidden">
-                    <span className="font-serif text-[clamp(19px,1.7vw,26px)] font-light leading-[1.35] text-ink transition-colors duration-500 group-hover:text-blue-deep group-open:italic group-open:text-blue-deep">
+                    <span className="font-serif text-[clamp(19px,1.7vw,26px)] font-light leading-[1.35] text-ink transition-colors duration-300 group-hover:text-blue-deep group-open:italic group-open:text-blue-deep">
                       {item.question}
                     </span>
                     <span

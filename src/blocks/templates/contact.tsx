@@ -248,7 +248,7 @@ export const contactCarteSchema = z.object({
 const bigLink =
   'inline-block break-all font-serif font-light text-[clamp(1.3rem,2.4vw,2rem)] leading-[1.3] ' +
   'text-ink underline decoration-line-strong decoration-1 underline-offset-[10px] ' +
-  'transition-colors duration-500 ease-[var(--ease)] hover:text-blue-deep hover:decoration-blue-deep'
+  'transition-colors duration-300 ease-[var(--ease)] hover:text-blue-deep hover:decoration-blue-deep'
 
 function ContactCarte({
   data,

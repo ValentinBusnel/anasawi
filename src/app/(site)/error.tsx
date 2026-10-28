@@ -1,8 +1,8 @@
 'use client'
 
-import Link from 'next/link'
 import { useEffect } from 'react'
 
+import { ActionButton, ActionLink } from '@/components/site/ActionLink'
 import { LogoMark } from '@/components/site/Logo'
 
 /**
@@ -38,26 +38,11 @@ export default function SiteError({
       </p>
 
       <div className="mt-12 flex flex-wrap items-center justify-center gap-4">
-        <button
-          type="button"
-          onClick={() => reset()}
-          className="inline-flex items-center gap-3 rounded-[2px] border border-ink bg-ink px-7 py-4 text-[0.8rem] uppercase tracking-[0.14em] text-ivory transition-colors duration-500 hover:bg-transparent hover:text-ink"
-        >
-          Réessayer
-        </button>
-
-        <Link
-          href="/"
-          className="group inline-flex items-center gap-3 rounded-[2px] border border-line px-7 py-4 text-[0.8rem] uppercase tracking-[0.14em] text-ink transition-colors duration-500 hover:border-ink hover:bg-ink hover:text-ivory"
-        >
+        {/* Les boutons du site, plutôt que deux boutons à part. */}
+        <ActionButton onClick={() => reset()}>Réessayer</ActionButton>
+        <ActionLink href="/" variant="outline">
           Retour à l’accueil
-          <span
-            aria-hidden="true"
-            className="transition-transform duration-500 group-hover:translate-x-1"
-          >
-            →
-          </span>
-        </Link>
+        </ActionLink>
       </div>
     </div>
   )

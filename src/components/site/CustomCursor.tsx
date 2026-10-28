@@ -39,6 +39,8 @@ export function CustomCursor() {
        forme (taille + arrondi) et le suit, avec un léger jeu vers la
        souris pour garder de la vie. */
     let stuck: HTMLElement | null = null
+    /* Son arrondi, en pixels (NaN si non numérique). */
+    let stuckRadius = Number.NaN
     /* Marge autour du bouton, en pixels. */
     const PAD = 6
     /* Amplitude du jeu : fraction du décalage souris / centre du bouton. */
@@ -125,6 +127,9 @@ export function CustomCursor() {
         /* Accroche réservée à la barre de navigation (et aux éléments
            qui la demandent explicitement). */
         stuck = interactive
+        /* Lu UNE fois, à l'accroche : la boucle le relisait à chaque
+           image (getComputedStyle force un recalcul de style). */
+        stuckRadius = Number.parseFloat(getComputedStyle(interactive).borderRadius)
         ring.dataset.big = 'stuck'
         dot.dataset.big = 'stuck'
         label.textContent = ''
@@ -183,10 +188,11 @@ export function CustomCursor() {
           ring.style.height = `${h}px`
           /* Jamais d'angle vif : un lien sans arrondi (le logo) donnerait
              un rectangle sec. On remonte au minimum à la capsule. */
-          const own = Number.parseFloat(getComputedStyle(stuck).borderRadius)
           const pill = h / 2
           ring.style.borderRadius =
-            Number.isFinite(own) && own > pill ? `${own}px` : `${pill}px`
+            Number.isFinite(stuckRadius) && stuckRadius > pill
+              ? `${stuckRadius}px`
+              : `${pill}px`
         }
       }
 

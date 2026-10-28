@@ -28,6 +28,71 @@ const inks: Record<Variant, string> = {
   ghost: 'bg-blue-mist',
 }
 
+/** Libellé + flèche + encre : le contenu commun du lien et du bouton. */
+function ActionContent({
+  variant,
+  withArrow,
+  ink,
+  children,
+}: {
+  variant: Variant
+  withArrow: boolean
+  ink?: string
+  children: React.ReactNode
+}) {
+  return (
+    <>
+      <LiquidFill className={ink ?? inks[variant]} />
+      <span className="relative z-[1]">{children}</span>
+      {withArrow && (
+        <span
+          aria-hidden="true"
+          className="relative z-[1] inline-block transition-transform duration-[350ms] ease-[var(--ease)] group-hover:translate-x-1"
+        >
+          →
+        </span>
+      )}
+    </>
+  )
+}
+
+/**
+ * Le même bouton, pour une ACTION plutôt qu'une navigation (envoi d'un
+ * formulaire, « Réessayer »). Avant, ces boutons gardaient un ancien style
+ * — angles vifs, autre corps, autre interlettrage — et juraient à côté des
+ * pilules du reste du site.
+ */
+export function ActionButton({
+  children,
+  variant = 'primary',
+  className,
+  withArrow = false,
+  ink,
+  ...props
+}: Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'children'> & {
+  children: React.ReactNode
+  variant?: Variant
+  withArrow?: boolean
+  ink?: string
+}) {
+  return (
+    <button
+      type="button"
+      {...props}
+      className={cn(
+        base,
+        variants[variant],
+        'disabled:pointer-events-none disabled:opacity-60',
+        className,
+      )}
+    >
+      <ActionContent variant={variant} withArrow={withArrow} ink={ink}>
+        {children}
+      </ActionContent>
+    </button>
+  )
+}
+
 export function ActionLink({
   href,
   children,
@@ -51,18 +116,9 @@ export function ActionLink({
   ink?: string
 }) {
   const content = (
-    <>
-      <LiquidFill className={ink ?? inks[variant]} />
-      <span className="relative z-[1]">{children}</span>
-      {withArrow && (
-        <span
-          aria-hidden="true"
-          className="relative z-[1] inline-block transition-transform duration-[350ms] ease-[var(--ease)] group-hover:translate-x-1"
-        >
-          →
-        </span>
-      )}
-    </>
+    <ActionContent variant={variant} withArrow={withArrow} ink={ink}>
+      {children}
+    </ActionContent>
   )
 
   const classes = cn(base, variants[variant], className)

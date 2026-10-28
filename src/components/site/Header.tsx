@@ -245,7 +245,9 @@ export function Header({
           'fixed left-1/2 top-4 z-[110] flex w-max items-center gap-1.5',
           'rounded-full border border-line bg-[rgba(251,248,242,0.82)] py-[7px] pl-5 pr-2',
           'shadow-[0_10px_34px_rgba(43,47,44,0.07)] backdrop-blur-[16px]',
-          'transition-transform duration-700 ease-[var(--ease)]',
+          /* 500 ms : à 700, la capsule rappelée en remontant arrivait
+             après le regard. */
+          'transition-transform duration-500 ease-[var(--ease)]',
           '-translate-x-1/2',
           /* Sous `lg`, la capsule ne dépasse jamais l'écran. */
           'max-lg:max-w-[calc(100vw-24px)] max-lg:pl-4',
@@ -329,14 +331,14 @@ export function Header({
             <span
               aria-hidden="true"
               className={cn(
-                'absolute h-px w-[18px] bg-current transition-transform duration-500 ease-[var(--ease)]',
+                'absolute h-px w-[18px] bg-current transition-transform duration-[400ms] ease-[var(--ease)]',
                 open ? 'rotate-45' : '-translate-y-[3.5px]',
               )}
             />
             <span
               aria-hidden="true"
               className={cn(
-                'absolute h-px w-[18px] bg-current transition-transform duration-500 ease-[var(--ease)]',
+                'absolute h-px w-[18px] bg-current transition-transform duration-[400ms] ease-[var(--ease)]',
                 open ? '-rotate-45' : 'translate-y-[3.5px]',
               )}
             />
@@ -359,7 +361,10 @@ export function Header({
           inert={!open ? true : undefined}
           className={cn(
             'fixed inset-0 z-[105] flex flex-col overflow-y-auto bg-night text-ivory lg:hidden',
-            'transition-[opacity,visibility,transform] duration-700 ease-[var(--ease)]',
+            /* 450 ms : le panneau couvre l'écran, il doit s'effacer vite
+               — à 700, après un choix de rubrique, il restait devant la
+               page pendant que celle-ci défilait déjà. */
+            'transition-[opacity,visibility,transform] duration-[450ms] ease-[var(--ease)]',
             open
               ? 'visible translate-y-0 opacity-100'
               : 'invisible -translate-y-3 opacity-0',
@@ -427,7 +432,7 @@ export function Header({
                   </a>
                 )
 
-                /* Cascade : chaque ligne monte depuis un masque, 70 ms
+                /* Cascade : chaque ligne monte depuis un masque, 40 ms
                    d'écart. Mouvement réduit : rendu direct. */
                 if (reduced) {
                   return <li key={item.anchor}>{link}</li>
@@ -444,8 +449,8 @@ export function Header({
                       }
                       transition={
                         open
-                          ? { duration: 0.6, ease: EASE, delay: 0.06 + i * 0.05 }
-                          : { duration: 0.35, ease: EASE }
+                          ? { duration: 0.5, ease: EASE, delay: 0.04 + i * 0.04 }
+                          : { duration: 0.25, ease: EASE }
                       }
                     >
                       {link}

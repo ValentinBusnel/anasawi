@@ -22,7 +22,7 @@ export function InvitationForm({ token, email }: { token: string; email: string 
   const [fait, setFait] = useState(false)
 
   const champ =
-    'mt-2 w-full border-0 border-b border-line bg-transparent pb-2.5 pt-1.5 text-[0.95rem] outline-none transition-colors duration-500 focus:border-blue-deep'
+    'mt-2 w-full border-0 border-b border-line bg-transparent pb-2.5 pt-1.5 text-[0.95rem] outline-none transition-colors duration-200 focus:border-blue-deep'
   const libelle = 'block text-[0.72rem] uppercase tracking-[0.16em] text-stone'
 
   if (fait) {

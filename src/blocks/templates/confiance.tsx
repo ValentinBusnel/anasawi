@@ -266,7 +266,7 @@ function LogosPresse({
                 alt={logo.alt}
                 width={logo.width || 160}
                 height={logo.height || 60}
-                className="h-9 w-auto opacity-55 grayscale transition-opacity duration-500 hover:opacity-90 sm:h-11"
+                className="h-9 w-auto opacity-55 grayscale transition-opacity duration-300 hover:opacity-90 sm:h-11"
               />
             </Reveal>
           ))}

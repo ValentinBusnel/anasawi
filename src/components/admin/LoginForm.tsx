@@ -37,7 +37,7 @@ export function LoginForm() {
           type="email"
           required
           autoComplete="username"
-          className="mt-2 w-full border-0 border-b border-line bg-transparent pb-2.5 pt-1.5 text-[0.95rem] outline-none transition-colors duration-500 focus:border-blue-deep"
+          className="mt-2 w-full border-0 border-b border-line bg-transparent pb-2.5 pt-1.5 text-[0.95rem] outline-none transition-colors duration-200 focus:border-blue-deep"
         />
       </div>
 
@@ -54,7 +54,7 @@ export function LoginForm() {
           type="password"
           required
           autoComplete="current-password"
-          className="mt-2 w-full border-0 border-b border-line bg-transparent pb-2.5 pt-1.5 text-[0.95rem] outline-none transition-colors duration-500 focus:border-blue-deep"
+          className="mt-2 w-full border-0 border-b border-line bg-transparent pb-2.5 pt-1.5 text-[0.95rem] outline-none transition-colors duration-200 focus:border-blue-deep"
         />
       </div>
 

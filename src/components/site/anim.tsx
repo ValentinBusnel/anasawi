@@ -81,9 +81,14 @@ export function useAnimEnabled(): boolean {
 }
 
 /* ── Reveal ────────────────────────────────────────────────────────────
-   Révélation de la maquette : 18px plus bas, flou de 4px, opacité 0 →
-   net en 0.7s sur la courbe signature (1 s et 26 px à l'origine : le
-   même geste, plus vif). */
+   Révélation de la maquette : 18px plus bas, opacité 0 → en place en
+   0.7s sur la courbe signature (1 s et 26 px à l'origine : le même geste,
+   plus vif).
+
+   Plus de flou d'entrée : un `filter: blur()` animé se repeint à chaque
+   image, sur chaque bloc révélé — sur une page qui en compte des dizaines,
+   c'était la principale source de saccades au défilement. Opacité et
+   translation restent sur le compositeur ; le geste est le même. */
 
 export function Reveal({
   children,
@@ -102,8 +107,8 @@ export function Reveal({
   return (
     <m.div
       className={className}
-      initial={{ opacity: 0, y: 18, filter: 'blur(4px)' }}
-      whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+      initial={{ opacity: 0, y: 18 }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={VIEWPORT}
       transition={{ duration: 0.7, ease: EASE, delay: tempo(delay) }}
     >
@@ -158,7 +163,6 @@ export function MaskLines({
       {lines.map((line, i) => (
         <div key={i} className={cn('line-mask', lineClassName)}>
           <m.div
-            className="will-change-transform"
             initial={{ y: '110%' }}
             animate={inView ? { y: '0%' } : { y: '110%' }}
             transition={{ duration: 0.8, ease: EASE, delay: tempo(delay) + i * step * 0.7 }}
@@ -225,6 +229,12 @@ export function SplitChars({
   }
 
   let index = 0
+  /* 20 ms entre deux lettres, mais la vague entière ne dépasse pas
+     ~0,45 s : sur un titre de quarante lettres, la dernière arrivait
+     près d'une seconde et demie après la première. Les titres courts
+     gardent exactement le rythme d'origine. */
+  const lettres = text.replace(/ /g, '').length
+  const pas = Math.min(0.02, 0.45 / Math.max(lettres, 1))
 
   return (
     <Comp className={cn('line-mask', style, className)} aria-label={text}>
@@ -236,12 +246,15 @@ export function SplitChars({
               {Array.from(mot).map((char) => {
                 const i = index++
                 return (
+                  /* Pas de `will-change` permanent : une couche graphique
+                     par lettre, gardée après l'animation, pour rien. Motion
+                     promeut l'élément le temps du mouvement. */
                   <m.span
                     key={i}
-                    className="inline-block will-change-transform"
+                    className="inline-block"
                     initial={{ y: '115%' }}
                     animate={inView ? { y: '0%' } : { y: '115%' }}
-                    transition={{ duration: 0.75, ease: EASE, delay: tempo(delay) + i * 0.02 }}
+                    transition={{ duration: 0.75, ease: EASE, delay: tempo(delay) + i * pas }}
                   >
                     {char}
                   </m.span>
@@ -521,22 +534,27 @@ export function WordsIgnite({
 }) {
   const on = useAnimEnabled()
   const Comp: ElementType = as ?? 'p'
+  /* UN observateur pour tout le paragraphe. Chaque mot portait le sien
+     (`whileInView`) : quatre-vingts mots, quatre-vingts observateurs, pour
+     un seul déclenchement. Le rendu est le même — les mots s'allument
+     dans l'ordre, à la même cadence. */
+  const ref = useRef<HTMLElement>(null)
+  const inView = useInView(ref, VIEWPORT)
 
   if (!on) return <Comp className={className}>{text}</Comp>
 
   const words = text.split(/\s+/).filter((word) => word.length > 0)
 
   return (
-    <Comp className={className} aria-label={text}>
+    <Comp ref={ref} className={className} aria-label={text}>
       {words.map((word, i) => (
         <span key={i} aria-hidden="true">
           {i > 0 ? ' ' : null}
           <m.span
             className="inline-block"
             initial={{ opacity: 0.14 }}
-            whileInView={{ opacity: 1 }}
-            viewport={VIEWPORT}
-            transition={{ duration: 0.3, delay: tempo(delay) + i * step }}
+            animate={{ opacity: inView ? 1 : 0.14 }}
+            transition={{ duration: 0.3, delay: inView ? tempo(delay) + i * step : 0 }}
           >
             {word}
           </m.span>

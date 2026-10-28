@@ -101,7 +101,7 @@ export function EditorStage({
             <button
               type="button"
               onClick={onAddFirst}
-              className="mt-5 inline-flex items-center gap-2 rounded-lg bg-blue-deep px-4 py-2 text-[12.5px] font-medium text-white transition-all hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-deep/50 focus-visible:ring-offset-2"
+              className="mt-5 inline-flex items-center gap-2 rounded-lg bg-blue-deep px-4 py-2 text-[12.5px] font-medium text-white transition-[filter] hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-deep/50 focus-visible:ring-offset-2"
             >
               <Plus className="h-3.5 w-3.5" strokeWidth={1.8} />
               Ajouter votre première section

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 
+import { ActionButton } from '@/components/site/ActionLink'
 import { contactSchema } from '@/lib/schemas'
 import { cn } from '@/lib/utils'
 
@@ -19,7 +20,7 @@ const FIELD_ORDER = ['name', 'email', 'phone', 'message', 'consent'] as const
    global, que `outline-none` retirait ici sans le remplacer. */
 const fieldClass =
   'w-full border-0 border-b border-line-strong bg-transparent pb-3 pt-2 text-[0.95rem] ' +
-  'text-ink outline-none transition-[border-color,box-shadow] duration-500 placeholder:text-stone ' +
+  'text-ink outline-none transition-[border-color,box-shadow] duration-200 placeholder:text-stone ' +
   'focus-visible:border-blue-deep focus-visible:shadow-[0_2px_0_0_var(--color-blue-deep)] ' +
   'aria-[invalid=true]:border-[#b4342c]'
 
@@ -242,16 +243,9 @@ export function ContactForm() {
         {errors.consent && <ErrorText id="consent-error">{errors.consent}</ErrorText>}
       </div>
 
-      <button
-        type="submit"
-        disabled={status === 'sending'}
-        className="group inline-flex items-center gap-3 rounded-[2px] bg-blue px-8 py-4 text-[0.8rem] font-medium uppercase tracking-[0.14em] text-ink transition-colors duration-500 ease-[var(--ease-out-soft)] hover:bg-blue-deep hover:text-ivory disabled:opacity-60"
-      >
+      <ActionButton type="submit" disabled={status === 'sending'} withArrow>
         {status === 'sending' ? 'Envoi…' : 'Envoyer le message'}
-        <span aria-hidden="true" className="transition-transform duration-500 group-hover:translate-x-1">
-          →
-        </span>
-      </button>
+      </ActionButton>
     </form>
   )
 }

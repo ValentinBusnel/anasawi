@@ -103,7 +103,7 @@ function Services({ data, ctx }: BlockProps<ServicesPayload>) {
                   </span>
 
                   <div className="lg:col-span-4">
-                    <h3 className="text-[length:var(--text-h3)] transition-transform duration-700 ease-[var(--ease)] group-hover:translate-x-2">
+                    <h3 className="text-[length:var(--text-h3)] transition-transform duration-500 ease-[var(--ease)] group-hover:translate-x-2">
                       {service.title}
                     </h3>
                     {service.duration && (
