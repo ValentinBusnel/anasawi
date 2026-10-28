@@ -61,8 +61,6 @@ En développement, les médias envoyés vont dans `.storage/` (ignoré par Git) 
 | `npm run db:prune-pages` | supprime les anciennes pages secondaires (le site est à page unique) |
 | `npm run admin:create` · `npm run doctor` | compte administrateur · diagnostic |
 
-Scripts « double-clic » pour macOS dans `scripts/*.command` (chacun écrit son journal dans `.e2e-logs/`) : `lancer-les-tests`, `construire` (lint + typecheck + build), `deployer` (push de la branche lue dans `.e2e-logs/branche.txt`), `migrer-la-base`, `copier-le-contenu` (dev → préprod/prod, cible dans `.e2e-logs/copie.txt`), `nettoyer-les-pages`, `retirer-les-temoignages`. Les scripts de copie et de retrait écrivent dans la base indiquée par leur fichier de cible : lire le fichier avant de double-cliquer.
-
 ---
 
 ## Structure
