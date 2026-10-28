@@ -47,11 +47,14 @@ export function ServiceRows({
   bookingHref,
   ctaLabel,
   interactive = true,
+  preview = true,
 }: {
   items: ServiceWithMedia[]
   bookingHref: string
   ctaLabel?: string
   interactive?: boolean
+  /** Carte d'aperçu au survol (option de la section). */
+  preview?: boolean
 }) {
   const [openSlug, setOpenSlug] = useState<string | null>(null)
 
@@ -116,7 +119,7 @@ export function ServiceRows({
     setOpenSlug(null)
   }, [])
 
-  const showPreview = interactive && canHover && openSlug === null
+  const showPreview = preview && interactive && canHover && openSlug === null
   const hovered = hoverIndex !== null ? (items[hoverIndex] ?? null) : null
 
   return (
@@ -174,7 +177,9 @@ export function ServiceRows({
 
                 <p
                   className={`mt-1 max-w-[40ch] text-[14.5px] leading-[1.75] text-stone transition-[opacity,transform,color] duration-[450ms] group-hover:text-ivory/75 lg:mt-0 lg:translate-y-1.5 lg:text-[14px] lg:opacity-0 ${
-                    showPreview
+                    /* Aperçu désactivé : sur grand écran, la ligne reste
+                       sobre (le résumé n'y réserve pas de place). */
+                    showPreview || !preview
                       ? 'lg:hidden'
                       : 'lg:group-hover:translate-y-0 lg:group-hover:opacity-100'
                   }`}

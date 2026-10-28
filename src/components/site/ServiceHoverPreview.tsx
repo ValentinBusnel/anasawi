@@ -5,7 +5,6 @@ import {
   useMotionValue,
   useSpring,
   useTransform,
-  useVelocity,
   type MotionValue,
 } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
@@ -92,12 +91,8 @@ export function ServiceHoverPreview({
     y.jump(pointerY.get())
   }, [visible, x, y, pointerX, pointerY])
 
-  /* Inclinaison depuis la vitesse horizontale, bornée : une nuance. */
-  const velocity = useVelocity(x)
-  const rotate = useTransform(velocity, [-2400, 0, 2400], [-3, 0, 3], {
-    clamp: true,
-  })
-  const rotateSmooth = useSpring(rotate, { stiffness: 180, damping: 24 })
+  /* Plus d'inclinaison selon la vitesse de la souris : la carte suit le
+     curseur, droite. */
 
   /* La dernière fiche survolée reste affichée pendant le fondu de sortie. */
   const [shown, setShown] = useState<{
@@ -150,19 +145,19 @@ export function ServiceHoverPreview({
 
   const body = paragraphs(shown.service.body)
   const texte = body.length > 0 ? body : [shown.service.excerpt]
-  const duration = on ? (visible ? 0.55 : 0.32) : 0
+  const duration = on ? (visible ? 0.35 : 0.2) : 0
 
   return createPortal(
     <>
       <m.div
         aria-hidden="true"
         className="pointer-events-none fixed z-[60] hidden md:block"
-        style={{ left, top, width: CARD_W, rotate: rotateSmooth }}
+        style={{ left, top, width: CARD_W }}
         initial={false}
         animate={{
           opacity: visible ? 1 : 0,
-          scale: visible ? 1 : 0.94,
-          y: visible ? 0 : 14,
+          scale: visible ? 1 : 0.98,
+          y: visible ? 0 : 6,
         }}
         transition={{ duration, ease: EASE }}
       >
@@ -171,34 +166,13 @@ export function ServiceHoverPreview({
         <article
           ref={cardRef}
           style={{ minHeight: CARD_MIN_H, maxHeight: `calc(100vh - ${MARGIN * 2}px)` }}
-          /* Carte « Froide » de la planche : blanc franc, angles serrés, et
-             trois bulles translucides aux couleurs de la charte, rognées par
-             les bords — deux bleus qui se chevauchent en haut à droite (le
-             recouvrement s'assombrit par multiplication), une sauge en bas à
-             gauche. Le texte passe au-dessus. */
-          /* Réglage iOS : blanc à 58 % seulement — c'est la transparence qui
-             fait l'effet —, flou fort et saturation poussée pour que ce qui
-             transparaît garde ses couleurs au lieu de virer au gris. */
-          className="relative isolate flex flex-col overflow-hidden rounded-[18px] border border-white/70 bg-white/[0.58] px-7 pb-6 pt-7 text-ink shadow-[0_32px_80px_-24px_rgba(46,66,79,0.5),0_1px_0_rgba(255,255,255,0.95)_inset] backdrop-blur-[36px] backdrop-saturate-[2]"
+          /* Carte sobre : fond ivoire plein, filet fin, ombre douce. Les
+             trois bulles colorées, le verre dépoli saturé et l'astérisque
+             sont retirés — la carte garde sa place et son contenu, sans
+             décor. */
+          className="relative flex flex-col overflow-hidden rounded-[14px] border border-line bg-ivory px-7 pb-6 pt-7 text-ink shadow-[0_18px_48px_-22px_rgba(46,66,79,0.28)]"
         >
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute -right-10 -top-[72px] -z-10 h-[210px] w-[210px] rounded-full bg-blue-deep/55 mix-blend-multiply"
-          />
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute right-[64px] -top-[46px] -z-10 h-[156px] w-[156px] rounded-full bg-blue/60 mix-blend-multiply"
-          />
-          <span
-            aria-hidden="true"
-            /* Sauge : pas encore de jeton dans la charte — candidat à en
-               devenir un si la bulle plaît. */
-            className="pointer-events-none absolute -bottom-[96px] -left-12 -z-10 h-[180px] w-[180px] rounded-full bg-[#b8d1c5]/75 mix-blend-multiply"
-          />
           <p className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-stone">
-            <span aria-hidden="true" className="text-blue-deep">
-              ✳︎
-            </span>
             {shown.service.group?.label.trim() ||
               `Accompagnement · ${numberWordFr(shown.index)}`}
             {shown.service.method && (
@@ -220,7 +194,7 @@ export function ServiceHoverPreview({
             {overflowing && (
               <span
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-white/90 via-white/60 to-transparent"
+                className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-ivory via-ivory/70 to-transparent"
               />
             )}
           </div>

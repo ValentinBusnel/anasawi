@@ -43,6 +43,9 @@ export const servicesListeSchema = z.object({
   title: z.string().default(''),
   intro: z.string().default(''),
   panelCta: z.string().default('Prendre rendez-vous'),
+  /* Vrai par défaut : les sections déjà enregistrées gardent leur
+     comportement. */
+  hoverPreview: z.boolean().default(true),
 })
 
 function ServicesListe({
@@ -85,6 +88,7 @@ function ServicesListe({
           bookingHref={bookingHref(ctx.settings, '#contact')}
           ctaLabel={data.panelCta}
           interactive={!ctx.editable}
+          preview={data.hoverPreview}
         />
       )}
     </div>
@@ -110,6 +114,9 @@ export const servicesListeBlock: BlockDefinition<typeof servicesListeSchema> =
       field.text('panelCta', 'Fiche — bouton', {
         help: 'Le bouton en bas de la fiche qui s’ouvre au clic sur un accompagnement. Il mène à la prise de rendez-vous des Réglages, ou à la section Contact.',
       }),
+      field.boolean('hoverPreview', 'Aperçu au survol', {
+        help: 'Sur ordinateur, une petite carte présente l’accompagnement quand la souris passe sur sa ligne. Décochée : la ligne seule réagit, et le clic ouvre toujours la fiche.',
+      }),
     ],
     defaults: {
       eyebrow: 'Accompagnements',
@@ -117,6 +124,7 @@ export const servicesListeBlock: BlockDefinition<typeof servicesListeSchema> =
       intro:
         'Cinq accompagnements, rangés par ce qu’ils permettent plutôt que par leur méthode. Au cabinet de Cesson-Sévigné ou en visio.',
       panelCta: 'Prendre rendez-vous',
+      hoverPreview: true,
     },
     Component: ServicesListe,
   }
