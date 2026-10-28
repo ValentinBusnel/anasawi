@@ -334,7 +334,7 @@ function ContactCarte({
           <aside className="rounded-[28px] bg-cream px-6 py-2 sm:px-8">
             {address.length > 0 && (
               <div className="border-b border-line py-6">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-blue-deep">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-stone">
                   Le cabinet
                 </p>
                 <address className="mt-2.5 text-[0.92rem] not-italic leading-[1.75] text-ink">
@@ -359,7 +359,7 @@ function ContactCarte({
 
             {hours.length > 0 && (
               <div className="border-b border-line py-6">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-blue-deep">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-stone">
                   Horaires
                 </p>
                 <dl className="mt-2.5">
@@ -380,7 +380,7 @@ function ContactCarte({
 
             {s.practicalInfo && (
               <div className="border-b border-line py-6">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-blue-deep">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-stone">
                   Bon à savoir
                 </p>
                 <p className="mt-2.5 text-[0.88rem] leading-[1.75] text-ink-soft">

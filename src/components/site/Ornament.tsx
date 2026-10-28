@@ -1,7 +1,3 @@
-'use client'
-
-import { m, useReducedMotion } from 'motion/react'
-
 import { cn } from '@/lib/utils'
 import type { OrnamentMotif, OrnamentPosition, OrnamentSize } from '@/lib/section-settings'
 
@@ -81,7 +77,6 @@ export function Ornament({
   /** Section à fond sombre : le trait passe en ivoire. */
   dark?: boolean
 }) {
-  const reduced = useReducedMotion()
   if (motif === 'aucun') return null
 
   const paths = MOTIFS[motif]
@@ -97,36 +92,14 @@ export function Ornament({
         'pointer-events-none absolute -z-10 h-auto',
         SIZE[size],
         POSITION[position],
-        dark ? 'text-ivory/25' : 'text-blue-deep/20',
+        dark ? 'text-ivory/15' : 'text-blue-deep/12',
       )}
     >
-      {paths.map((d, i) =>
-        reduced ? (
-          <path
-            key={i}
-            d={d}
-            stroke="currentColor"
-            strokeWidth={1}
-            strokeLinecap="round"
-          />
-        ) : (
-          <m.path
-            key={i}
-            d={d}
-            stroke="currentColor"
-            strokeWidth={1}
-            strokeLinecap="round"
-            initial={{ pathLength: 0, opacity: 0 }}
-            whileInView={{ pathLength: 1, opacity: 1 }}
-            viewport={{ once: true, amount: 0.2, margin: '0px 0px -10% 0px' }}
-            transition={{
-              duration: 2.2,
-              delay: 0.2 + i * 0.25,
-              ease: [0.22, 1, 0.36, 1],
-            }}
-          />
-        ),
-      )}
+      {/* Tracés posés tels quels : le dessin lent (2,2 s par trait)
+          attirait l'œil sur un décor qui doit rester en filigrane. */}
+      {paths.map((d, i) => (
+        <path key={i} d={d} stroke="currentColor" strokeWidth={1} strokeLinecap="round" />
+      ))}
     </svg>
   )
 }

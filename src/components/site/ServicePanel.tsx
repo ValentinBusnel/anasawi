@@ -320,7 +320,6 @@ export function ServicePanel({
             type="button"
             onClick={onClose}
             aria-label="Fermer la fiche"
-            data-cursor-stick
             className="absolute right-4 top-4 z-[2] flex h-11 w-11 items-center justify-center rounded-full border border-line bg-ivory/85 text-ink backdrop-blur transition-[background-color,border-color,transform] duration-[350ms] ease-[var(--ease)] hover:border-ink hover:bg-ivory active:scale-95 md:right-5 md:top-5"
           >
             <svg

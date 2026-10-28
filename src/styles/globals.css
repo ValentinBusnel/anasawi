@@ -65,7 +65,9 @@
          qui doit laisser passer la capsule de navigation (7rem mini).
      Le contact K (grande arche) compose : marge externe ½ section,
      padding interne 1 section en haut, ½ section en bas. */
-  --spacing-section: clamp(72px, 12vh, 130px);
+  /* Plus d'air : environ un quart de respiration en plus entre les
+     sections (72–130 px auparavant). */
+  --spacing-section: clamp(92px, 15vh, 168px);
   --spacing-section-tight: calc(var(--spacing-section) * 0.6);
   --spacing-band: clamp(24px, 3vh, 32px);
   --spacing-hero-top: max(calc(var(--spacing-section) * 0.7), 7rem);
@@ -250,16 +252,6 @@
     display: none;
   }
 
-  /* Curseur personnalisé — la classe est posée par <CustomCursor> quand
-     le pointeur est fin et que le mouvement n'est pas réduit. */
-  @media (hover: hover) and (pointer: fine) {
-    html.anasawi-cursor body,
-    html.anasawi-cursor a,
-    html.anasawi-cursor button,
-    html.anasawi-cursor [data-cursor] {
-      cursor: none;
-    }
-  }
 
 }
 
@@ -290,25 +282,19 @@
   font-family: var(--font-sans);
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.24em;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--color-blue-deep);
+  /* Gris pierre : le bleu est réservé aux actions. */
+  color: var(--color-stone);
 }
 
-/* Grain très léger — évite l'aplat numérique sur les grands fonds ivoire */
+/* Grain — retiré. Le bruit en filigrane sur les fonds ivoire n'apportait
+   rien qu'on remarque, sinon une impression de « texture » qui alourdit.
+   L'utilitaire reste (les templates le posent) et ne fait plus rien
+   d'autre que créer un contexte d'empilement, comme avant. */
 @utility grain {
   position: relative;
   isolation: isolate;
-
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    opacity: 0.028;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
-  }
 }
 
 /* Inversion — pour tout texte qui chevauche une image ou un aplat.
@@ -360,10 +346,6 @@
   to {
     transform: translateX(-50%);
   }
-}
-
-.anasawi-spin {
-  animation: anasawi-spin 26s linear infinite;
 }
 
 .anasawi-marquee {

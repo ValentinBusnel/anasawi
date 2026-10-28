@@ -244,7 +244,7 @@ export function Header({
              lignes à 1 440 px. Elle prend la largeur de son contenu. */
           'fixed left-1/2 top-4 z-[110] flex w-max items-center gap-1.5',
           'rounded-full border border-line bg-[rgba(251,248,242,0.82)] py-[7px] pl-5 pr-2',
-          'shadow-[0_10px_34px_rgba(43,47,44,0.07)] backdrop-blur-[16px]',
+          'shadow-[0_2px_14px_rgba(43,47,44,0.045)] backdrop-blur-[16px]',
           /* 500 ms : à 700, la capsule rappelée en remontant arrivait
              après le regard. */
           'transition-transform duration-500 ease-[var(--ease)]',

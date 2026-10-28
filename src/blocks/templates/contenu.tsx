@@ -653,8 +653,12 @@ function SeparateurAsterisque({
     <div className="flex justify-center py-[var(--spacing-band)]">
       <Reveal>
         {data.variant === 'points' && <Dots />}
+        {/* L'astérisque est ici le SUJET de la variante, pas un décor : il
+            reste un vrai ✳︎ (et non le point qu'est devenu `Aster`). */}
         {data.variant === 'asterisque' && (
-          <Aster className="text-[22px] text-blue-deep" />
+          <span aria-hidden="true" className="font-serif text-[22px] text-blue-deep">
+            ✳︎
+          </span>
         )}
         {data.variant === 'filet' && (
           <span aria-hidden="true" className="block h-16 w-px bg-line-strong" />

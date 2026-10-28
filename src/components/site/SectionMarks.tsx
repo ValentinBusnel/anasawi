@@ -1,4 +1,3 @@
-import { toRoman } from '@/lib/format'
 import { cn } from '@/lib/utils'
 
 /**
@@ -10,11 +9,23 @@ import { cn } from '@/lib/utils'
  * template consomme pour parler la même langue.
  */
 
-/** L'astérisque ✳︎ seul, en serif — l'ornement signature. */
+/**
+ * L'ornement des templates. Ce fut l'astérisque ✳︎, répété partout
+ * (au-dessus des citations, en puce, entre deux titres) ; c'est désormais
+ * un simple point, de la couleur du texte — la ponctuation reste, le décor
+ * se tait. Les tailles passées par `className` sont sans effet ; la
+ * couleur et les marges sont conservées.
+ */
 export function Aster({ className }: { className?: string }) {
   return (
-    <span aria-hidden="true" className={cn('font-serif', className)}>
-      ✳︎
+    <span
+      aria-hidden="true"
+      className={cn(
+        'inline-flex h-[1em] items-center justify-center align-middle',
+        className,
+      )}
+    >
+      <span className="block size-[5px] rounded-full bg-current opacity-70" />
     </span>
   )
 }
@@ -36,55 +47,33 @@ export function MetaLabel({
   return (
     <p
       className={cn(
-        'font-sans text-[11px] font-semibold uppercase tracking-[0.24em]',
-        tone === 'accent' && 'text-blue-deep',
-        tone === 'muted' && 'text-stone',
-        tone === 'light' && 'text-ivory/70',
+        'font-sans text-[11px] font-semibold uppercase tracking-[0.22em]',
+        /* Gris pierre, sans ornement — voir `Eyebrow`. Sur fond nuit,
+           l'ivoire atténué reste. */
+        tone === 'light' ? 'text-ivory/70' : 'text-stone',
         className,
       )}
     >
-      <Aster className="text-[1.2em] font-normal normal-case tracking-normal" />
-      <span aria-hidden="true">&nbsp;&nbsp;</span>
-      <span>{children}</span>
+      {children}
     </p>
   )
 }
 
 /**
- * Index de section en serif italique, posé en haut à droite de la section.
- * `index` vient de `ctx.index` (position de la section dans la page).
- *
- * Position unique, partout : 28px du haut de la SECTION, une gouttière du
- * bord droit (`section-index`, globals.css). La racine du template doit
- * être `relative` ; SectionsView fournit `--section-index-top` pour
- * compenser le padding du wrapper — aucun template n'a à passer de `top-…`.
+ * Index de section (« iv — approche »), en haut à droite de chaque
+ * section. N'est plus affiché : répété sur toute la page, il ajoutait un
+ * niveau de lecture sans information utile au visiteur. Le composant reste
+ * — les templates l'appellent toujours — et ne rend rien.
  */
-export function SectionIndex({
-  index,
-  label,
-  light = false,
-  className,
-}: {
+export function SectionIndex(props: {
   index: number
   label: string
   /** Sur fond nuit. */
   light?: boolean
   className?: string
-}) {
-  return (
-    <span
-      aria-hidden="true"
-      className={cn(
-        /* Masqué sous `md` : à 360px il chevaucherait le label supérieur
-           ou la capsule de navigation. */
-        'section-index pointer-events-none hidden font-serif text-[14.5px] italic md:inline',
-        light ? 'text-ivory/55' : 'text-stone',
-        className,
-      )}
-    >
-      {toRoman(index + 1)} — {label}
-    </span>
-  )
+}): null {
+  void props
+  return null
 }
 
 /** Les trois points bleus de la maquette — ponctuation entre deux sections. */

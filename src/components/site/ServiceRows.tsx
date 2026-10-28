@@ -104,9 +104,9 @@ export function ServiceRows({
 
   return (
     <>
-      {/* Plus de carte flottante au survol : elle couvrait les rangées
-          voisines et doublait la fiche. La rangée suffit — elle s'assombrit,
-          le titre glisse, la flèche avance — et un clic ouvre la fiche. */}
+      {/* Survol réduit à l'essentiel : le titre prend le bleu, la flèche
+          avance. Plus de carte flottante, plus de rangée qui s'assombrit,
+          s'arrondit et passe en italique — un clic ouvre la fiche. */}
       <div className="mt-10 md:mt-12">
         {items.map((service, i) => {
           const last = i === items.length - 1
@@ -119,20 +119,20 @@ export function ServiceRows({
             service.groupId && service.groupId !== items[i - 1]?.groupId
               ? service.group?.label.trim() || null
               : null
-          const rowClass = `group grid grid-cols-1 gap-y-2 border-line px-[var(--spacing-gutter)] py-7 text-left transition-[background-color,color,border-radius] duration-[450ms] ease-[var(--ease)] hover:rounded-[24px] hover:bg-night hover:text-ivory md:py-8 lg:grid-cols-12 lg:items-baseline lg:gap-x-5 ${
+          const rowClass = `group grid grid-cols-1 gap-y-2 border-line px-[var(--spacing-gutter)] py-7 text-left md:py-9 lg:grid-cols-12 lg:items-baseline lg:gap-x-5 ${
             /* L'intitulé de famille porte déjà le filet du dessus. */
             groupStart ? '' : 'border-t'
           } ${last ? 'border-b' : ''}`
 
           const inner = (
             <>
-              <span className="font-serif text-[16px] font-light italic text-blue-deep transition-colors duration-[450ms] group-hover:text-blue lg:col-span-1">
+              <span className="font-serif text-[16px] font-light italic text-stone lg:col-span-1">
                 {numberWordFr(i)}
               </span>
 
               {/* Plus petit que l'intitulé de famille : la hiérarchie se lit
                   à la taille, puisqu'il n'y a plus de filet pour la marquer. */}
-              <h3 className="font-serif text-[clamp(23px,2.5vw,35px)] font-light leading-[1.15] transition-transform duration-[450ms] ease-[var(--ease)] group-hover:translate-x-3 group-hover:italic lg:col-span-7">
+              <h3 className="font-serif text-[clamp(23px,2.5vw,35px)] font-light leading-[1.15] transition-colors duration-200 group-hover:text-blue-deep lg:col-span-7">
                 {service.title}
               </h3>
 
@@ -141,12 +141,12 @@ export function ServiceRows({
                   résumé ne s'affiche qu'en petit écran, sous le titre. */}
               <div className="lg:col-span-3">
                 {service.method && (
-                  <span className="hidden text-[10px] font-semibold uppercase tracking-[0.18em] text-stone transition-colors duration-[450ms] group-hover:text-ivory/70 lg:block lg:text-right">
+                  <span className="hidden text-[10px] font-semibold uppercase tracking-[0.18em] text-stone lg:block lg:text-right">
                     {service.method}
                   </span>
                 )}
 
-                <p className="mt-1 max-w-[40ch] text-[14.5px] leading-[1.75] text-stone transition-colors duration-[450ms] group-hover:text-ivory/75 lg:hidden">
+                <p className="mt-1 max-w-[40ch] text-[14.5px] leading-[1.75] text-stone lg:hidden">
                   {service.excerpt}
                   {service.duration ? (
                     <span className="mt-2 block text-[10.5px] font-semibold uppercase tracking-[0.2em] opacity-80">
@@ -158,7 +158,7 @@ export function ServiceRows({
 
               <span
                 aria-hidden="true"
-                className="mt-1 block text-left font-serif text-[22px] opacity-35 transition-[opacity,transform,color] duration-[450ms] ease-[var(--ease)] group-hover:translate-x-[5px] group-hover:text-blue group-hover:opacity-100 lg:mt-0 lg:col-span-1 lg:text-right"
+                className="mt-1 block text-left font-serif text-[22px] text-stone transition-[transform,color] duration-200 ease-out group-hover:translate-x-1 group-hover:text-blue-deep lg:mt-0 lg:col-span-1 lg:text-right"
               >
                 →
               </span>

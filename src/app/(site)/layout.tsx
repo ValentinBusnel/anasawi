@@ -1,5 +1,4 @@
 import { AdminBar } from '@/components/site/AdminBar'
-import { CustomCursor } from '@/components/site/CustomCursor'
 import { Footer } from '@/components/site/Footer'
 import { Grain } from '@/components/site/Grain'
 import { Header } from '@/components/site/Header'
@@ -60,7 +59,6 @@ export default async function SiteLayout({
       />
       <Preloader />
       <Grain />
-      <CustomCursor />
       <Header
         items={navItems}
         /* Le bouton plein de la capsule mène à la section Contact — pas à

@@ -6,10 +6,8 @@ import {
   Fragment,
   createContext,
   useContext,
-  useEffect,
   useId,
   useRef,
-  useState,
   type ElementType,
   type ReactNode,
 } from 'react'
@@ -48,7 +46,7 @@ const VIEWPORT = { once: true, amount: 0.12, margin: '0px 0px -4% 0px' } as cons
  * modèle, le tempo réduit tous les délais d'un même facteur : l'ordre et
  * le rythme relatif restent, l'attente tombe.
  */
-const TEMPO = 0.55
+const TEMPO = 0.35
 const tempo = (delay: number) => delay * TEMPO
 
 /* ── AnimProvider ──────────────────────────────────────────────────── */
@@ -80,15 +78,52 @@ export function useAnimEnabled(): boolean {
   return enabled && !reduced
 }
 
-/* ── Reveal ────────────────────────────────────────────────────────────
-   Révélation de la maquette : 18px plus bas, opacité 0 → en place en
-   0.7s sur la courbe signature (1 s et 26 px à l'origine : le même geste,
-   plus vif).
+/* ══════════════════════════════════════════════════════════════════════
+   UN SEUL GESTE D'APPARITION
 
-   Plus de flou d'entrée : un `filter: blur()` animé se repeint à chaque
-   image, sur chaque bloc révélé — sur une page qui en compte des dizaines,
-   c'était la principale source de saccades au défilement. Opacité et
-   translation restent sur le compositeur ; le geste est le même. */
+   Le site animait chaque chose à sa façon : lettres une à une, lignes
+   sorties d'un masque, photos dévoilées par un rideau avec zoom, chiffres
+   qui défilent, mots qui s'allument. Pris un à un, des gestes soignés ;
+   ensemble, une page qui bouge sans cesse et détourne du contenu.
+
+   Toutes les primitives ci-dessous partagent désormais le même geste :
+   un fondu, porté par une montée de quelques pixels, court. Leurs props
+   sont inchangées — les templates et les contenus enregistrés n'ont rien
+   à savoir de ce changement.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/** Montée de l'apparition, en pixels. */
+const RISE = 10
+/** Durée de l'apparition, en secondes. */
+const DURATION = 0.55
+
+/** Le geste commun : fondu montant, déclenché à l'entrée dans l'écran. */
+function Appear({
+  as = 'div',
+  delay = 0,
+  className,
+  children,
+}: {
+  as?: 'div' | 'span'
+  delay?: number
+  className?: string
+  children: ReactNode
+}) {
+  const Comp = as === 'span' ? m.span : m.div
+  return (
+    <Comp
+      className={className}
+      initial={{ opacity: 0, y: RISE }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={VIEWPORT}
+      transition={{ duration: DURATION, ease: EASE, delay: tempo(delay) }}
+    >
+      {children}
+    </Comp>
+  )
+}
+
+/* ── Reveal ──────────────────────────────────────────────────────────── */
 
 export function Reveal({
   children,
@@ -101,84 +136,53 @@ export function Reveal({
   className?: string
 }) {
   const on = useAnimEnabled()
-
   if (!on) return <div className={className}>{children}</div>
-
   return (
-    <m.div
-      className={className}
-      initial={{ opacity: 0, y: 18 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={VIEWPORT}
-      transition={{ duration: 0.7, ease: EASE, delay: tempo(delay) }}
-    >
+    <Appear delay={delay} className={className}>
       {children}
-    </m.div>
+    </Appear>
   )
 }
 
 /* ── MaskLines ─────────────────────────────────────────────────────────
-   Chaque enfant est une ligne : elle monte depuis un masque
-   (translateY 110% → 0), délais échelonnés 0 / .1 / .2s. */
+   Chaque enfant est une ligne. Le bloc apparaît d'un seul geste : plus de
+   lignes qui montent une à une depuis un masque. `step` est conservé
+   pour l'API. */
 
 export function MaskLines({
   children,
   delay = 0,
-  step = 0.1,
   className,
   lineClassName,
 }: {
   /** Un enfant = une ligne (spans, fragments…). */
   children: ReactNode
   delay?: number
-  /** Écart entre deux lignes, en secondes. */
+  /** Écart entre deux lignes, en secondes (sans effet : un seul geste). */
   step?: number
   className?: string
   /** Classes posées sur chaque conteneur de ligne. */
   lineClassName?: string
 }) {
   const on = useAnimEnabled()
-  const lines = Children.toArray(children)
-  /* L'observation porte sur le conteneur, jamais sur la ligne animée :
-     celle-ci démarre à 110 % — donc entièrement rognée par son masque —
-     et un élément rogné n'entre jamais « dans le viewport ». Observer la
-     ligne elle-même bloquerait l'animation pour toujours. */
-  const ref = useRef<HTMLDivElement>(null)
-  const inView = useInView(ref, VIEWPORT)
-
-  if (!on) {
-    return (
-      <div className={className}>
-        {lines.map((line, i) => (
-          <div key={i} className={lineClassName}>
-            {line}
-          </div>
-        ))}
-      </div>
-    )
-  }
-
-  return (
-    <div ref={ref} className={className}>
-      {lines.map((line, i) => (
-        <div key={i} className={cn('line-mask', lineClassName)}>
-          <m.div
-            initial={{ y: '110%' }}
-            animate={inView ? { y: '0%' } : { y: '110%' }}
-            transition={{ duration: 0.8, ease: EASE, delay: tempo(delay) + i * step * 0.7 }}
-          >
-            {line}
-          </m.div>
-        </div>
-      ))}
+  const lines = Children.toArray(children).map((line, i) => (
+    <div key={i} className={lineClassName}>
+      {line}
     </div>
+  ))
+
+  if (!on) return <div className={className}>{lines}</div>
+  return (
+    <Appear delay={delay} className={className}>
+      {lines}
+    </Appear>
   )
 }
 
 /* ── SplitChars ────────────────────────────────────────────────────────
-   Le texte du hero : chaque lettre monte de 115 % depuis un masque,
-   20 ms d'écart entre deux lettres. Texte brut uniquement — pour un
-   passage en italique, la prop `italic` couvre tout le texte. */
+   Le texte du hero. Il n'est plus découpé lettre à lettre : il apparaît
+   d'un bloc. Les MOTS restent insécables — un mot trop large déborde, ce
+   que `TitreAjuste` mesure et corrige en réduisant le titre. */
 
 export function SplitChars({
   text,
@@ -197,127 +201,57 @@ export function SplitChars({
 }) {
   const on = useAnimEnabled()
   const Comp: ElementType = as ?? 'span'
-  const style = italic ? 'italic' : undefined
-  /* Même précaution que MaskLines : les lettres démarrent rognées, donc
-     invisibles pour l'observateur. On observe un porteur non transformé. */
-  const ref = useRef<HTMLSpanElement>(null)
-  const inView = useInView(ref, VIEWPORT)
 
-  /*
-   * Les MOTS restent entiers. Chaque lettre est un `inline-block` pour
-   * pouvoir monter séparément ; sans regroupement, le navigateur voyait
-   * quinze boîtes indépendantes et coupait n'importe où — « Anne Wi /
-   * nzenried » sur un téléphone. Un mot est donc une boîte insécable ;
-   * la ligne ne se replie qu'aux espaces, et un mot trop large pour
-   * l'écran déborde, ce que `TitreAjuste` mesure et corrige en réduisant
-   * le titre. Même règle sans animation, pour que le rendu ne dépende
-   * pas de l'interrupteur.
-   */
-  const mots = text.split(' ')
-
-  if (!on) {
-    return (
-      <Comp className={cn('block', style, className)}>
-        {mots.map((mot, indexMot) => (
-          <Fragment key={indexMot}>
-            {indexMot > 0 && ' '}
-            <span className="whitespace-nowrap">{mot}</span>
-          </Fragment>
-        ))}
-      </Comp>
-    )
-  }
-
-  let index = 0
-  /* 20 ms entre deux lettres, mais la vague entière ne dépasse pas
-     ~0,45 s : sur un titre de quarante lettres, la dernière arrivait
-     près d'une seconde et demie après la première. Les titres courts
-     gardent exactement le rythme d'origine. */
-  const lettres = text.replace(/ /g, '').length
-  const pas = Math.min(0.02, 0.45 / Math.max(lettres, 1))
+  const mots = text.split(' ').map((mot, i) => (
+    <Fragment key={i}>
+      {i > 0 && ' '}
+      <span className="whitespace-nowrap">{mot}</span>
+    </Fragment>
+  ))
 
   return (
-    <Comp className={cn('line-mask', style, className)} aria-label={text}>
-      <span ref={ref} className="block">
-        {mots.map((mot, indexMot) => (
-          <Fragment key={indexMot}>
-            {indexMot > 0 && <span aria-hidden="true"> </span>}
-            <span aria-hidden="true" className="inline-block whitespace-nowrap">
-              {Array.from(mot).map((char) => {
-                const i = index++
-                return (
-                  /* Pas de `will-change` permanent : une couche graphique
-                     par lettre, gardée après l'animation, pour rien. Motion
-                     promeut l'élément le temps du mouvement. */
-                  <m.span
-                    key={i}
-                    className="inline-block"
-                    initial={{ y: '115%' }}
-                    animate={inView ? { y: '0%' } : { y: '115%' }}
-                    transition={{ duration: 0.75, ease: EASE, delay: tempo(delay) + i * pas }}
-                  >
-                    {char}
-                  </m.span>
-                )
-              })}
-            </span>
-          </Fragment>
-        ))}
-      </span>
+    <Comp className={cn('block', italic && 'italic', className)}>
+      {on ? (
+        <Appear as="span" delay={delay} className="block">
+          {mots}
+        </Appear>
+      ) : (
+        mots
+      )}
     </Comp>
   )
 }
 
 /* ── Counter ───────────────────────────────────────────────────────────
-   Compte de 0 à `value` en ~1.3s, ease-out quartique, à l'entrée dans
-   le viewport. Rend un simple <span>. */
+   Le chiffre, tel quel. Un nombre qui défile de 0 à sa valeur attire
+   l'œil sur l'animation plutôt que sur ce qu'il dit — et se lit faux
+   pendant une seconde. `duration` est conservé pour l'API. */
 
 export function Counter({
   value,
-  duration = 1,
   className,
 }: {
   value: number
-  /** Durée en secondes. */
+  /** Sans effet : le chiffre est affiché directement. */
   duration?: number
   className?: string
 }) {
-  const on = useAnimEnabled()
-  const ref = useRef<HTMLSpanElement>(null)
-  const inView = useInView(ref, { once: true, amount: 0.5 })
-  const [display, setDisplay] = useState(0)
-
-  useEffect(() => {
-    if (!on || !inView) return
-
-    let frame = 0
-    const start = performance.now()
-    const total = Math.max(duration, 0.05) * 1000
-
-    const tick = (now: number) => {
-      const p = Math.min((now - start) / total, 1)
-      setDisplay(Math.round(value * (1 - Math.pow(1 - p, 4))))
-      if (p < 1) frame = requestAnimationFrame(tick)
-    }
-
-    frame = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(frame)
-  }, [on, inView, value, duration])
-
-  return (
-    <span ref={ref} className={className}>
-      {on ? display : value}
-    </span>
-  )
+  return <span className={className}>{value}</span>
 }
 
 /* ── ImageVeil ─────────────────────────────────────────────────────────
-   Rideau qui se retire (découpage du bas vers le haut, 0.85s) pendant
-   que l'image dézoome (scale 1.1 → 1.02, 1.05s). Le rideau prend la couleur du
-   fond de la section via `tone`. Le conteneur porte l'arrondi (arche…) :
-   le rideau en hérite. */
+   L'image apparaît en fondu, une fois chargée — plus de rideau découpé
+   ni de zoom. Le conteneur porte l'arrondi (arche…).
+
+   `data-veil` (« ferme » / « ouvert ») est conservé : il dit si l'image
+   est montrée, et les tests s'en servent pour vérifier qu'elle ne
+   l'est jamais avant d'être chargée. */
 
 type VeilTone = 'ivory' | 'sand' | 'cream'
+
+/** Masque radial : force le rognage net sur l'arrondi (sans liseré). */
+const VEIL_FRAME =
+  'relative isolate overflow-hidden [-webkit-mask-image:-webkit-radial-gradient(white,black)]'
 
 export function ImageVeil({
   children,
@@ -327,75 +261,38 @@ export function ImageVeil({
 }: {
   /** L'image (ou tout contenu) à dévoiler. */
   children: ReactNode
-  /** Conservé pour l'API : le découpage ne dépend plus du fond. */
+  /** Conservé pour l'API. */
   tone?: VeilTone
   delay?: number
   className?: string
-  /**
-   * Faux tant que l'image n'est pas chargée : le rideau attend. Sans
-   * cela, il se retirait à l'entrée dans l'écran, sur une image encore
-   * en route — on voyait le flou, puis la photo apparaissait d'un coup,
-   * après l'animation. Le rideau ne s'ouvre que sur une image prête.
-   */
+  /** Faux tant que l'image n'est pas chargée : elle reste masquée. */
   ready?: boolean
 }) {
   const on = useAnimEnabled()
   const ref = useRef<HTMLDivElement>(null)
   const inView = useInView(ref, VIEWPORT)
 
-  if (!on) {
-    return (
-      <div
-        className={cn(
-          'relative isolate overflow-hidden [-webkit-mask-image:-webkit-radial-gradient(white,black)]',
-          className,
-        )}
-      >
-        <div className="absolute -inset-px scale-[1.02]">{children}</div>
-      </div>
-    )
-  }
+  /* L'image déborde d'un pixel et finit à 1.02 : à l'échelle exacte, ses
+     bords coïncident avec ceux du cadre et l'anti-aliasing dessine un
+     contour sombre sur l'arrondi. */
+  const image = (
+    <div className="absolute -inset-px scale-[1.02] rounded-[inherit]">{children}</div>
+  )
 
-  /* Le « rideau » est un découpage de l'image elle-même (clip-path), pas
-     un calque posé dessus : un calque laissait filer, sur les bords
-     arrondis, un fin liseré sombre de la photo avant l'apparition. Ici
-     l'image est révélée du bas vers le haut, et rien ne peut dépasser. */
+  if (!on) return <div className={cn(VEIL_FRAME, className)}>{image}</div>
+
+  const ouvert = inView && ready
   return (
-    <m.div
-      ref={ref}
-      /* Le masque radial force le compositeur à rogner les enfants
-         transformés sur l'arrondi : sans lui, un liseré d'un pixel de
-         la photo déborde sur les coins. Et l'image finit à 1.02, jamais
-         à 1 : à l'échelle exacte, ses bords coïncident avec ceux du
-         cadre et l'anti-aliasing dessine un contour sombre. */
-      className={cn(
-        'relative isolate overflow-hidden [-webkit-mask-image:-webkit-radial-gradient(white,black)]',
-        className,
-      )}
-      initial="hidden"
-      animate={inView && ready ? 'visible' : 'hidden'}
-      data-veil={inView && ready ? 'ouvert' : 'ferme'}
-    >
+    <div ref={ref} className={cn(VEIL_FRAME, className)} data-veil={ouvert ? 'ouvert' : 'ferme'}>
       <m.div
-        /* -inset-px : l'image déborde d'un pixel de son cadre, pour que la
-           rangée de pixels du haut (position fractionnaire) soit toujours
-           pleinement couverte. */
-        className="absolute -inset-px rounded-[inherit] will-change-[clip-path]"
-        variants={{
-          hidden: { clipPath: 'inset(100% 0% 0% 0%)' },
-          visible: { clipPath: 'inset(0% 0% 0% 0%)' },
-        }}
-        transition={{ duration: 0.85, ease: EASE, delay: tempo(delay) }}
+        className="absolute inset-0 rounded-[inherit]"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: ouvert ? 1 : 0 }}
+        transition={{ duration: 0.6, ease: EASE, delay: ouvert ? tempo(delay) : 0 }}
       >
-        <m.div
-          className="absolute inset-0 rounded-[inherit] will-change-transform"
-          variants={{ hidden: { scale: 1.1 }, visible: { scale: 1.02 } }}
-          transition={{ duration: 1.05, ease: EASE, delay: tempo(delay) }}
-        >
-          {children}
-        </m.div>
+        {image}
       </m.div>
-    </m.div>
+    </div>
   )
 }
 
@@ -434,14 +331,13 @@ export function Marquee({
 }
 
 /* ── CircleText ────────────────────────────────────────────────────────
-   Texte sur un cercle qui tourne (26s, linéaire). `center` pose un
-   glyphe au milieu — l'astérisque ✳︎ de la marque, typiquement. */
+   Texte posé sur un cercle, immobile. `center` pose un glyphe au
+   milieu — l'astérisque ✳︎ de la marque, typiquement. */
 
 export function CircleText({
   text,
   size = 120,
   center,
-  duration = 26,
   radius = 44,
   textClassName,
   centerClassName,
@@ -453,7 +349,7 @@ export function CircleText({
   size?: number
   /** Glyphe central optionnel, ex. '✳︎'. */
   center?: string
-  /** Durée d'un tour, en secondes. */
+  /** Sans effet : le cercle ne tourne plus. Conservé pour l'API. */
   duration?: number
   /** Rayon du cercle dans le viewBox 120 — 44 (hero) ou 56 (médaillon). */
   radius?: number
@@ -465,7 +361,6 @@ export function CircleText({
   centerClassName?: string
   className?: string
 }) {
-  const on = useAnimEnabled()
   const pathId = useId()
   const r = Math.max(10, Math.min(radius, 58))
 
@@ -476,8 +371,9 @@ export function CircleText({
       height={size}
       aria-hidden="true"
       focusable="false"
-      className={cn(on && 'anasawi-spin', className)}
-      style={on ? { animationDuration: `${duration}s` } : undefined}
+      /* Immobile : un texte qui tourne en continu tire l'œil sans rien
+         dire de plus. `duration` est conservé pour l'API. */
+      className={className}
     >
       <defs>
         <path
@@ -513,20 +409,19 @@ export function CircleText({
 }
 
 /* ── WordsIgnite ───────────────────────────────────────────────────────
-   Le manifeste : les mots passent d'opacité .14 à 1 un à un, 45 ms
-   d'écart, à l'entrée dans le viewport. */
+   Le manifeste. Les mots ne s'allument plus un à un : le texte apparaît
+   d'un seul geste, comme le reste. `step` est conservé pour l'API. */
 
 export function WordsIgnite({
   text,
   delay = 0.1,
-  step = 0.045,
   className,
   as,
 }: {
   text: string
-  /** Attente avant le premier mot, en secondes. */
+  /** Attente avant l'apparition, en secondes. */
   delay?: number
-  /** Écart entre deux mots, en secondes. */
+  /** Sans effet : un seul geste. */
   step?: number
   className?: string
   /** Balise du conteneur — 'p' par défaut. */
@@ -534,32 +429,15 @@ export function WordsIgnite({
 }) {
   const on = useAnimEnabled()
   const Comp: ElementType = as ?? 'p'
-  /* UN observateur pour tout le paragraphe. Chaque mot portait le sien
-     (`whileInView`) : quatre-vingts mots, quatre-vingts observateurs, pour
-     un seul déclenchement. Le rendu est le même — les mots s'allument
-     dans l'ordre, à la même cadence. */
-  const ref = useRef<HTMLElement>(null)
-  const inView = useInView(ref, VIEWPORT)
-
-  if (!on) return <Comp className={className}>{text}</Comp>
-
-  const words = text.split(/\s+/).filter((word) => word.length > 0)
-
   return (
-    <Comp ref={ref} className={className} aria-label={text}>
-      {words.map((word, i) => (
-        <span key={i} aria-hidden="true">
-          {i > 0 ? ' ' : null}
-          <m.span
-            className="inline-block"
-            initial={{ opacity: 0.14 }}
-            animate={{ opacity: inView ? 1 : 0.14 }}
-            transition={{ duration: 0.3, delay: inView ? tempo(delay) + i * step : 0 }}
-          >
-            {word}
-          </m.span>
-        </span>
-      ))}
+    <Comp className={className}>
+      {on ? (
+        <Appear as="span" delay={delay} className="inline-block">
+          {text}
+        </Appear>
+      ) : (
+        text
+      )}
     </Comp>
   )
 }
