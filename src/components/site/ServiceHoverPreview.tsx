@@ -8,6 +8,7 @@ import {
   type MotionValue,
 } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
 import { createPortal } from 'react-dom'
 
 import { EASE, useAnimEnabled } from '@/components/site/anim'
@@ -105,21 +106,16 @@ export function ServiceHoverPreview({
 
   /* Hauteur réelle de la carte, mesurée : elle change avec le texte. */
   const cardRef = useRef<HTMLElement>(null)
-  const textRef = useRef<HTMLDivElement>(null)
   const cardH = useMotionValue(CARD_MIN_H)
-  const [overflowing, setOverflowing] = useState(false)
   useEffect(() => {
     const card = cardRef.current
-    const text = textRef.current
-    if (!card || !text) return
-    const measure = () => {
-      cardH.set(card.offsetHeight)
-      setOverflowing(text.scrollHeight > text.clientHeight + 2)
-    }
+    if (!card) return
+    /* Le texte est borné à quatre lignes (`line-clamp`) : plus besoin de
+       mesurer un débordement, seule la hauteur de la carte compte. */
+    const measure = () => cardH.set(card.offsetHeight)
     measure()
     const observer = new ResizeObserver(measure)
     observer.observe(card)
-    observer.observe(text)
     return () => observer.disconnect()
     /* Sur `shown`, pas `service` : la carte n'est montée qu'au rendu qui
        suit la mise à jour de `shown`. */
@@ -166,48 +162,51 @@ export function ServiceHoverPreview({
         <article
           ref={cardRef}
           style={{ minHeight: CARD_MIN_H, maxHeight: `calc(100vh - ${MARGIN * 2}px)` }}
-          /* Carte sobre : fond ivoire plein, filet fin, ombre douce. Les
-             trois bulles colorées, le verre dépoli saturé et l'astérisque
-             sont retirés — la carte garde sa place et son contenu, sans
-             décor. */
-          className="relative flex flex-col overflow-hidden rounded-[14px] border border-line bg-ivory px-7 pb-6 pt-7 text-ink shadow-[0_18px_48px_-22px_rgba(46,66,79,0.28)]"
+          /* Carte contemporaine : blanc franc, grands arrondis, filet à
+             peine visible, ombre diffuse. La photo de l'accompagnement à
+             gauche, le texte à droite, des étiquettes en pastilles plutôt
+             qu'en capitales espacées, et un vrai bouton. */
+          className="flex gap-5 overflow-hidden rounded-[22px] border border-black/[0.06] bg-white p-3 text-ink shadow-[0_24px_60px_-24px_rgba(46,66,79,0.35)]"
         >
-          <p className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-stone">
-            {shown.service.group?.label.trim() ||
-              `Accompagnement · ${numberWordFr(shown.index)}`}
-            {shown.service.method && (
-              <span className="text-blue-deep">· {shown.service.method}</span>
-            )}
-          </p>
-
-          <h4 className="mt-3 font-serif text-[30px] font-light leading-[1.08]">
-            {shown.service.title}
-          </h4>
-
-          {/* Un seul bloc : le premier paragraphe de la description longue,
-              à défaut l'extrait. La fiche a le reste. S'il dépasse l'écran,
-              il se rogne ici et s'estompe — le pied reste visible. */}
-          <div ref={textRef} className="relative mt-4 min-h-0 flex-1 overflow-hidden pb-6">
-            <p className="max-w-[58ch] text-[14.5px] leading-[1.75] text-ink-soft">
-              {texte[0]}
-            </p>
-            {overflowing && (
-              <span
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-ivory via-ivory/70 to-transparent"
+          {shown.service.media && (
+            <div className="relative w-[168px] shrink-0 self-stretch overflow-hidden rounded-[16px] bg-sand">
+              <Image
+                src={shown.service.media.url}
+                alt=""
+                fill
+                sizes="168px"
+                className="object-cover"
               />
-            )}
-          </div>
+            </div>
+          )}
 
-          <div className="flex shrink-0 items-center justify-between gap-4 border-t border-line pt-4">
-            {shown.service.duration ? (
-              <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-stone">
-                {shown.service.duration}
+          <div className="flex min-w-0 flex-1 flex-col py-3 pr-3">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="rounded-full bg-blue-mist px-2.5 py-1 text-[11.5px] font-medium text-blue-ink">
+                {shown.service.method ||
+                  shown.service.group?.label.trim() ||
+                  `Accompagnement ${numberWordFr(shown.index)}`}
               </span>
-            ) : (
-              <span />
-            )}
-            <span className="inline-flex items-center gap-2 text-[10.5px] font-semibold uppercase tracking-[0.18em] text-blue-deep">
+              {shown.service.duration && (
+                <span className="rounded-full bg-ink/[0.05] px-2.5 py-1 text-[11.5px] font-medium text-ink-soft">
+                  {shown.service.duration}
+                </span>
+              )}
+            </div>
+
+            <h4 className="mt-3 font-serif text-[27px] leading-[1.1]">
+              {shown.service.title}
+            </h4>
+
+            {/* Le premier paragraphe, sur quatre lignes au plus : la fiche
+                a le reste. */}
+            <div className="mt-2.5 min-h-0 flex-1">
+              <p className="line-clamp-4 text-[14px] leading-[1.65] text-ink-soft">
+                {texte[0]}
+              </p>
+            </div>
+
+            <span className="mt-4 inline-flex w-fit items-center gap-1.5 rounded-full bg-blue-deep px-4 py-2 text-[12.5px] font-medium text-ivory">
               Ouvrir la fiche
               <span aria-hidden="true">→</span>
             </span>
