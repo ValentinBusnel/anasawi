@@ -1,8 +1,13 @@
 'use client'
 
+import { useMotionValue } from 'motion/react'
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
 
 import { Reveal } from '@/components/site/anim'
+import {
+  ServiceHoverPreview,
+  useCanHover,
+} from '@/components/site/ServiceHoverPreview'
 import { ServicePanel } from '@/components/site/ServicePanel'
 import type { ServiceWithMedia } from '@/server/db/schema'
 import { numberWordFr } from '@/lib/format'
@@ -49,6 +54,15 @@ export function ServiceRows({
   interactive?: boolean
 }) {
   const [openSlug, setOpenSlug] = useState<string | null>(null)
+
+  /* Survol : l'aperçu flottant suit le curseur sur la rangée survolée.
+     Pointeurs fins seulement, et jamais pendant que la fiche est ouverte. */
+  const canHover = useCanHover()
+  const [hoverIndex, setHoverIndex] = useState<number | null>(null)
+  /* Le curseur vit dans des valeurs de mouvement : les mettre à jour ne
+     re-rend rien, l'aperçu les suit directement. */
+  const pointerX = useMotionValue(0)
+  const pointerY = useMotionValue(0)
 
   const openIndex = useMemo(
     () => items.findIndex((item) => item.slug === openSlug),
@@ -102,13 +116,23 @@ export function ServiceRows({
     setOpenSlug(null)
   }, [])
 
+  const showPreview = interactive && canHover && openSlug === null
+  const hovered = hoverIndex !== null ? (items[hoverIndex] ?? null) : null
+
   return (
     <>
-      {/* Survol : la rangée prend le bleu brume en fondu, sur place — pas
-          de balayage —, le texte passe en ivoire, le titre glisse d'un
-          souffle et la pastille de la flèche s'éclaire. Un clic ouvre la
-          fiche. */}
-      <div className="mt-10 md:mt-12">
+      <div
+        className="mt-10 md:mt-12"
+        onMouseMove={
+          showPreview
+            ? (event) => {
+                pointerX.set(event.clientX)
+                pointerY.set(event.clientY)
+              }
+            : undefined
+        }
+        onMouseLeave={showPreview ? () => setHoverIndex(null) : undefined}
+      >
         {items.map((service, i) => {
           const last = i === items.length - 1
 
@@ -120,34 +144,41 @@ export function ServiceRows({
             service.groupId && service.groupId !== items[i - 1]?.groupId
               ? service.group?.label.trim() || null
               : null
-          const rowClass = `group relative grid grid-cols-1 gap-y-2 border-line px-[var(--spacing-gutter)] py-7 text-left transition-colors duration-500 ease-out hover:bg-blue focus-visible:bg-blue md:py-9 lg:grid-cols-12 lg:items-center lg:gap-x-5 ${
+          const rowClass = `group grid grid-cols-1 gap-y-2 border-line px-[var(--spacing-gutter)] py-7 text-left transition-[background-color,color,border-radius] duration-[450ms] ease-[var(--ease)] hover:rounded-[24px] hover:bg-night hover:text-ivory md:py-8 lg:grid-cols-12 lg:items-baseline lg:gap-x-5 ${
             /* L'intitulé de famille porte déjà le filet du dessus. */
             groupStart ? '' : 'border-t'
           } ${last ? 'border-b' : ''}`
 
           const inner = (
             <>
-              <span className="font-serif text-[16px] font-light italic text-stone transition-colors duration-500 ease-out group-hover:text-ivory group-focus-visible:text-ivory lg:col-span-1">
+              <span className="font-serif text-[16px] font-light italic text-blue-deep transition-colors duration-[450ms] group-hover:text-blue lg:col-span-1">
                 {numberWordFr(i)}
               </span>
 
               {/* Plus petit que l'intitulé de famille : la hiérarchie se lit
                   à la taille, puisqu'il n'y a plus de filet pour la marquer. */}
-              <h3 className="font-serif text-[clamp(23px,2.5vw,35px)] font-light leading-[1.15] transition-[color,transform] duration-500 ease-out group-hover:translate-x-1 group-hover:text-ivory group-focus-visible:text-ivory lg:col-span-7">
+              <h3 className="font-serif text-[clamp(23px,2.5vw,35px)] font-light leading-[1.15] transition-transform duration-[450ms] ease-[var(--ease)] group-hover:translate-x-3 group-hover:italic lg:col-span-7">
                 {service.title}
               </h3>
 
-              {/* Colonne de droite : la méthode sur grand écran — les
-                  rangées restent sobres, la fiche porte le texte. Le
-                  résumé ne s'affiche qu'en petit écran, sous le titre. */}
+              {/* Colonne de droite. Sur large écran avec carte flottante,
+                  seule la mention de méthode subsiste — la carte porte le
+                  texte. Sans carte (tactile, ou aperçu), la description
+                  reprend sa place : au doigt, rien ne survole. */}
               <div className="lg:col-span-3">
                 {service.method && (
-                  <span className="hidden text-[10px] font-semibold uppercase tracking-[0.18em] text-stone transition-colors duration-500 ease-out group-hover:text-ivory group-focus-visible:text-ivory lg:block lg:text-right">
+                  <span className="hidden text-[10px] font-semibold uppercase tracking-[0.18em] text-stone transition-colors duration-[450ms] group-hover:text-ivory/70 lg:block lg:text-right">
                     {service.method}
                   </span>
                 )}
 
-                <p className="mt-1 max-w-[40ch] text-[14.5px] leading-[1.75] text-stone transition-colors duration-500 ease-out group-hover:text-ivory lg:hidden">
+                <p
+                  className={`mt-1 max-w-[40ch] text-[14.5px] leading-[1.75] text-stone transition-[opacity,transform,color] duration-[450ms] group-hover:text-ivory/75 lg:mt-0 lg:translate-y-1.5 lg:text-[14px] lg:opacity-0 ${
+                    showPreview
+                      ? 'lg:hidden'
+                      : 'lg:group-hover:translate-y-0 lg:group-hover:opacity-100'
+                  }`}
+                >
                   {service.excerpt}
                   {service.duration ? (
                     <span className="mt-2 block text-[10.5px] font-semibold uppercase tracking-[0.2em] opacity-80">
@@ -157,17 +188,11 @@ export function ServiceRows({
                 </p>
               </div>
 
-              {/* La flèche dans une pastille qui se remplit au survol :
-                  le signal « ouvrir » se voit de loin, sans décor ajouté. */}
-              <span className="mt-2 flex lg:col-span-1 lg:mt-0 lg:justify-end">
-                <span
-                  aria-hidden="true"
-                  className="grid size-11 place-items-center rounded-full border border-line-strong font-serif text-[19px] text-stone transition-colors duration-500 ease-out group-hover:border-ivory group-hover:bg-ivory group-hover:text-blue-deep group-focus-visible:border-ivory group-focus-visible:bg-ivory group-focus-visible:text-blue-deep"
-                >
-                  <span className="block transition-transform duration-500 ease-out group-hover:translate-x-0.5">
-                    →
-                  </span>
-                </span>
+              <span
+                aria-hidden="true"
+                className="mt-1 block text-left font-serif text-[22px] opacity-35 transition-[opacity,transform,color] duration-[450ms] ease-[var(--ease)] group-hover:translate-x-[5px] group-hover:text-blue group-hover:opacity-100 lg:mt-0 lg:col-span-1 lg:text-right"
+              >
+                →
               </span>
             </>
           )
@@ -180,6 +205,12 @@ export function ServiceRows({
                       ce sont l'italique, le bleu et le centrage qui font
                       lire un titre, pas une échelle plus grande. */}
                   <p
+                    /* Le pointeur reste dans le conteneur en passant d'une
+                       rangée au titre : sans cet effacement, la carte de la
+                       rangée précédente resterait affichée au-dessus. */
+                    onMouseEnter={
+                      showPreview ? () => setHoverIndex(null) : undefined
+                    }
                     className="px-[var(--spacing-gutter)] pb-3 pt-6 text-center font-serif text-[clamp(22px,2.4vw,33px)] font-light italic text-blue-deep md:pb-4 md:pt-8"
                   >
                     {groupStart}
@@ -205,6 +236,17 @@ export function ServiceRows({
                     event.preventDefault()
                     open(service.slug)
                   }}
+                  onMouseEnter={
+                    showPreview
+                      ? (event) => {
+                          /* Position posée avant l'apparition : l'aperçu
+                             naît sous le curseur, pas au coin de l'écran. */
+                          pointerX.set(event.clientX)
+                          pointerY.set(event.clientY)
+                          setHoverIndex(i)
+                        }
+                      : undefined
+                  }
                   aria-haspopup="dialog"
                   aria-expanded={openSlug === service.slug}
                   className={`${rowClass} cursor-pointer no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-deep focus-visible:ring-offset-2 focus-visible:ring-offset-ivory`}
@@ -219,6 +261,15 @@ export function ServiceRows({
           )
         })}
       </div>
+
+      {showPreview && (
+        <ServiceHoverPreview
+          service={hovered}
+          index={hoverIndex ?? 0}
+          pointerX={pointerX}
+          pointerY={pointerY}
+        />
+      )}
 
       {interactive && (
         <ServicePanel
