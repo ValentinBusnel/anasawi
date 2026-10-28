@@ -147,20 +147,20 @@ export function ServiceRows({
             service.groupId && service.groupId !== items[i - 1]?.groupId
               ? service.group?.label.trim() || null
               : null
-          const rowClass = `group grid grid-cols-1 gap-y-2 border-line px-[var(--spacing-gutter)] py-7 text-left transition-[background-color,color,border-radius] duration-[450ms] ease-[var(--ease)] hover:rounded-[24px] hover:bg-night hover:text-ivory md:py-8 lg:grid-cols-12 lg:items-baseline lg:gap-x-5 ${
+          const rowClass = `group relative isolate grid grid-cols-1 gap-y-2 border-line px-[var(--spacing-gutter)] py-7 text-left before:pointer-events-none before:absolute before:inset-x-[calc(var(--spacing-gutter)*0.45)] before:inset-y-2 before:-z-10 before:scale-[0.985] before:rounded-[22px] before:bg-blue-mist before:opacity-0 before:transition-[opacity,transform] before:duration-300 before:ease-out before:content-[''] hover:before:scale-100 hover:before:opacity-100 focus-visible:before:scale-100 focus-visible:before:opacity-100 md:py-8 lg:grid-cols-12 lg:items-center lg:gap-x-5 ${
             /* L'intitulé de famille porte déjà le filet du dessus. */
             groupStart ? '' : 'border-t'
           } ${last ? 'border-b' : ''}`
 
           const inner = (
             <>
-              <span className="font-serif text-[16px] font-light italic text-blue-deep transition-colors duration-[450ms] group-hover:text-blue lg:col-span-1">
+              <span className="font-serif text-[16px] font-light italic text-blue-deep lg:col-span-1">
                 {numberWordFr(i)}
               </span>
 
               {/* Plus petit que l'intitulé de famille : la hiérarchie se lit
                   à la taille, puisqu'il n'y a plus de filet pour la marquer. */}
-              <h3 className="font-serif text-[clamp(23px,2.5vw,35px)] font-light leading-[1.15] transition-transform duration-[450ms] ease-[var(--ease)] group-hover:translate-x-3 group-hover:italic lg:col-span-7">
+              <h3 className="font-serif text-[clamp(23px,2.5vw,35px)] font-light leading-[1.15] transition-[color,transform] duration-300 ease-out group-hover:translate-x-2 group-hover:text-blue-ink lg:col-span-7">
                 {service.title}
               </h3>
 
@@ -170,13 +170,13 @@ export function ServiceRows({
                   reprend sa place : au doigt, rien ne survole. */}
               <div className="lg:col-span-3">
                 {service.method && (
-                  <span className="hidden text-[10px] font-semibold uppercase tracking-[0.18em] text-stone transition-colors duration-[450ms] group-hover:text-ivory/70 lg:block lg:text-right">
+                  <span className="hidden text-[10px] font-semibold uppercase tracking-[0.18em] text-stone transition-colors duration-300 group-hover:text-blue-ink lg:block lg:text-right">
                     {service.method}
                   </span>
                 )}
 
                 <p
-                  className={`mt-1 max-w-[40ch] text-[14.5px] leading-[1.75] text-stone transition-[opacity,transform,color] duration-[450ms] group-hover:text-ivory/75 lg:mt-0 lg:translate-y-1.5 lg:text-[14px] lg:opacity-0 ${
+                  className={`mt-1 max-w-[40ch] text-[14.5px] leading-[1.75] text-stone transition-[opacity,transform,color] duration-300 lg:mt-0 lg:translate-y-1.5 lg:text-[14px] lg:opacity-0 ${
                     /* Aperçu désactivé : sur grand écran, la ligne reste
                        sobre (le résumé n'y réserve pas de place). */
                     showPreview || !preview
@@ -193,11 +193,14 @@ export function ServiceRows({
                 </p>
               </div>
 
-              <span
-                aria-hidden="true"
-                className="mt-1 block text-left font-serif text-[22px] opacity-35 transition-[opacity,transform,color] duration-[450ms] ease-[var(--ease)] group-hover:translate-x-[5px] group-hover:text-blue group-hover:opacity-100 lg:mt-0 lg:col-span-1 lg:text-right"
-              >
-                →
+              {/* La flèche dans une pastille, qui se remplit au survol. */}
+              <span className="mt-2 flex lg:col-span-1 lg:mt-0 lg:justify-end">
+                <span
+                  aria-hidden="true"
+                  className="grid size-11 place-items-center rounded-full border border-line-strong text-[17px] text-ink-soft transition-[background-color,border-color,color,transform] duration-300 ease-out group-hover:scale-105 group-hover:border-blue-deep group-hover:bg-blue-deep group-hover:text-white group-focus-visible:border-blue-deep group-focus-visible:bg-blue-deep group-focus-visible:text-white"
+                >
+                  →
+                </span>
               </span>
             </>
           )
