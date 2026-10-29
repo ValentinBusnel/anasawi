@@ -3,6 +3,7 @@ import Image from 'next/image'
 
 import { Arches, Chemin, Conversation, Encre, Lettre, Lignes, Promenade, Revele, Semaine, Seuil, Souffle } from './vivant'
 import type { Contenu } from '@/components/qeeps/donnees'
+import { LogoMark } from '@/components/site/Logo'
 import { cn, toE164 } from '@/lib/utils'
 
 /**
@@ -55,6 +56,9 @@ export function SectionSeuil({ c }: P) {
       accroche={c.accroche}
       photo={c.ambiance ?? c.portrait}
       rdv={c.rdv}
+      horaires={c.horaires}
+      services={c.services.map((s) => ({ titre: s.title }))}
+      intro={c.ouverture.intro || c.accroche}
     />
   )
 }
@@ -71,7 +75,9 @@ export function Respiration({ c }: P) {
             <Lignes lignes={['Prenez le temps', <span key="r">d’une <em>respiration</em>.</span>]} />
           </h2>
           <Revele delai={0.3}>
-            <p className="mt-8 max-w-[42ch] text-[17px] leading-[1.75] text-[var(--ad-pierre)]">{c.ouverture.intro || c.accroche}</p>
+            <p className="mt-8 max-w-[42ch] text-[17px] leading-[1.75] text-[var(--ad-pierre)]">
+              Un instant pour vous, avant la suite. Suivez le cercle : il gonfle, vous inspirez ; il se pose, vous expirez.
+            </p>
           </Revele>
         </div>
         {/* Le cercle qui respire — et l'exercice guidé d'une minute. */}
@@ -102,7 +108,7 @@ export function Rencontre({ c }: P) {
                 <textPath href="#ad-cercle">{anneau}</textPath>
               </text>
             </svg>
-            <span className="font-[family-name:var(--ad-titre)] font-semibold tracking-[-0.03em] text-[34px] text-[var(--ad-or)]">A.</span>
+            <LogoMark src={c.logo} className="h-12 w-12" />
           </div>
         </Revele>
         <div>
@@ -404,8 +410,13 @@ export function Horizon({ c, liens, base }: P & { liens: { href: string; label: 
           )}
         </Revele>
         <div className="mt-24 flex flex-wrap items-end justify-between gap-8 border-t border-white/15 pt-8 text-[14px] text-white/60">
-          <span className="font-[family-name:var(--ad-titre)] font-semibold tracking-[-0.03em] text-[28px] text-white">
-            Anasawi<span className="text-[var(--ad-or)]">.</span>
+          <span className="flex items-center gap-3 text-[26px] font-bold tracking-[-0.03em] text-white">
+            <span className="grid h-12 w-12 place-items-center rounded-[16px] bg-white">
+              <LogoMark src={c.logo} className="h-9 w-9" />
+            </span>
+            <span>
+              Anasawi<span className="text-[var(--ad-or)]">.</span>
+            </span>
           </span>
           <nav aria-label="Pied de page" className="flex flex-wrap gap-x-6 gap-y-2">
             {liens.map((l) => (

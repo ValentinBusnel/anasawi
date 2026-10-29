@@ -4,6 +4,7 @@ import { ArrowUpRight, Check, Menu, Plus, X } from 'lucide-react'
 import Image from 'next/image'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 
+import { LogoMark } from '@/components/site/Logo'
 import { cn } from '@/lib/utils'
 import type { FaqItem, Media, OpeningHour, ServiceWithMedia } from '@/server/db/schema'
 
@@ -183,6 +184,9 @@ export function Seuil({
   accroche,
   photo,
   rdv,
+  horaires,
+  services,
+  intro,
 }: {
   prenom: string
   nom: string
@@ -191,8 +195,22 @@ export function Seuil({
   accroche: string
   photo: Media | null
   rdv: string
+  horaires: OpeningHour[]
+  services: { titre: string }[]
+  /** Une phrase de présentation, à gauche de la fenêtre. */
+  intro: string
 }) {
   const ref = useAvancement<HTMLElement>('colle', true)
+  /* « Ouvert aujourd'hui » se calcule chez le visiteur (son jour, son
+     heure) : après l'hydratation, jamais au rendu serveur. */
+  const [jour, setJour] = useState<string | null>(null)
+  useEffect(() => {
+    const j = JOURS[(new Date().getDay() + 6) % 7]!
+    const h = horaires.find((x) => x.day.toLowerCase().startsWith(j.slice(0, 3)))?.hours
+    setJour(h && !/ferm/i.test(h) ? h : '')
+  }, [horaires])
+  /* Ce qui accompagne le premier écran et s'efface quand on entre. */
+  const sEfface = { opacity: 'calc(1 - var(--e) * 2.6)' }
   /* Sur téléphone, la fenêtre est plus petite : le nom reste lisible
      au-dessus et au-dessous. */
   const base = 'min(420px, 56vw)'
@@ -260,6 +278,58 @@ export function Seuil({
                 <ArrowUpRight className="h-4 w-4" />
               </span>
             </a>
+          </div>
+        </div>
+
+        {/* À gauche de la fenêtre : qui, et l'action principale. */}
+        <div
+          className="absolute left-[5vw] top-1/2 z-20 hidden w-[min(300px,calc(50vw-260px))] -translate-y-[10%] lg:block"
+          style={sEfface}
+        >
+          <p className="text-[15px] leading-[1.6] text-[var(--ad-pierre)] motion-safe:animate-[ad-monter_1.2s_var(--ad-ease)_0.5s_backwards]">{intro}</p>
+          <div className="mt-6 flex flex-wrap gap-2 motion-safe:animate-[ad-monter_1.2s_var(--ad-ease)_0.62s_backwards]">
+            <a
+              href={rdv}
+              className="group inline-flex items-center gap-2.5 rounded-full bg-[var(--ad-nuit)] py-1.5 pl-5 pr-1.5 text-[14px] font-semibold text-white"
+            >
+              Prendre rendez-vous
+              <span className="grid h-8 w-8 place-items-center rounded-full bg-white/15 transition-transform duration-500 ease-[var(--ad-ease)] group-hover:rotate-45">
+                <ArrowUpRight className="h-3.5 w-3.5" />
+              </span>
+            </a>
+            <a href="#accompagnements" className="inline-flex items-center rounded-full border border-[var(--ad-sable-fonce)] bg-white px-5 text-[14px] font-semibold text-[var(--ad-nuit)] transition-colors hover:border-[var(--ad-nuit)]">
+              Découvrir
+            </a>
+          </div>
+        </div>
+
+        {/* À droite : deux cartes de verre qui flottent. */}
+        <div className="pointer-events-none absolute right-[6vw] top-[26%] z-20 hidden flex-col items-end gap-4 lg:flex" style={sEfface}>
+          {jour !== null && (
+            <div className="motion-safe:animate-[ad-monter_1.2s_var(--ad-ease)_0.7s_backwards]">
+              <div className="flex items-center gap-3 rounded-[18px] border border-white/70 bg-white/70 px-4 py-3 shadow-[0_20px_50px_-24px_rgba(20,35,46,0.35)] backdrop-blur-xl motion-safe:animate-[ad-flotter_6s_ease-in-out_infinite]">
+                <span className="relative grid h-3 w-3 place-items-center">
+                  {jour && <span className="absolute inset-0 rounded-full bg-[#4caf8b] motion-safe:animate-[ad-pouls_1.8s_ease-out_infinite]" />}
+                  <span className={cn('relative h-2 w-2 rounded-full', jour ? 'bg-[#4caf8b]' : 'bg-[var(--ad-gris)]')} />
+                </span>
+                <span>
+                  <span className="block text-[13px] font-semibold text-[var(--ad-nuit)]">{jour ? 'Ouvert aujourd’hui' : 'Fermé aujourd’hui'}</span>
+                  <span className="block text-[12px] text-[var(--ad-gris)]">{jour || 'Écrivez-moi, je vous réponds'}</span>
+                </span>
+              </div>
+            </div>
+          )}
+          <div className="mr-[4vw] motion-safe:animate-[ad-monter_1.2s_var(--ad-ease)_0.85s_backwards]">
+            <div className="w-[240px] rounded-[20px] border border-white/70 bg-white/70 p-4 shadow-[0_20px_50px_-24px_rgba(20,35,46,0.35)] backdrop-blur-xl motion-safe:animate-[ad-flotter_7s_ease-in-out_1.2s_infinite]">
+              <p className="text-[12px] font-semibold text-[var(--ad-gris)]">{services.length} accompagnements</p>
+              <ul className="mt-2.5 flex flex-wrap gap-1.5">
+                {services.slice(0, 4).map((x) => (
+                  <li key={x.titre} className="rounded-full bg-[var(--ad-sable)] px-2.5 py-1 text-[12px] font-medium text-[var(--ad-nuit)]">
+                    {x.titre}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
 
@@ -851,7 +921,7 @@ export function Lettre({ prenom }: { prenom: string }) {
    rideau ivoire aux grands liens.
    ══════════════════════════════════════════════════════════════════════ */
 
-export function Fil({ liens, rdv }: { liens: { href: string; label: string }[]; rdv: string }) {
+export function Fil({ liens, rdv, logo }: { liens: { href: string; label: string }[]; rdv: string; logo: string | null }) {
   const ref = useRef<HTMLDivElement>(null)
   const [serre, setSerre] = useState(false)
   const [ouvert, setOuvert] = useState(false)
@@ -905,8 +975,11 @@ export function Fil({ liens, rdv }: { liens: { href: string; label: string }[]; 
             serre ? 'py-1.5 pl-5 pr-1.5' : 'py-2.5 pl-6 pr-2.5',
           )}
         >
-          <a href="#haut" className="mr-3 font-[family-name:var(--ad-titre)] font-semibold tracking-[-0.03em] text-[24px] leading-none text-[var(--ad-nuit)]">
-            Anasawi<span className="text-[var(--ad-or)]">.</span>
+          <a href="#haut" className="group/logo mr-3 flex items-center gap-2.5 text-[20px] font-bold leading-none tracking-[-0.03em] text-[var(--ad-nuit)]">
+            <LogoMark src={logo} priority className="h-8 w-8 transition-transform duration-700 ease-[var(--ad-ease)] group-hover/logo:rotate-[-12deg]" />
+            <span className={cn('transition-[opacity,max-width] duration-700 ease-[var(--ad-ease)]', serre ? 'max-w-0 opacity-0 md:max-w-[120px] md:opacity-100' : 'max-w-[120px]')}>
+              Anasawi<span className="text-[var(--ad-or)]">.</span>
+            </span>
           </a>
           <nav aria-label="Sections" className="flex items-center max-md:hidden">
             {liens.map((l) => (
@@ -951,8 +1024,9 @@ export function Fil({ liens, rdv }: { liens: { href: string; label: string }[]; 
         aria-hidden={!ouvert}
       >
         <div className="flex items-center justify-between">
-          <span className="font-[family-name:var(--ad-titre)] font-semibold tracking-[-0.03em] text-[26px] ">
-            Anasawi<span className="text-[var(--ad-or)]">.</span>
+          <span className="flex items-center gap-2.5 text-[24px] font-bold tracking-[-0.03em]">
+            <LogoMark src={logo} className="h-9 w-9" />
+            Anasawi<span className="-ml-2.5 text-[var(--ad-or)]">.</span>
           </span>
           <button type="button" onClick={() => setOuvert(false)} aria-label="Fermer le menu" className="grid h-10 w-10 place-items-center rounded-full border border-[var(--ad-sable-fonce)]">
             <X className="h-4 w-4" />

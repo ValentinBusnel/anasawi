@@ -27,7 +27,7 @@ export async function PageAnasawi({ base }: { base: string }) {
   const c = await chargerContenu()
   return (
     <>
-      <Fil liens={LIENS} rdv="#contact" />
+      <Fil liens={LIENS} rdv="#contact" logo={c.logo} />
       <main>
         <SectionSeuil c={c} />
         <Respiration c={c} />

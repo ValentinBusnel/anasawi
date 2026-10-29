@@ -50,6 +50,8 @@ export type Contenu = {
   dossiers: MediaFolder[]
   portrait: Media | null
   ambiance: Media | null
+  /** Le logo choisi dans les Réglages (adresse), sinon nul : celui livré. */
+  logo: string | null
 }
 
 const CATEGORIE = new Map<string, TemplateCategory>(
@@ -195,5 +197,6 @@ export async function chargerContenu(): Promise<Contenu> {
     dossiers: dossiers.filter((d) => photos.some((m) => m.folderId === d.id)),
     portrait,
     ambiance,
+    logo: media.find((m) => m.id === settings.logoMediaId)?.url ?? null,
   }
 }

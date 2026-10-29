@@ -928,3 +928,12 @@
   scroll-behavior: smooth;
   scroll-padding-top: 96px;
 }
+@keyframes ad-flotter {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
