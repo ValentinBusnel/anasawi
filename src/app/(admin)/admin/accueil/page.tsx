@@ -1,6 +1,7 @@
 import { AdminContent } from '@/components/admin/AdminContent'
 import { PageHeader } from '@/components/admin/PageHeader'
 import { TemplateEditor } from '@/components/admin/TemplateEditor'
+import { PoliceModerne } from '@/components/anasawi/PoliceModerne'
 import { chargerContenu } from '@/components/anasawi/charger'
 import { assurerPageModerne } from '@/server/moderne'
 import {
@@ -59,6 +60,8 @@ export default async function HomeBuilderPage({
   }
 
   return (
+    <>
+      {theme === 'moderne' && <PoliceModerne />}
     <TemplateEditor
       key={`${theme}-${page.id}`}
       pageId={page.id}
@@ -77,5 +80,6 @@ export default async function HomeBuilderPage({
           : null
       }
     />
+    </>
   )
 }

@@ -33,7 +33,6 @@ Les visiteurs passent de l'un à l'autre par la bascule « Classique | Moderne �
    - `src/app/(admin)/admin/accueil/page.tsx` : le paramètre `theme`, `assurerPageModerne`, `chargerContenu`.
    - `src/components/admin/editor/EditorTopBar.tsx` : la bascule « Classique | Moderne » (remettre le titre de la page).
    - `src/components/site/Header.tsx` : les deux `BasculeVersion`.
-   - `src/app/layout.tsx` : la police Plus Jakarta Sans.
    - `src/styles/globals.css` : le bloc `/nouvelle-da — LES COMPOSANTS PROPRES…` et les `@keyframes ad-*`, `q-*` ; les blocs `.qeeps-da`.
    - `next.config.ts` : les redirections `/nouvelle-da`.
 3. En base : supprimer la page `accueil-moderne` (ses sections partent avec elle, clé étrangère en cascade).
@@ -44,6 +43,7 @@ Les visiteurs passent de l'un à l'autre par la bascule « Classique | Moderne �
 2. Servir `/` avec le rendu de `src/app/moderne/page.tsx` (barre `Fil`, sections, pied `Horizon`) et un layout `.ad` ; retirer le chrome classique de `src/app/(site)/layout.tsx` (en-tête, pied, rideau, grain).
 3. Retirer les blocs classiques du registre (ou les garder cachés de l'éditeur), `BasculeVersion`, la bascule de l'éditeur, le paramètre `theme`.
 4. Remplacer, dans `src/blocks/moderne/contenu.ts`, la lecture des textes « classiques » par les champs des blocs modernes (ils deviennent la seule source).
-5. Indexer la page (retirer `robots: noindex` de `src/app/moderne/layout.tsx`) et rebrancher le JSON-LD de `src/app/(site)/page.tsx`.
+5. Auto-héberger Plus Jakarta Sans (`next/font/local`) à la place de `PoliceModerne` (Google Fonts).
+6. Indexer la page (retirer `robots: noindex` de `src/app/moderne/layout.tsx`) et rebrancher le JSON-LD de `src/app/(site)/page.tsx`.
 
 Dans les deux cas : `npm run typecheck`, `npm run lint`, `npm test`.

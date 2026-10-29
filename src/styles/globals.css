@@ -778,6 +778,7 @@
   --ad-or: #36a39b;
   --ad-pierre: #4c5b67;
   --ad-gris: #7a8894;
+  --font-jakarta: 'Plus Jakarta Sans';
   --ad-titre: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
   /* La hauteur d'écran des mises en scène (ouverture, promenade). Dans
      l'aperçu de l'éditeur, le cadre est aussi haut que toute la page :

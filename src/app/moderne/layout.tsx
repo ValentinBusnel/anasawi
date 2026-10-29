@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 
+import { PoliceModerne } from '@/components/anasawi/PoliceModerne'
+
 /**
  * `/moderne` — le site d'Anne dans sa NOUVELLE direction artistique, en
  * cours d'arbitrage avec le site classique (`/`). Même contenu (réglages,
@@ -12,5 +14,10 @@ export const metadata: Metadata = {
 }
 
 export default function ModerneLayout({ children }: { children: React.ReactNode }) {
-  return <div className="ad min-h-screen overflow-x-clip bg-[var(--ad-ivoire)] antialiased">{children}</div>
+  return (
+    <div className="ad min-h-screen overflow-x-clip bg-[var(--ad-ivoire)] antialiased">
+      <PoliceModerne />
+      {children}
+    </div>
+  )
 }
