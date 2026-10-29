@@ -53,7 +53,10 @@ export function TemplateEditor({
   data,
   saved,
   initialSelectedId = null,
+  theme = 'classique',
 }: {
+  /** Le site édité (arbitrage classique / moderne en cours). */
+  theme?: 'classique' | 'moderne'
   /** Section ouverte d'emblée — le lien « Votre page » de l'accueil. */
   initialSelectedId?: string | null
   pageId: string
@@ -255,6 +258,7 @@ export function TemplateEditor({
   return (
     <div className="flex h-full min-h-0 flex-1 flex-col bg-background">
       <EditorTopBar
+        theme={theme}
         pageTitle={pageTitle}
         publishState={publishState}
         saving={saveState !== 'saved' || enVol}
@@ -433,6 +437,7 @@ export function TemplateEditor({
       </div>
 
       <TemplateLibrary
+        theme={theme}
         open={libraryOpen}
         onOpenChange={(open) => {
           setLibraryOpen(open)

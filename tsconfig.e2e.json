@@ -10,6 +10,8 @@
     "jsx": "preserve",
     "types": ["node"]
   },
-  "include": ["e2e/**/*.ts", "playwright.config.ts"],
+  // `next-env.d.ts` : les types des imports d'images (`*.png`) — certains
+  // tests importent le registre des blocs, qui rend le logo du site.
+  "include": ["e2e/**/*.ts", "playwright.config.ts", "next-env.d.ts"],
   "exclude": ["node_modules"]
 }

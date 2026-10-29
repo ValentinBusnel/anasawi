@@ -1,6 +1,7 @@
 'use client'
 
 import type { Dispatch, SetStateAction } from 'react'
+import Link from 'next/link'
 import {
   Eye,
   Monitor,
@@ -67,7 +68,10 @@ export function EditorTopBar({
   canPublish,
   onPublish,
   onDiscardRequest,
+  theme = 'classique',
 }: {
+  /** Le site édité — classique ou moderne (arbitrage en cours). */
+  theme?: 'classique' | 'moderne'
   pageTitle: string
   publishState: PublishState
   /** Une frappe ou une action pas encore écrite. */
@@ -99,7 +103,29 @@ export function EditorTopBar({
           C'est LA phrase qui répond à « est-ce que c'est enregistré ?
           est-ce que c'est en ligne ? ». */}
       <div className="flex min-w-0 items-center gap-3">
-        <span className="max-w-48 truncate text-[14px] font-semibold tracking-[-0.01em]">{pageTitle}</span>
+        {/* Le temps de l'arbitrage : quel site édite-t-on ? Chacun a ses
+            sections et ses modèles ; le contenu (accompagnements,
+            questions, médias, réglages) est commun aux deux. */}
+        <span role="group" aria-label={`Site édité — ${pageTitle}`} className="flex shrink-0 items-center gap-0.5 rounded-[10px] bg-block p-[3px] text-[13px] font-medium">
+          {(
+            [
+              ['classique', '/admin/accueil', 'Classique'],
+              ['moderne', '/admin/accueil?theme=moderne', 'Moderne'],
+            ] as const
+          ).map(([t, href, libelle]) => (
+            <Link
+              key={t}
+              href={href}
+              aria-current={theme === t ? 'page' : undefined}
+              className={cn(
+                'rounded-[8px] px-2.5 py-1 transition-[background-color,color,box-shadow] duration-300',
+                theme === t ? 'bg-white text-foreground shadow-[0_1px_2px_rgba(22,73,81,0.08)]' : 'text-muted-foreground hover:text-foreground',
+              )}
+            >
+              {libelle}
+            </Link>
+          ))}
+        </span>
         <span
           className={cn(
             'flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-[12.5px] font-medium',

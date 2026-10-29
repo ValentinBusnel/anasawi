@@ -1,5 +1,6 @@
 'use client'
 
+import { BasculeVersion } from './BasculeVersion'
 import Link from 'next/link'
 import { m, useReducedMotion } from 'motion/react'
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
@@ -310,6 +311,9 @@ export function Header({
           })}
         </nav>
 
+        {/* Le temps de l'arbitrage : passer à la version moderne. */}
+        <BasculeVersion actuelle="classique" className="ml-2 text-ink-soft max-lg:hidden" />
+
         <a
           href={ctaHref}
           aria-label={ctaLabel}
@@ -467,6 +471,10 @@ export function Header({
               })}
             </ul>
           </nav>
+
+          <div className="px-[var(--spacing-gutter)] pb-6">
+            <BasculeVersion actuelle="classique" sombre />
+          </div>
 
           {(phone || email) && (
             <div className="border-t border-ivory/12 px-[var(--spacing-gutter)] pb-[max(28px,env(safe-area-inset-bottom))] pt-6">

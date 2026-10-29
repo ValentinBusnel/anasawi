@@ -1,3 +1,4 @@
+import type { Contenu } from './moderne/contenu'
 import type { ComponentType } from 'react'
 import type { z } from 'zod'
 
@@ -29,6 +30,8 @@ export type BlockContext = {
    * site public.
    */
   editable?: boolean
+  /** Version moderne : le contenu partagé avec le site classique. */
+  partage?: Contenu
 }
 
 export type BlockProps<TPayload> = {
@@ -107,6 +110,13 @@ type BlockMeta = {
 
   /** Regroupement dans la palette du constructeur. */
   group: 'Sections' | 'Contenu' | 'Mise en page'
+
+  /**
+   * Le site auquel appartient le bloc : `classique` (par défaut) ou
+   * `moderne` (la nouvelle direction artistique, en cours d'arbitrage).
+   * L'éditeur ne propose que les blocs du site qu'on édite.
+   */
+  theme?: 'classique' | 'moderne'
 }
 
 /**

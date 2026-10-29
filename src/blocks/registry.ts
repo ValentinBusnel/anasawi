@@ -41,6 +41,18 @@ import {
   dividerBlock,
   spacerBlock,
 } from './layout'
+import {
+  mArchesBlock,
+  mCheminBlock,
+  mConversationBlock,
+  mEnPratiqueBlock,
+  mPhraseBlock,
+  mPromenadeBlock,
+  mRencontreBlock,
+  mRendezVousBlock,
+  mRespirationBlock,
+  mSeuilBlock,
+} from './moderne/blocs'
 import { quoteBlock } from './quote'
 import { servicesBlock } from './services'
 import {
@@ -210,6 +222,18 @@ export const blockRegistry = {
   /* Mise en page */
   divider: dividerBlock,
   spacer: spacerBlock,
+
+  /* VERSION MODERNE — en cours d'arbitrage (voir ARBITRAGE.md). */
+  mSeuil: mSeuilBlock,
+  mRespiration: mRespirationBlock,
+  mRencontre: mRencontreBlock,
+  mChemin: mCheminBlock,
+  mArches: mArchesBlock,
+  mEnPratique: mEnPratiqueBlock,
+  mPhrase: mPhraseBlock,
+  mPromenade: mPromenadeBlock,
+  mConversation: mConversationBlock,
+  mRendezVous: mRendezVousBlock,
 } as const satisfies Record<string, AnyBlockDefinition>
 
 export type BlockType = keyof typeof blockRegistry
@@ -233,6 +257,8 @@ export type BlockOption = {
   navigable: boolean
   container: boolean
   inline: boolean
+  /** Site auquel appartient le modèle (voir `BlockMeta.theme`). */
+  theme: 'classique' | 'moderne'
 }
 
 /** Fiche de chaque bloc — base de la bibliothèque de templates. */
@@ -247,6 +273,7 @@ export const blockOptions: BlockOption[] = blockTypes.map((type) => {
     navigable: block.navigable ?? false,
     container: block.container ?? false,
     inline: block.inline ?? false,
+    theme: ('theme' in block && block.theme) || 'classique',
   }
 })
 
@@ -299,6 +326,18 @@ export const CATEGORY_HINT: Record<TemplateCategory, string> = {
 /** Catégorie de chaque modèle. Un type absent d'ici (primitives du rendu
     interne : titre, image, colonnes…) n'apparaît pas dans la bibliothèque. */
 const CATEGORY_OF: Partial<Record<BlockType, TemplateCategory>> = {
+  /* Version moderne. */
+  mSeuil: 'Ouverture',
+  mRencontre: 'Qui je suis',
+  mChemin: 'Ma méthode',
+  mArches: 'Accompagnements',
+  mConversation: 'Questions',
+  mPromenade: 'Photos & vidéos',
+  mRespiration: 'Textes',
+  mPhrase: 'Textes',
+  mEnPratique: 'Contact & rendez-vous',
+  mRendezVous: 'Contact & rendez-vous',
+
   heroPleinEcran: 'Ouverture',
   hero: 'Ouverture',
   heroEditorial: 'Ouverture',
@@ -369,3 +408,11 @@ export const templateLibrary = TEMPLATE_CATEGORIES.map((category) => ({
     .filter((option) => CATEGORY_OF[option.type] === category)
     .map((option): TemplateOption => ({ ...option, category })),
 })).filter((group) => group.options.length > 0)
+
+/** La bibliothèque d'UN site : les modèles du thème demandé, catégories
+    vides retirées. */
+export function bibliotheque(theme: 'classique' | 'moderne') {
+  return templateLibrary
+    .map((g) => ({ ...g, options: g.options.filter((o) => o.theme === theme) }))
+    .filter((g) => g.options.length > 0)
+}

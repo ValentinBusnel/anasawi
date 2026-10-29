@@ -14,7 +14,7 @@ import {
   blockRegistry,
   CATEGORY_HINT,
   getBlock,
-  templateLibrary,
+  bibliotheque,
   type BlockType,
   type TemplateCategory,
   type TemplateOption,
@@ -56,7 +56,10 @@ export function TemplateLibrary({
   onPick,
   onPickSaved,
   onDeleteSaved,
+  theme = 'classique',
 }: {
+  /** Le site édité : seuls ses modèles sont proposés. */
+  theme?: 'classique' | 'moderne'
   open: boolean
   onOpenChange: (open: boolean) => void
   data: SectionsViewData
@@ -65,6 +68,7 @@ export function TemplateLibrary({
   onPickSaved: (saved: SavedSection) => Promise<void>
   onDeleteSaved: (id: string) => Promise<void>
 }) {
+  const templateLibrary = useMemo(() => bibliotheque(theme), [theme])
   const [busy, setBusy] = useState<string | null>(null)
   const [query, setQuery] = useState('')
   /** Modèle personnel dont la suppression attend confirmation. */
@@ -83,7 +87,7 @@ export function TemplateLibrary({
     if (active === MINE && saved.length === 0) {
       setActive(templateLibrary[0]?.category ?? '')
     }
-  }, [active, saved.length])
+  }, [active, saved.length, templateLibrary])
 
   const results = useMemo(() => {
     if (!searching) return null
@@ -97,7 +101,7 @@ export function TemplateLibrary({
       )
     const mine = saved.filter((s) => s.name.toLowerCase().includes(q))
     return { options, mine }
-  }, [q, saved, searching])
+  }, [q, saved, searching, templateLibrary])
 
   const currentGroup = templateLibrary.find((g) => g.category === active)
 

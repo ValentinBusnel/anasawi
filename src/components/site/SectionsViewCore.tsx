@@ -1,3 +1,4 @@
+import type { Contenu } from '@/blocks/moderne/contenu'
 import { getBlock } from '@/blocks/registry'
 import type { BlockContext } from '@/blocks/types'
 import { sectionTheme } from '@/lib/color'
@@ -61,6 +62,9 @@ export type SectionsViewData = {
   faqItems: FaqItem[]
   settings: Settings
   media: Media[]
+  /** Version moderne uniquement : le contenu partagé avec le site
+      classique (voir `blocks/moderne`). */
+  partage?: Contenu
 }
 
 /** Tableau vide partagé : une racine sans enfant garde la même référence
@@ -137,6 +141,7 @@ export function buildBlockContext(
     services: data.services,
     faqItems: data.faqItems,
     settings: data.settings,
+    partage: data.partage,
     index: 0,
     editable,
   }
@@ -479,6 +484,24 @@ export function SectionRootView({
   }
 
   const env: RenderEnv = { childrenOf, ctx, editable }
+
+  /* VERSION MODERNE : ses blocs portent toute leur mise en page (fond,
+     marges, animations). Aucun habillage du site classique — ni fond de
+     section, ni grain, ni ornement, ni vague, ni entrée animée. */
+  if (block.theme === 'moderne') {
+    return (
+      <section
+        id={section.anchor ?? undefined}
+        aria-label={section.navLabel ?? undefined}
+        data-block-id={editable ? section.id : undefined}
+        data-block-root={editable ? 'true' : undefined}
+        data-block-inactive={editable && !section.isActive ? 'true' : undefined}
+        className={cn('relative', nodeClass(section.id), editable && !section.isActive && 'opacity-40')}
+      >
+        {renderBlock(section, index, env)}
+      </section>
+    )
+  }
 
   const anchor = section.anchor ?? undefined
   const theme = sectionTheme(section.backgroundColor)

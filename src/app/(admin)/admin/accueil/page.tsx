@@ -1,11 +1,14 @@
 import { AdminContent } from '@/components/admin/AdminContent'
 import { PageHeader } from '@/components/admin/PageHeader'
 import { TemplateEditor } from '@/components/admin/TemplateEditor'
+import { chargerContenu } from '@/components/anasawi/charger'
+import { assurerPageModerne } from '@/server/moderne'
 import {
   getAllFaq,
   getAllMedia,
   getAllServices,
   getHomePageForAdmin,
+  getModernPageForAdmin,
   getSavedSections,
   getSettings,
 } from '@/server/queries'
@@ -23,17 +26,24 @@ export const dynamic = 'force-dynamic'
 export default async function HomeBuilderPage({
   searchParams,
 }: {
-  searchParams: Promise<{ section?: string | string[] }>
+  searchParams: Promise<{ section?: string | string[]; theme?: string | string[] }>
 }) {
-  const { section } = await searchParams
-  const [page, media, services, faqItems, settings, saved] =
+  const { section, theme: themeBrut } = await searchParams
+  /* Le temps de l'arbitrage, deux sites : le classique (la page
+     d'accueil) et le moderne (sa propre page, créée au premier passage). */
+  const theme = themeBrut === 'moderne' ? 'moderne' : 'classique'
+  if (theme === 'moderne') await assurerPageModerne()
+  const [page, media, services, faqItems, settings, saved, partage] =
     await Promise.all([
-      getHomePageForAdmin(),
+      theme === 'moderne' ? getModernPageForAdmin() : getHomePageForAdmin(),
       getAllMedia(),
       getAllServices(),
       getAllFaq(),
       getSettings(),
       getSavedSections(),
+      /* Le contenu partagé que lisent les blocs modernes — d'après les
+         sections VIVANTES du site classique. */
+      theme === 'moderne' ? chargerContenu({ brouillon: true }) : Promise.resolve(undefined),
     ])
 
   if (!page) {
@@ -50,13 +60,14 @@ export default async function HomeBuilderPage({
 
   return (
     <TemplateEditor
-      key={page.id}
+      key={`${theme}-${page.id}`}
       pageId={page.id}
       pageTitle={page.title}
       publishedSnapshot={page.publishedSnapshot}
       publishedAt={page.publishedAt}
       initialSections={page.sections}
-      data={{ services, faqItems, settings, media }}
+      data={{ services, faqItems, settings, media, partage }}
+      theme={theme}
       saved={saved}
       /* `?section=…` : depuis « Votre page » sur l'accueil, l'éditeur
          s'ouvre sur la section cliquée. Une valeur inconnue est ignorée. */

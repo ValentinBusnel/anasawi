@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Cormorant_Garamond, Karla, Poppins } from 'next/font/google'
+import { Cormorant_Garamond, Karla, Plus_Jakarta_Sans, Poppins } from 'next/font/google'
 
 import '@/styles/globals.css'
 import { SITE_URL } from '@/lib/utils'
@@ -35,6 +35,17 @@ const poppins = Poppins({
   preload: false,
 })
 
+/* La police de la VERSION MODERNE (en cours d'arbitrage, voir
+   ARBITRAGE.md). Ici et non sur /moderne seulement : l'aperçu de
+   l'éditeur, dans l'admin, doit la connaître aussi. Non préchargée. */
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ['latin', 'latin-ext'],
+  display: 'swap',
+  variable: '--font-jakarta',
+  weight: ['400', '500', '600', '700'],
+  preload: false,
+})
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: { default: 'ANASAWI', template: '%s' },
@@ -57,7 +68,7 @@ export default function RootLayout({
   return (
     <html
       lang="fr"
-      className={`${cormorant.variable} ${karla.variable} ${poppins.variable}`}
+      className={`${cormorant.variable} ${karla.variable} ${poppins.variable} ${jakarta.variable}`}
       suppressHydrationWarning
     >
       <body>{children}</body>

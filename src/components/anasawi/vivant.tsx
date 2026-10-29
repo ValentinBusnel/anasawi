@@ -2,8 +2,9 @@
 
 import { ArrowUpRight, Check, Menu, Plus, X } from 'lucide-react'
 import Image from 'next/image'
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { createContext, useContext, useEffect, useLayoutEffect, useRef, useState } from 'react'
 
+import { BasculeVersion } from '@/components/site/BasculeVersion'
 import { LogoMark } from '@/components/site/Logo'
 import { cn } from '@/lib/utils'
 import type { FaqItem, Media, OpeningHour, ServiceWithMedia } from '@/server/db/schema'
@@ -18,6 +19,27 @@ import type { FaqItem, Media, OpeningHour, ServiceWithMedia } from '@/server/db/
  * ne bouge pour qui a demandé moins d'animations.
  */
 
+/* ══════════════════════════════════════════════════════════════════════
+   MODE ÉDITION — dans l'aperçu de l'éditeur, le cadre est aussi haut que
+   toute la page et ne défile pas : les mises en scène liées au
+   défilement y sont FIGÉES (état de départ), les apparitions jouées
+   d'emblée, et un « écran » vaut 860 px.
+   ══════════════════════════════════════════════════════════════════════ */
+
+const Edition = createContext(false)
+
+/** L'enveloppe de tout bloc moderne : la classe `ad` (jetons, police),
+    et le mode édition pour ses composants. */
+export function ModeEdition({ actif, children }: { actif: boolean; children: React.ReactNode }) {
+  return (
+    <Edition.Provider value={actif}>
+      <div className="ad" style={actif ? ({ '--ad-vh': '8.6px' } as React.CSSProperties) : undefined}>
+        {children}
+      </div>
+    </Edition.Provider>
+  )
+}
+
 const reduit = () =>
   typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
@@ -30,10 +52,11 @@ const reduit = () =>
  */
 function useAvancement<T extends HTMLElement>(mode: 'colle' | 'passage', lisse = false) {
   const ref = useRef<T>(null)
+  const edition = useContext(Edition)
   useEffect(() => {
     const el = ref.current
     if (!el) return
-    if (reduit()) {
+    if (reduit() || edition) {
       el.style.setProperty('--p', mode === 'colle' ? '0' : '1')
       el.style.setProperty('--e', '0')
       return
@@ -88,7 +111,7 @@ function useAvancement<T extends HTMLElement>(mode: 'colle' | 'passage', lisse =
       window.removeEventListener('scroll', demande)
       window.removeEventListener('resize', demande)
     }
-  }, [mode, lisse])
+  }, [mode, lisse, edition])
   return ref
 }
 
@@ -109,9 +132,11 @@ export function Revele({
   as?: 'div' | 'li' | 'p' | 'span'
 }) {
   const ref = useRef<HTMLDivElement>(null)
+  const edition = useContext(Edition)
   const [etat, setEtat] = useState<'ssr' | 'cache' | 'vu'>('ssr')
   useLayoutEffect(() => {
     const el = ref.current
+    if (edition) return
     if (!el || reduit()) return setEtat('vu')
     if (el.getBoundingClientRect().top < window.innerHeight * 0.88) return setEtat('vu')
     setEtat('cache')
@@ -126,7 +151,7 @@ export function Revele({
     )
     io.observe(el)
     return () => io.disconnect()
-  }, [])
+  }, [edition])
   return (
     <Balise
       ref={ref as never}
@@ -155,10 +180,11 @@ export function Lignes({
   delai?: number
 }) {
   const ref = useRef<HTMLSpanElement>(null)
+  const edition = useContext(Edition)
   const [vu, setVu] = useState(false)
   useEffect(() => {
     const el = ref.current
-    if (!el) return
+    if (!el || edition) return
     const io = new IntersectionObserver(
       ([e]) => {
         if (e?.isIntersecting) {
@@ -170,7 +196,7 @@ export function Lignes({
     )
     io.observe(el)
     return () => io.disconnect()
-  }, [])
+  }, [edition])
   return (
     <span ref={ref} className={cn('block', className)}>
       {lignes.map((l, i) => (
@@ -178,7 +204,7 @@ export function Lignes({
           <span
             className={cn(
               'block',
-              vu ? 'motion-safe:animate-[ad-sortir_1.1s_var(--ad-ease)_backwards]' : 'motion-safe:translate-y-[105%]',
+              edition ? '' : vu ? 'motion-safe:animate-[ad-sortir_1.1s_var(--ad-ease)_backwards]' : 'motion-safe:translate-y-[105%]',
               ligneClassName,
             )}
             style={vu ? { animationDelay: `${delai + i * 0.12}s` } : undefined}
@@ -224,6 +250,7 @@ export function Seuil({
   intro: string
 }) {
   const ref = useAvancement<HTMLElement>('colle', true)
+  const edition = useContext(Edition)
   /* « Ouvert aujourd'hui » se calcule chez le visiteur (son jour) : après
      l'hydratation, jamais au rendu serveur. */
   const [jour, setJour] = useState<string | null>(null)
@@ -240,19 +267,19 @@ export function Seuil({
     'flex items-center gap-2 whitespace-nowrap rounded-full border border-white/80 bg-white/55 px-3 py-1.5 text-[12px] font-medium text-[var(--ad-pierre)] shadow-[0_8px_24px_-14px_rgba(20,35,46,0.35)] backdrop-blur-md'
   /* La fenêtre : sous le nom au départ, plein écran à l'arrivée. */
   const larg = 'min(460px, 64vw)'
-  const haut = 'min(400px, 38svh)'
+  const haut = 'min(400px, var(--ad-vh) * 38)'
   return (
-    <section ref={ref} id="haut" className="relative h-[240vh] [--e:0] [--p:0]">
-      <div className="sticky top-0 h-[100svh] overflow-hidden">
+    <section ref={ref} id="haut" className={cn('relative [--e:0] [--p:0]', edition ? 'h-[calc(var(--ad-vh)*100)]' : 'h-[calc(var(--ad-vh)*240)]')}>
+      <div className="sticky top-0 h-[calc(var(--ad-vh)*100)] overflow-hidden">
         {/* Un halo très doux, derrière tout. */}
         <div
           aria-hidden="true"
-          className="absolute left-1/2 top-[30%] h-[70svh] w-[90vw] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(54,163,155,0.14),rgba(47,111,147,0.08)_55%,transparent)] blur-2xl"
+          className="absolute left-1/2 top-[30%] h-[calc(var(--ad-vh)*70)] w-[90vw] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(54,163,155,0.14),rgba(47,111,147,0.08)_55%,transparent)] blur-2xl"
           style={sFondu}
         />
 
         {/* Le métier, au-dessus du nom. */}
-        <div className="absolute inset-x-0 top-[13svh] z-30 flex justify-center md:top-[14svh]" style={sEfface}>
+        <div className="absolute inset-x-0 top-[calc(var(--ad-vh)*13)] z-30 flex justify-center md:top-[calc(var(--ad-vh)*14)]" style={sEfface}>
           <span className="inline-flex items-center gap-2 rounded-full bg-white px-3.5 py-1.5 text-[13px] font-semibold text-[var(--ad-pierre)] shadow-[0_1px_2px_rgba(20,35,46,0.06),0_6px_18px_-8px_rgba(20,35,46,0.18)] motion-safe:animate-[ad-monter_1.1s_var(--ad-ease)_0.1s_backwards]">
             <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-[var(--ad-or)]" />
             {metier} · {ville}
@@ -261,9 +288,9 @@ export function Seuil({
 
         {/* Le nom : centré, AU PREMIER PLAN, jusqu'à ce qu'on fasse défiler. */}
         <h1
-          className="pointer-events-none absolute inset-x-0 top-[19svh] z-30 px-5 text-center text-[clamp(52px,9.4vw,156px)] leading-[0.95] text-[var(--ad-nuit)] md:top-[20svh]"
+          className="pointer-events-none absolute inset-x-0 top-[calc(var(--ad-vh)*19)] z-30 px-5 text-center text-[clamp(52px,9.4vw,156px)] leading-[0.95] text-[var(--ad-nuit)] md:top-[calc(var(--ad-vh)*20)]"
           style={{
-            transform: 'translateY(calc(var(--e) * -16svh)) scale(calc(1 - var(--e) * 0.25))',
+            transform: 'translateY(calc(var(--e) * var(--ad-vh) * -16)) scale(calc(1 - var(--e) * 0.25))',
             opacity: 'clamp(0, calc(1 - var(--e) * 2.2), 1)',
           }}
         >
@@ -277,7 +304,7 @@ export function Seuil({
 
         {/* Sous le nom : la présentation, et les deux actions. */}
         <div
-          className="absolute inset-x-0 top-[calc(19svh+clamp(120px,21vw,330px))] z-30 hidden flex-col items-center px-6 text-center md:top-[calc(20svh+clamp(60px,10.5vw,170px))] md:flex"
+          className="absolute inset-x-0 top-[calc(var(--ad-vh)*19+clamp(120px,21vw,330px))] z-30 hidden flex-col items-center px-6 text-center md:top-[calc(var(--ad-vh)*20+clamp(60px,10.5vw,170px))] md:flex"
           style={sEfface}
         >
           <p className="max-w-[54ch] text-[16px] leading-[1.6] text-[var(--ad-pierre)] motion-safe:animate-[ad-monter_1.2s_var(--ad-ease)_0.45s_backwards]">{intro}</p>
@@ -289,7 +316,7 @@ export function Seuil({
           style={{
             top: 'calc(66% - 16% * var(--e))',
             width: `calc(${larg} + (100vw - ${larg}) * var(--e))`,
-            height: `calc(${haut} + (100svh - ${haut}) * var(--e))`,
+            height: `calc(${haut} + (var(--ad-vh) * 100 - ${haut}) * var(--e))`,
             transform: 'translate(-50%, -50%)',
             borderRadius: 'calc((1 - var(--e)) * 32px)',
           }}
@@ -606,6 +633,7 @@ export function Arches({ services, rdv }: { services: ServiceWithMedia[]; rdv: s
 
 export function Promenade({ photos, titre }: { photos: Media[]; titre: React.ReactNode }) {
   const ref = useAvancement<HTMLElement>('colle')
+  const edition = useContext(Edition)
   const piste = useRef<HTMLDivElement>(null)
   useEffect(() => {
     const mesure = () => {
@@ -620,8 +648,8 @@ export function Promenade({ photos, titre }: { photos: Media[]; titre: React.Rea
   }, [ref])
   const formes = ['rounded-[28px]', 'rounded-[20px]', 'rounded-[36px]', 'rounded-[24px]']
   return (
-    <section ref={ref} id="cabinet" className="relative [--p:0] md:h-[320vh]">
-      <div className="py-20 md:sticky md:top-0 md:flex md:h-[100svh] md:flex-col md:justify-center md:overflow-hidden md:py-0">
+    <section ref={ref} id="cabinet" className={cn('relative [--p:0]', !edition && 'md:h-[calc(var(--ad-vh)*320)]')}>
+      <div className={cn('py-20', !edition && 'md:sticky md:top-0 md:flex md:h-[calc(var(--ad-vh)*100)] md:flex-col md:justify-center md:overflow-hidden md:py-0')}>
         <div className="mb-10 flex items-end justify-between gap-6 px-[5vw]">
           <h2 className="text-[48px] md:text-[80px]">{titre}</h2>
           <p className="pb-3 text-[12px] uppercase tracking-[0.2em] text-[var(--ad-gris)] max-md:hidden">
@@ -640,7 +668,7 @@ export function Promenade({ photos, titre }: { photos: Media[]; titre: React.Rea
                   className={cn(
                     'relative overflow-hidden bg-[var(--ad-sable-fonce)]',
                     formes[i % formes.length],
-                    i % 3 === 0 ? 'h-[300px] w-[240px] md:h-[52svh] md:w-[30svh]' : 'h-[240px] w-[300px] md:h-[40svh] md:w-[52svh]',
+                    i % 3 === 0 ? 'h-[300px] w-[240px] md:h-[calc(var(--ad-vh)*52)] md:w-[calc(var(--ad-vh)*30)]' : 'h-[240px] w-[300px] md:h-[calc(var(--ad-vh)*40)] md:w-[calc(var(--ad-vh)*52)]',
                   )}
                 >
                   <Image
@@ -1105,6 +1133,7 @@ export function Fil({ liens, rdv, logo }: { liens: { href: string; label: string
               </a>
             ))}
           </nav>
+          <BasculeVersion actuelle="moderne" className="mr-1 text-[var(--ad-pierre)] max-lg:hidden" />
           <Aimant force={0.25} className="max-md:hidden">
           <a
             href={rdv}
@@ -1162,7 +1191,8 @@ export function Fil({ liens, rdv, logo }: { liens: { href: string; label: string
             </a>
           ))}
         </nav>
-        <a href={rdv} onClick={() => setOuvert(false)} tabIndex={ouvert ? 0 : -1} className="mt-10 rounded-full bg-[var(--ad-nuit)] py-4 text-center text-[16px] font-medium text-white">
+        <BasculeVersion actuelle="moderne" className="mt-8 self-start text-[var(--ad-pierre)]" />
+        <a href={rdv} onClick={() => setOuvert(false)} tabIndex={ouvert ? 0 : -1} className="mt-6 rounded-full bg-[var(--ad-nuit)] py-4 text-center text-[16px] font-medium text-white">
           Prendre rendez-vous
         </a>
       </div>

@@ -181,6 +181,9 @@ const nextConfig: NextConfig = {
       { source: '/admin/navigation', destination: '/admin/reglages#menu', permanent: true },
       { source: '/admin/seo', destination: '/admin/reglages#referencement', permanent: true },
       { source: '/admin/edit', destination: '/admin/accueil', permanent: true },
+      /* Ancienne adresse de la démonstration de la version moderne. */
+      { source: '/nouvelle-da/:path*', destination: '/moderne', permanent: false },
+      { source: '/nouvelle-da', destination: '/moderne', permanent: false },
     ]
   },
 }

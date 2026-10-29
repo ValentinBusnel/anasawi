@@ -308,6 +308,27 @@ export function getHomePageForAdmin() {
   return loadPage(eq(pages.isHome, true), false)
 }
 
+/* ════════════════════════════════════════════════════════════════════
+   Version moderne — en cours d'arbitrage (voir ARBITRAGE.md)
+   Une seconde page, ses propres sections (blocs « moderne »), le même
+   contenu partagé. Elle n'est pas la page d'accueil : elle est servie
+   sur /moderne.
+   ════════════════════════════════════════════════════════════════════ */
+
+export const SLUG_MODERNE = 'accueil-moderne'
+
+export function getModernPageForAdmin() {
+  return loadPage(eq(pages.slug, SLUG_MODERNE), false)
+}
+
+export const getPublishedModern = cache(
+  cached(
+    () => loadPage(eq(pages.slug, SLUG_MODERNE), true),
+    ['page-moderne'],
+    [tags.page(SLUG_MODERNE), tags.pages],
+  ),
+)
+
 /**
  * Une entrée de menu telle que le site la consomme. `href` est le lien
  * (ancre nue `contact`, `/#contact`, `https://…`) ; `anchor` en est la

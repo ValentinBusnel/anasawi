@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 import { illustratePayload } from '@/blocks/media-fields'
-import { blockRegistry, templateLibrary } from '@/blocks/registry'
+import { bibliotheque, blockRegistry } from '@/blocks/registry'
 import { isVideoMimeType } from '@/lib/media-kind'
 import { SectionsView } from '@/components/site/SectionsView'
 import type { Section } from '@/server/db/schema'
@@ -42,7 +42,7 @@ export default async function TemplatesPage() {
   const now = new Date()
   let position = 0
 
-  const groups = templateLibrary.map((group) => ({
+  const groups = bibliotheque('classique').map((group) => ({
     category: group.category,
     entries: group.options.map((option) => {
       const block = blockRegistry[option.type]

@@ -779,6 +779,10 @@
   --ad-pierre: #4c5b67;
   --ad-gris: #7a8894;
   --ad-titre: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  /* La hauteur d'écran des mises en scène (ouverture, promenade). Dans
+     l'aperçu de l'éditeur, le cadre est aussi haut que toute la page :
+     on y fige un écran de 860 px (voir \`ModeEdition\`). */
+  --ad-vh: 1svh;
   --ad-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --ad-ease-lent: cubic-bezier(0.65, 0, 0.35, 1);
   font-family: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;

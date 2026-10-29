@@ -1,8 +1,9 @@
 import { ArrowUpRight, Mail, MapPin, Phone } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
 
 import { Aimant, Arches, Chemin, Conversation, Encre, Lettre, Lignes, Promenade, Revele, Semaine, Seuil, Souffle } from './vivant'
-import type { Contenu } from '@/components/qeeps/donnees'
+import type { Contenu } from '@/blocks/moderne/contenu'
 import { LogoMark } from '@/components/site/Logo'
 import { cn, toE164 } from '@/lib/utils'
 
@@ -375,7 +376,7 @@ export function RendezVous({ c }: P) {
 
 /* ── Horizon ────────────────────────────────────────────────────────── */
 
-export function Horizon({ c, liens, base }: P & { liens: { href: string; label: string }[]; base: string }) {
+export function Horizon({ c, liens }: P & { liens: { href: string; label: string }[] }) {
   return (
     /* Le fond sable continue celui du rendez-vous derrière la courbe. */
     <div className="bg-[var(--ad-sable)]">
@@ -430,9 +431,9 @@ export function Horizon({ c, liens, base }: P & { liens: { href: string; label: 
           </nav>
           <span>
             © {new Date().getFullYear()} {c.nom} ·{' '}
-            <a href={`${base}/modeles`} className="underline-offset-2 hover:text-white hover:underline">
-              les composants
-            </a>
+            <Link href="/" className="underline-offset-2 hover:text-white hover:underline">
+              version classique
+            </Link>
           </span>
         </div>
       </div>
