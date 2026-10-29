@@ -443,7 +443,12 @@ export function MediaManager({
                     <button
                       type="button"
                       onClick={() => openEditor(media)}
-                      aria-label={`Modifier ${media.alt}`}
+                      /* Nommé « Modifier », décrit par le nom du fichier : la
+                         description (« … à supprimer ») ne doit pas finir
+                         dans le nom du bouton, où elle le confondait avec
+                         la commande « Supprimer ». */
+                      aria-label="Modifier"
+                      aria-describedby={`media-nom-${media.id}`}
                       className="relative block aspect-4/3 overflow-hidden rounded-[12px] bg-block transition-shadow duration-300 hover:shadow-[0_10px_30px_rgba(22,73,81,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     >
                       <MediaThumb media={media} sizes="(max-width: 640px) 50vw, 220px" />
@@ -456,7 +461,7 @@ export function MediaManager({
 
                     <div className="mt-2 flex min-w-0 items-start gap-1">
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-[14px] font-medium text-foreground">{media.alt}</p>
+                        <p id={`media-nom-${media.id}`} className="truncate text-[14px] font-medium text-foreground">{media.alt}</p>
                         <p className="text-[12px] text-[#8aa4a8]">
                           {[estVideo ? 'Vidéo' : 'Image', formatTaille(media.size)].filter(Boolean).join(' · ')}
                         </p>

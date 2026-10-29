@@ -210,7 +210,10 @@ export function SplitChars({
   ))
 
   return (
-    <Comp className={cn('block', italic && 'italic', className)}>
+    /* `aria-label` : le repère de la LIGNE (son texte entier). L'admin
+       pose chaque ligne du hero à gauche, au centre ou à droite, et les
+       tests vérifient ce placement en mesurant cet élément-là. */
+    <Comp className={cn('block', italic && 'italic', className)} aria-label={text}>
       {on ? (
         <Appear as="span" delay={delay} className="block">
           {mots}

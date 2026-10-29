@@ -165,7 +165,7 @@ function Compte({ userName }: { userName: string }) {
         onClick={() => setOuvert((v) => !v)}
         aria-expanded={ouvert}
         aria-haspopup="true"
-        aria-label="Mon compte"
+        aria-label={`Mon compte — ${userName}`}
         className={cn(
           'flex items-center gap-1.5 rounded-full py-[3px] pl-[3px] pr-2 text-muted-foreground transition-colors hover:bg-block',
           ouvert && 'bg-block',
