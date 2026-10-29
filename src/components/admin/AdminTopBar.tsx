@@ -74,7 +74,7 @@ function Espaces({ nonLus }: { nonLus: number }) {
         <span
           aria-hidden="true"
           className="absolute bottom-1 top-1 rounded-[9px] shadow-[0_1px_2px_rgba(22,73,81,0.08),0_4px_12px_rgba(22,73,81,0.06)] transition-[left,width,background-color] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] max-lg:bottom-1.5 max-lg:top-1.5 max-lg:rounded-[12px] max-lg:shadow-none"
-          /* Blanc, à peine teinté du pastel de l'espace courant. */
+          /* Blanc, à peine teinté de cyan — le même pour tous les onglets. */
           style={{
             left: indicateur.left,
             width: indicateur.width,
