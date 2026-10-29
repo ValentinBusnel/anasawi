@@ -161,7 +161,7 @@ export function EditorStage({
              est recréé et rejoue son halo — le geste de l'espace Qeeps. */
           <div
             key={selectedId ?? 'aucune'}
-            className="pointer-events-none absolute inset-x-0 rounded-[2px] shadow-[inset_0_0_0_1.5px_#176c79] motion-safe:animate-[adm-flash-inset_1.4s_cubic-bezier(0.22,1,0.36,1)]"
+            className="pointer-events-none absolute inset-x-0 rounded-[2px] shadow-[inset_0_0_0_3px_#176c79,inset_0_0_0_10px_rgba(221,247,247,0.55)] motion-safe:animate-[adm-flash-inset_1.4s_cubic-bezier(0.22,1,0.36,1)]"
             style={{
               top: selectionRect.top * scale,
               height: selectionRect.height * scale,
