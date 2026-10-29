@@ -232,23 +232,24 @@
     box-shadow: 0 0 0 0 rgba(23, 108, 121, 0);
   }
 }
-/* Le cadre de la section choisie dans l'aperçu : le halo monte, puis
-   se pose — le cadre garde ensuite l'épaisseur et la lueur du halo. */
+/* Le cadre de la section choisie dans l'aperçu : exactement le halo de
+   l'espace Qeeps (anneau pétrole + lueur cyan, à l'extérieur), qui monte
+   puis se pose — et reste tant que la section est choisie. */
 @keyframes adm-flash-inset {
   0% {
     box-shadow:
-      inset 0 0 0 0 rgba(23, 108, 121, 0),
-      inset 0 0 0 0 rgba(221, 247, 247, 0);
+      0 0 0 0 rgba(23, 108, 121, 0),
+      0 0 0 0 rgba(221, 247, 247, 0);
   }
   25% {
     box-shadow:
-      inset 0 0 0 3px #176c79,
-      inset 0 0 0 14px rgba(221, 247, 247, 0.75);
+      0 0 0 4px rgba(23, 108, 121, 0.55),
+      0 0 0 14px rgba(221, 247, 247, 0.9);
   }
   100% {
     box-shadow:
-      inset 0 0 0 3px #176c79,
-      inset 0 0 0 10px rgba(221, 247, 247, 0.55);
+      0 0 0 3px rgba(23, 108, 121, 0.5),
+      0 0 0 10px rgba(221, 247, 247, 0.8);
   }
 }
 @keyframes adm-ping {
