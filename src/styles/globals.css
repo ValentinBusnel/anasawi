@@ -579,20 +579,29 @@
 }
 
 /* Bloc « écran » — le cadre gris des écrans Accueil, Questions, Médias et
-   Messages, à la façon de l'espace Qeeps : sur grand écran, il remplit la
-   fenêtre jusqu'en bas et ses colonnes défilent à l'intérieur ; la page,
-   elle, ne défile plus. `--bloc-haut` : la hauteur occupée au-dessus
-   (barre du haut, en-tête, marges). Sur un écran bas ou étroit, retour
-   au défilement de page ordinaire — rien n'est jamais coupé. */
+   Messages, à la façon de l'espace Qeeps : sur grand écran, il occupe la
+   hauteur restante sous l'en-tête, ses colonnes défilent à l'intérieur, et
+   la zone de contenu (`.admin-scroll`, le seul élément qui défile dans
+   l'admin) devient immobile. Une hauteur calculée au pixel (« 100dvh moins
+   l'en-tête ») ratait : la marge basse de la zone de contenu (64 px) la
+   faisait encore défiler. Ici c'est la mise en page flex qui partage la
+   hauteur — juste quelle que soit la taille de l'en-tête. Sur un écran
+   bas ou étroit, retour au défilement ordinaire : rien n'est coupé. */
 @utility bloc-ecran {
   @media (min-width: 64rem) and (min-height: 620px) {
-    height: calc(100dvh - var(--bloc-haut, 265px));
+    flex: 1 1 0%;
+    min-height: 0;
   }
 }
 
 @media (min-width: 64rem) and (min-height: 620px) {
-  :root:has(.bloc-ecran) {
+  .admin-scroll:has(.bloc-ecran) {
     overflow: hidden;
+  }
+
+  .admin-scroll:has(.bloc-ecran) > .adm-page {
+    height: 100%;
+    padding-bottom: 24px;
   }
 }
 
