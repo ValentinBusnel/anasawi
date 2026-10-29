@@ -8,10 +8,10 @@ import {
   type DropAnimation,
 } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
-import { GripVertical, HeartHandshake, Plus } from 'lucide-react'
+import { GripVertical, HeartHandshake, Layers, Plus } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useActionForm } from './hooks/useActionForm'
@@ -259,59 +259,50 @@ export function ServicesManager({
   const vide = items.length === 0 && groups.length === 0
   const enLigne = items.filter((s) => s.isActive).length
 
-  /* ── Le sommaire de gauche ────────────────────────────────────────
-     Les titres ne sont pas des filtres : la liste de droite les montre
-     TOUS, parce qu'on glisse une ligne d'un titre à l'autre. Le sommaire
-     y mène (défilement) et suit la lecture (titre allumé). */
-  const defilement = useRef<HTMLDivElement>(null)
-  const [courant, setCourant] = useState<string | null>(null)
-  /* Le temps du défilement demandé, le suivi se tait : sinon il rallumait
-     le titre précédent quand le dernier ne peut pas monter tout en haut. */
-  const clicRecent = useRef(0)
-  const ancre = (id: string | null) => `famille-${id ?? 'seuls'}`
-
-  function allerA(id: string | null) {
-    const cible = document.getElementById(ancre(id))
-    const boite = defilement.current
-    if (!cible || !boite) return
-    setCourant(id ?? 'seuls')
-    clicRecent.current = Date.now()
-    boite.scrollTo({
-      top:
-        boite.scrollTop +
-        cible.getBoundingClientRect().top -
-        boite.getBoundingClientRect().top -
-        12,
-      behavior: 'smooth',
-    })
-  }
-
-  function suivreLecture() {
-    const boite = defilement.current
-    if (!boite || Date.now() - clicRecent.current < 900) return
-    /* Tout en bas : c'est le dernier titre qu'on lit. */
-    if (boite.scrollTop + boite.clientHeight >= boite.scrollHeight - 2) {
-      setCourant(lignes.at(-1)?.cle ?? null)
-      return
-    }
-    const haut = boite.getBoundingClientRect().top + 40
-    let actif: string | null = null
-    for (const el of boite.querySelectorAll<HTMLElement>('[data-famille]')) {
-      if (el.getBoundingClientRect().top <= haut) actif = el.dataset.famille ?? null
-    }
-    setCourant(actif ?? groups[0]?.id ?? 'seuls')
-  }
+  /* ── Les titres, à gauche ─────────────────────────────────────────
+     Comme les dossiers de Médias : un clic n'affiche que ce titre-là.
+     « Tous les accompagnements » remet la liste entière — c'est là qu'on
+     glisse une ligne d'un titre à l'autre. */
+  type Vue = 'tous' | 'seuls' | string
+  const [vue, setVue] = useState<Vue>('tous')
+  /* Un titre supprimé alors qu'il était ouvert : retour à la liste entière. */
+  const vueValide =
+    vue === 'tous' || (vue === 'seuls' ? blocs.orphelins.length > 0 : groups.some((g) => g.id === vue))
+      ? vue
+      : 'tous'
+  const groupesVisibles =
+    vueValide === 'tous' ? groups : groups.filter((g) => g.id === vueValide)
+  const seulsVisibles = vueValide === 'tous' || vueValide === 'seuls'
+  const titreVue =
+    vueValide === 'tous'
+      ? 'Tous les accompagnements'
+      : vueValide === 'seuls'
+        ? 'Présentés seuls'
+        : (groups.find((g) => g.id === vueValide)?.label ?? '')
+  const nVue =
+    vueValide === 'tous'
+      ? items.length
+      : vueValide === 'seuls'
+        ? blocs.orphelins.length
+        : (blocs.parFamille.get(vueValide) ?? []).length
 
   const lignes = [
+    {
+      id: 'tous',
+      cle: 'tous',
+      label: 'Tous',
+      n: items.length,
+      tone: PASTELS[0]!,
+    },
     ...groups.map((g, i) => ({
-      id: g.id as string | null,
+      id: g.id,
       cle: g.id,
       label: g.label,
       n: (blocs.parFamille.get(g.id) ?? []).length,
       tone: PASTELS[(i + 3) % PASTELS.length]!,
     })),
     ...(blocs.orphelins.length > 0
-      ? [{ id: null, cle: 'seuls', label: 'Présentés seuls', n: blocs.orphelins.length, tone: { bg: '#e9eced', fg: '#6b8186' } }]
+      ? [{ id: 'seuls', cle: 'seuls', label: 'Présentés seuls', n: blocs.orphelins.length, tone: { bg: '#e9eced', fg: '#6b8186' } }]
       : []),
   ]
 
@@ -357,16 +348,20 @@ export function ServicesManager({
         <div className="bloc-ecran grid gap-2 rounded-[24px] bg-block p-2 lg:grid-cols-[260px_minmax(0,1fr)]">
           {/* ── Le sommaire ───────────────────────────────────────── */}
           <nav aria-label="Titres" className="min-h-0 overflow-y-auto overscroll-contain p-1 [scrollbar-width:thin] lg:p-2">
-            <p className="px-3 pb-1.5 pt-1 text-[13px] font-medium text-[#8aa4a8]">Titres</p>
             <ul className="flex flex-col gap-0.5">
-              {lignes.map((l) => {
-                const actif = courant === l.cle
+              {lignes.map((l, index) => {
+                const actif = vueValide === l.cle
                 return (
                   <li key={l.cle}>
+                    {index === 1 && (
+                      <p className="px-3 pb-1.5 pt-4 text-[13px] font-medium text-[#8aa4a8]">Titres</p>
+                    )}
                     <button
                       type="button"
-                      onClick={() => allerA(l.id)}
-                      aria-label={`Aller à « ${l.label} »`}
+                      onClick={() => setVue(l.cle)}
+                      /* « Afficher… » : jamais le libellé seul — le titre
+                         lui-même, dans la liste, est le bouton qui le renomme. */
+                      aria-label={`Afficher « ${l.label} »`}
                       aria-current={actif ? 'true' : undefined}
                       className={cn(
                         'group flex h-[52px] w-full items-center gap-3 rounded-[14px] px-3 text-left text-[14px] font-medium transition-[background-color,color,box-shadow] duration-[250ms] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
@@ -380,7 +375,11 @@ export function ServicesManager({
                         className="grid h-8 w-8 shrink-0 place-items-center rounded-[10px] transition-transform duration-[350ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:scale-[1.06]"
                         style={{ background: l.tone.bg, color: l.tone.fg }}
                       >
-                        <HeartHandshake className="h-4 w-4" strokeWidth={1.8} />
+                        {l.cle === 'tous' ? (
+                          <Layers className="h-4 w-4" strokeWidth={1.8} />
+                        ) : (
+                          <HeartHandshake className="h-4 w-4" strokeWidth={1.8} />
+                        )}
                       </span>
                       <span aria-hidden="true" className="min-w-0 flex-1 truncate">{l.label}</span>
                       <span aria-hidden="true" className="text-[12px] tabular-nums text-[#8aa4a8]">{l.n}</span>
@@ -391,7 +390,11 @@ export function ServicesManager({
               <li className="pt-1">
                 <button
                   type="button"
-                  onClick={ajouterFamille}
+                  onClick={() => {
+                    /* Le nouveau titre arrive en bas de la liste entière. */
+                    setVue('tous')
+                    ajouterFamille()
+                  }}
                   disabled={pending}
                   className="group/add flex items-center gap-[7px] rounded-[8px] px-3 py-2 text-[13.5px] font-medium text-[#176c79] transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
                 >
@@ -405,17 +408,17 @@ export function ServicesManager({
           {/* ── La liste, toute entière ───────────────────────────── */}
           <section aria-label="Vos accompagnements" className="flex min-h-0 min-w-0 flex-col overflow-hidden rounded-[20px] bg-white">
             <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-[#eef1f2] px-5 py-4 sm:px-6">
-              <h2 className="text-[16px] font-semibold text-foreground">
-                Vos accompagnements
-                <span className="ml-2 text-[13px] font-medium text-[#8aa4a8]">{items.length}</span>
+              <h2 key={vueValide} className="text-[16px] font-semibold text-foreground animate-[adm-fade_0.3s_ease_both]">
+                {titreVue}
+                <span className="ml-2 text-[13px] font-medium text-[#8aa4a8]">{nVue}</span>
               </h2>
               <p className="text-[13px] text-[#8aa4a8]">
-                Glissez une ligne pour la déplacer, y compris d’un titre à l’autre
+                {vueValide === 'tous'
+                  ? 'Glissez une ligne pour la déplacer, y compris d’un titre à l’autre'
+                  : 'Glissez une ligne pour changer l’ordre'}
               </p>
             </div>
             <div
-              ref={defilement}
-              onScroll={suivreLecture}
               className="relative min-h-0 flex-1 overflow-y-auto overscroll-contain p-3 [scrollbar-width:thin] sm:p-4"
             >
               <DndContext
@@ -436,11 +439,11 @@ export function ServicesManager({
                       les accompagnements dans chacune. dnd-kit distingue les deux
                       par l'identifiant saisi au départ du glisser. */}
                   <SortableContext
-                    items={groups.map((g) => g.id)}
+                    items={groupesVisibles.map((g) => g.id)}
                     strategy={verticalListSortingStrategy}
                   >
-                    {groups.map((group) => (
-                      <div key={group.id} id={ancre(group.id)} data-famille={group.id}>
+                    {groupesVisibles.map((group) => (
+                      <div key={group.id} className="animate-[adm-fade_0.3s_ease_both]">
                         <Famille
                           group={group}
                           services={blocs.parFamille.get(group.id) ?? []}
@@ -455,7 +458,7 @@ export function ServicesManager({
                     ))}
                   </SortableContext>
 
-                  <div id={ancre(null)} data-famille="seuls">
+                  {seulsVisibles && (
                     <Famille
                       group={null}
                       services={blocs.orphelins}
@@ -464,7 +467,7 @@ export function ServicesManager({
                       onToggle={basculer}
                       onDeleted={supprimer}
                     />
-                  </div>
+                  )}
                 </div>
 
                 {/* Calque de glisser : une copie qui suit le pointeur au pixel.
