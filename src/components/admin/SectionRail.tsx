@@ -347,7 +347,9 @@ export function SectionRail({
                         aria-hidden="true"
                         className={cn(
                           'grid h-[26px] w-[26px] shrink-0 place-items-center rounded-[8px] transition-[opacity,transform] duration-[350ms] ease-[cubic-bezier(0.34,1.56,0.64,1)]',
-                          active ? 'scale-[1.06] opacity-100' : 'opacity-75 group-hover:opacity-100',
+                          active
+                            ? 'scale-[1.06] opacity-100 motion-safe:animate-[adm-pop_0.45s_cubic-bezier(0.34,1.56,0.64,1)]'
+                            : 'opacity-75 group-hover:opacity-100',
                         )}
                         style={{ background: tone.bg, color: tone.fg }}
                       >

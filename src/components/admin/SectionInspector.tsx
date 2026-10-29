@@ -50,6 +50,7 @@ function Group({
   onToggle,
   children,
   tone,
+  flash = false,
 }: {
   title: string
   open: boolean
@@ -57,11 +58,26 @@ function Group({
   children: React.ReactNode
   /** Encre de la section : la pastille devant le titre du bloc. */
   tone?: string
+  /** Premier bloc d'une section qu'on vient de choisir : il s'illumine. */
+  flash?: boolean
 }) {
   /* Un bloc gris de l'espace Qeeps : une pastille de la couleur de la
      section, le titre, et les champs blancs posés dessus. */
   return (
-    <div className="rounded-[24px] bg-block p-6">
+    <div
+      className="rounded-[24px] bg-block p-6"
+      /* Le halo de l'espace Qeeps, après l'entrée du bloc (style en
+         ligne : il s'ajoute à l'animation d'entrée au lieu de la
+         remplacer). */
+      style={
+        flash
+          ? {
+              animation:
+                'adm-in 0.7s cubic-bezier(0.02, 0.45, 0.56, 1) backwards, adm-flash 1.4s cubic-bezier(0.22, 1, 0.36, 1) 0.35s',
+            }
+          : undefined
+      }
+    >
       <button
         type="button"
         onClick={onToggle}
@@ -487,6 +503,7 @@ export function SectionInspector({
         {contentFields.length > 0 && (
           <Group
             tone={tone.fg}
+            flash
             title="Contenu"
             open={open.content}
             onToggle={() => toggle('content')}

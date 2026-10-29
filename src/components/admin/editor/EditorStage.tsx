@@ -157,8 +157,11 @@ export function EditorStage({
 
         {/* Cadre de la section sélectionnée */}
         {editing && selectionRect && (
+          /* Une clé par section : à chaque nouvelle sélection, le cadre
+             est recréé et rejoue son halo — le geste de l'espace Qeeps. */
           <div
-            className="pointer-events-none absolute inset-x-0 ring-[1.5px] ring-inset ring-blue-deep"
+            key={selectedId ?? 'aucune'}
+            className="pointer-events-none absolute inset-x-0 rounded-[2px] shadow-[inset_0_0_0_1.5px_#176c79] motion-safe:animate-[adm-flash-inset_1.4s_cubic-bezier(0.22,1,0.36,1)]"
             style={{
               top: selectionRect.top * scale,
               height: selectionRect.height * scale,
