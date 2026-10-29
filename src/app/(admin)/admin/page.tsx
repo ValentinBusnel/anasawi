@@ -176,7 +176,7 @@ export default async function DashboardPage() {
       </section>
 
       {/* ── Le cadre gris, deux colonnes ───────────────────────────── */}
-      <div className="grid gap-2 rounded-[24px] bg-block p-2 lg:h-[calc(100dvh-364px)] lg:min-h-[440px] lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
+      <div className="grid gap-2 rounded-[24px] bg-block p-2 bloc-ecran [--bloc-haut:364px] lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
         {/* Votre page */}
         <section aria-labelledby="votre-page" className="min-h-0 min-w-0 overflow-y-auto overscroll-contain rounded-[20px] [scrollbar-width:thin] bg-white p-5 sm:p-6">
           <div className="mb-3 flex items-baseline justify-between gap-3 px-1">

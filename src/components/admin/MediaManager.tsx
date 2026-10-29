@@ -299,7 +299,7 @@ export function MediaManager({
         }
       />
 
-      <div className="grid gap-2 rounded-[24px] bg-block p-2 lg:h-[calc(100dvh-265px)] lg:min-h-[480px] lg:grid-cols-[260px_minmax(0,1fr)]">
+      <div className="grid gap-2 rounded-[24px] bg-block p-2 bloc-ecran lg:grid-cols-[260px_minmax(0,1fr)]">
         {/* ── Les dossiers ─────────────────────────────────────────── */}
         <nav aria-label="Dossiers" className="min-h-0 overflow-y-auto overscroll-contain p-1 [scrollbar-width:thin] lg:p-2">
           <ul className="flex flex-col gap-0.5">

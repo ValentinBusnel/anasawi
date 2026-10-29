@@ -9,7 +9,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { GripVertical, Pencil, Plus } from 'lucide-react'
+import { GripVertical, HelpCircle, Pencil, Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -18,7 +18,8 @@ import { ConfirmDelete } from './ConfirmDelete'
 import { FieldError } from './form/FieldError'
 import { useActionForm } from './hooks/useActionForm'
 import { useSortableSensors } from './hooks/useSortableSensors'
-import { Notice } from './Notice'
+import { PASTELS } from './editor/pastels'
+import { PageHeader } from './PageHeader'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -67,6 +68,7 @@ export function FaqManager({ items: initial }: { items: FaqItem[] }) {
   const { pending, start, fieldErrors: erreurs, run } = useActionForm()
 
   const sensors = useSortableSensors()
+  const visibles = items.filter((i) => i.isActive).length
 
   function handleDragEnd({ active, over }: DragEndEvent) {
     if (!over || active.id === over.id) return
@@ -145,27 +147,31 @@ export function FaqManager({ items: initial }: { items: FaqItem[] }) {
 
   return (
     <>
-      <Notice>
-        Les modifications sont visibles sur le site dès que vous enregistrez.
-      </Notice>
-
-      {/* Sur téléphone, le texte et le bouton passent l'un sous l'autre. */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-[14px] leading-[1.5] text-muted-foreground">
-          Les questions visibles aident aussi Google à mieux présenter votre
-          site.
-        </p>
-        <Button className="shrink-0" onClick={() => setDraft(emptyDraft)}>
-          <Plus />
-          Nouvelle question
-        </Button>
-      </div>
+      <PageHeader
+        overline="Affichées sur le site"
+        title="Questions fréquentes"
+        description={
+          items.length === 0
+            ? 'Les questions que vos visiteurs se posent souvent, et vos réponses.'
+            : `${items.length} ${items.length > 1 ? 'questions' : 'question'} · ${visibles} ${visibles > 1 ? 'visibles' : 'visible'} sur le site`
+        }
+        action={
+          <Button size="sm" onClick={() => setDraft(emptyDraft)}>
+            <Plus />
+            Nouvelle question
+          </Button>
+        }
+      />
 
       {items.length === 0 ? (
-        <div className="rounded-[24px] bg-block px-6 py-16 text-center">
-          <p className="text-[13px] leading-[1.6] text-muted-foreground">
-            Aucune question pour l’instant. Commencez par celles qu’on vous
-            pose le plus souvent.
+        <div className="flex flex-col items-center gap-1.5 rounded-[24px] bg-block px-6 py-16 text-center">
+          <span className="mb-2 grid h-12 w-12 place-items-center rounded-[14px] bg-white text-[#8aa4a8]">
+            <HelpCircle className="h-5 w-5" strokeWidth={1.8} />
+          </span>
+          <p className="text-[16px] font-semibold text-foreground">Aucune question pour l’instant</p>
+          <p className="max-w-[44ch] text-[14px] text-muted-foreground">
+            Commencez par celles qu’on vous pose le plus souvent : elles
+            aident aussi Google à mieux présenter votre site.
           </p>
           <Button className="mt-4" onClick={() => setDraft(emptyDraft)}>
             <Plus />
@@ -173,62 +179,77 @@ export function FaqManager({ items: initial }: { items: FaqItem[] }) {
           </Button>
         </div>
       ) : (
-        <DndContext
-          /* Identifiant fixe : sans lui, dnd-kit génère un compteur différent
-             côté serveur et côté client (`DndDescribedBy-N`) — erreur
-             d'hydratation React à chaque ouverture de l'écran. */
-          id="faq-sortable"
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          /* Bornée à la liste : celle-ci rogne ses bords arrondis
-             (`overflow-hidden`), et une ligne tirée au-delà disparaissait
-             à moitié sous le bord. */
-          modifiers={[restrictToVerticalAxis, restrictToParentElement]}
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext
-            items={items.map((i) => i.id)}
-            strategy={verticalListSortingStrategy}
-          >
-            <ul className="list-block">
-              {items.map((item) => (
-                <FaqRow
-                  key={item.id}
-                  item={item}
-                  onEdit={() =>
-                    setDraft({
-                      id: item.id,
-                      question: item.question,
-                      answer: item.answer,
-                      category: item.category ?? '',
-                      isActive: item.isActive,
-                    })
-                  }
-                  onToggle={(checked) =>
-                    run(() => toggleFaq(item.id, checked), {
-                      success: checked
-                        ? 'Question affichée sur le site.'
-                        : 'Question masquée du site.',
-                      onSuccess: () =>
-                        setItems((prev) =>
-                          prev.map((i) =>
-                            i.id === item.id ? { ...i, isActive: checked } : i,
-                          ),
-                        ),
-                    })
-                  }
-                  onDeleted={async () => {
-                    const result = await deleteFaq(item.id)
-                    if (result.ok) {
-                      setItems((prev) => prev.filter((i) => i.id !== item.id))
-                    }
-                    return result
-                  }}
-                />
-              ))}
-            </ul>
-          </SortableContext>
-        </DndContext>
+        /* Le cadre gris de l'espace Qeeps : il remplit l'écran, la liste
+           défile à l'intérieur — la page, elle, reste immobile. */
+        <div className="bloc-ecran flex flex-col rounded-[24px] bg-block p-2">
+          <div className="flex min-h-0 flex-1 flex-col rounded-[20px] bg-white">
+            <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-[#eef1f2] px-5 py-4 sm:px-6">
+              <h2 className="text-[16px] font-semibold text-foreground">
+                Vos questions
+                <span className="ml-2 text-[13px] font-medium text-[#8aa4a8]">{items.length}</span>
+              </h2>
+              <p className="text-[13px] text-[#8aa4a8]">
+                Glissez la poignée pour changer l’ordre · visible sur le site dès l’enregistrement
+              </p>
+            </div>
+            <DndContext
+              /* Identifiant fixe : sans lui, dnd-kit génère un compteur différent
+                 côté serveur et côté client (`DndDescribedBy-N`) — erreur
+                 d'hydratation React à chaque ouverture de l'écran. */
+              id="faq-sortable"
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              /* Bornée à la liste : une ligne tirée au-delà disparaissait
+                 à moitié sous le bord arrondi. */
+              modifiers={[restrictToVerticalAxis, restrictToParentElement]}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={items.map((i) => i.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <ul className="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto overscroll-contain p-2 [scrollbar-width:thin] sm:p-3">
+                  {items.map((item, index) => (
+                    <FaqRow
+                      key={item.id}
+                      item={item}
+                      tone={PASTELS[index % PASTELS.length]!}
+                      onEdit={() =>
+                        setDraft({
+                          id: item.id,
+                          question: item.question,
+                          answer: item.answer,
+                          category: item.category ?? '',
+                          isActive: item.isActive,
+                        })
+                      }
+                      onToggle={(checked) =>
+                        run(() => toggleFaq(item.id, checked), {
+                          success: checked
+                            ? 'Question affichée sur le site.'
+                            : 'Question masquée du site.',
+                          onSuccess: () =>
+                            setItems((prev) =>
+                              prev.map((i) =>
+                                i.id === item.id ? { ...i, isActive: checked } : i,
+                              ),
+                            ),
+                        })
+                      }
+                      onDeleted={async () => {
+                        const result = await deleteFaq(item.id)
+                        if (result.ok) {
+                          setItems((prev) => prev.filter((i) => i.id !== item.id))
+                        }
+                        return result
+                      }}
+                    />
+                  ))}
+                </ul>
+              </SortableContext>
+            </DndContext>
+          </div>
+        </div>
       )}
 
       <Dialog
@@ -340,11 +361,14 @@ export function FaqManager({ items: initial }: { items: FaqItem[] }) {
 
 function FaqRow({
   item,
+  tone,
   onEdit,
   onToggle,
   onDeleted,
 }: {
   item: FaqItem
+  /** Le pastel de sa place dans la liste. */
+  tone: { bg: string; fg: string }
   onEdit: () => void
   onToggle: (checked: boolean) => void
   onDeleted: () => Promise<ActionResult<unknown>>
@@ -359,11 +383,11 @@ function FaqRow({
       className={cn(
         /* `flex-wrap` : sur téléphone, les commandes passent sous le texte
            plutôt que de l'écraser. */
-        'flex flex-wrap items-center gap-x-3 gap-y-2 bg-white px-3 py-3 transition-colors duration-150 hover:bg-ivory/50 sm:px-4',
+        'group flex flex-wrap items-center gap-x-3 gap-y-2 rounded-[14px] bg-white px-2 py-2.5 transition-colors duration-[250ms] hover:bg-[#f7f8f8] sm:px-3',
         /* Un anneau et une ombre, pas une bordure : une bordure ajoutée
            au départ du glisser grandissait la ligne de 2 px, et toute la
            liste sautait sous le pointeur. */
-        isDragging && 'relative z-10 rounded-lg shadow-md ring-1 ring-border',
+        isDragging && 'relative z-10 shadow-[0_10px_30px_rgba(22,73,81,0.14)]',
         !item.isActive && 'opacity-60',
       )}
     >
@@ -379,8 +403,16 @@ function FaqRow({
         <GripVertical className="h-4 w-4" />
       </button>
 
+      <span
+        aria-hidden="true"
+        className="grid h-10 w-10 shrink-0 place-items-center rounded-[12px] transition-transform duration-[350ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:scale-[1.06]"
+        style={{ background: tone.bg, color: tone.fg }}
+      >
+        <HelpCircle className="h-[18px] w-[18px]" strokeWidth={1.75} />
+      </span>
+
       <div className="min-w-[9rem] flex-1">
-        <p className="flex items-center gap-2 truncate text-sm font-medium">
+        <p className="flex items-center gap-2 truncate text-[14px] font-medium text-foreground">
           {item.question}
           {!item.isActive && (
             <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-[12px] font-medium text-muted-foreground">

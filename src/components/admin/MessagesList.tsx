@@ -100,7 +100,7 @@ export function MessagesList({ messages }: { messages: ContactMessage[] }) {
           </p>
         </div>
       ) : (
-        <div className="relative grid gap-2 rounded-[24px] bg-block p-2 lg:h-[calc(100dvh-265px)] lg:min-h-[440px] lg:grid-cols-[340px_minmax(0,1fr)]">
+        <div className="relative grid gap-2 rounded-[24px] bg-block p-2 bloc-ecran lg:grid-cols-[340px_minmax(0,1fr)]">
           <ul aria-label="Messages reçus" className="flex min-h-0 min-w-0 flex-col gap-0.5 overflow-y-auto overscroll-contain p-1 [scrollbar-width:thin] lg:p-2">
             {items.map((message) => {
               const open = openId === message.id

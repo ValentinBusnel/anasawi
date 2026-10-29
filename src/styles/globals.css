@@ -578,6 +578,24 @@
   mix-blend-mode: difference;
 }
 
+/* Bloc « écran » — le cadre gris des écrans Accueil, Questions, Médias et
+   Messages, à la façon de l'espace Qeeps : sur grand écran, il remplit la
+   fenêtre jusqu'en bas et ses colonnes défilent à l'intérieur ; la page,
+   elle, ne défile plus. `--bloc-haut` : la hauteur occupée au-dessus
+   (barre du haut, en-tête, marges). Sur un écran bas ou étroit, retour
+   au défilement de page ordinaire — rien n'est jamais coupé. */
+@utility bloc-ecran {
+  @media (min-width: 64rem) and (min-height: 620px) {
+    height: calc(100dvh - var(--bloc-haut, 265px));
+  }
+}
+
+@media (min-width: 64rem) and (min-height: 620px) {
+  :root:has(.bloc-ecran) {
+    overflow: hidden;
+  }
+}
+
 /* Rail sans barre de défilement — le mouvement vient du scroll de la page,
    la barre native n'aurait rien à piloter et casserait la composition. */
 @utility no-scrollbar {
