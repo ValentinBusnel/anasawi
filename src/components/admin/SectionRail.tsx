@@ -17,6 +17,7 @@ import { useEffect, useRef, useState } from 'react'
 
 import { getBlock } from '@/blocks/registry'
 import { ActionMenu } from '@/components/ui/action-menu'
+import { toneOf } from './editor/sectionTone'
 import { cn } from '@/lib/utils'
 import type { Section } from '@/server/db/schema'
 
@@ -242,14 +243,17 @@ export function SectionRail({
   return (
     <aside
       className={cn(
-        'flex w-[236px] shrink-0 flex-col border-r border-border bg-ivory',
-        floating && 'shadow-[8px_0_28px_rgba(28,32,30,0.14)]',
+        'flex w-[264px] shrink-0 flex-col bg-white',
+        floating && 'shadow-pop',
       )}
     >
-      <div data-rail-scroll className="min-h-0 flex-1 overflow-y-auto px-3 pb-4 pt-4">
-        <div className="flex items-center justify-between px-2 pb-2.5">
-          <h3 className="text-[13px] font-semibold text-foreground">
-            Sections de la page
+      <div data-rail-scroll className="min-h-0 flex-1 overflow-y-auto px-3 pb-6 pt-7">
+        <div className="flex items-center justify-between px-3 pb-2.5">
+          {/* « Sections de la page » reste le nom (lecteurs d'écran,
+              tests) ; l'œil lit « Votre page », comme sur l'espace Qeeps. */}
+          <h3 className="text-[13px] font-medium text-[#8aa4a8]">
+            <span aria-hidden="true">Votre page</span>
+            <span className="sr-only">Sections de la page</span>
           </h3>
           {floating && onCollapse && (
             <button
@@ -264,7 +268,7 @@ export function SectionRail({
           )}
         </div>
 
-        <ul ref={listRef} className="relative flex flex-col gap-[3px]">
+        <ul ref={listRef} className="relative flex flex-col gap-0.5">
           {roots.map((section, index) => {
             const active = section.id === selectedId
             const renaming = renamingId === section.id
@@ -274,6 +278,8 @@ export function SectionRail({
             const nom = labelOf(section)
             const premiere = index === 0
             const derniere = index === roots.length - 1
+            const tone = toneOf(section.type)
+            const Icone = tone.icon
 
             return (
               <li
@@ -284,28 +290,24 @@ export function SectionRail({
                   else rowRefs.current.delete(section.id)
                 }}
                 className={cn(
-                  'group relative flex select-none flex-col rounded-[9px] text-[13px] transition-colors duration-300',
-                  active
-                    ? 'bg-white text-foreground shadow-[0_1px_2px_rgba(28,32,30,0.06)]'
-                    : 'text-ink-soft hover:bg-white/95',
-                  highlighted && 'bg-blue-mist',
+                  'group relative flex select-none flex-col rounded-[10px] text-[14px] font-medium transition-[background-color,color] duration-[250ms]',
+                  active ? 'font-semibold text-foreground' : 'text-[#6b8186] hover:bg-[#f7f8f8] hover:text-foreground',
+                  highlighted && 'bg-accent',
                   !section.isActive && !confirming && 'opacity-45',
-                  dragged && 'z-10 shadow-[0_4px_14px_rgba(28,32,30,0.12)]',
+                  dragged && 'z-10 bg-white shadow-sm',
                 )}
-                style={
-                  drag && drag.id === section.id
+                style={{
+                  /* La teinte de la section, adoucie : le fond de la ligne
+                     active, comme le plan de page de l'espace Qeeps. */
+                  ...(active && !highlighted
+                    ? { background: `color-mix(in srgb, ${tone.bg} 45%, white)` }
+                    : {}),
+                  ...(drag && drag.id === section.id
                     ? { transform: `translateY(${drag.delta}px)` }
-                    : undefined
-                }
+                    : {}),
+                }}
               >
-                {active && (
-                  <span
-                    aria-hidden="true"
-                    className="absolute bottom-2 left-0 top-2 w-[2px] rounded-[2px] bg-blue-deep"
-                  />
-                )}
-
-                <div className="flex items-center gap-1.5 py-1 pl-1.5 pr-1.5">
+                <div className="flex h-10 items-center gap-1 pl-1 pr-1">
                   {/* Poignée : glisser à la souris. Monter/Descendre, dans
                       le menu, font la même chose au clavier et au doigt. */}
                   <span
@@ -313,7 +315,7 @@ export function SectionRail({
                     onPointerDown={(e) => beginDrag(e, section.id, index)}
                     /* `touch-none` : au doigt, le navigateur ne prend plus
                        le geste pour un défilement (qui annulait le glisser). */
-                    className="flex h-6 w-4 shrink-0 cursor-grab touch-none items-center justify-center text-stone/60 active:cursor-grabbing"
+                    className="flex h-6 w-3.5 shrink-0 cursor-grab touch-none items-center justify-center text-[#8aa4a8] opacity-0 transition-opacity group-hover:opacity-100 active:cursor-grabbing"
                   >
                     <GripVertical className="h-[13px] w-[13px]" strokeWidth={1.7} />
                   </span>
@@ -339,8 +341,18 @@ export function SectionRail({
                         if (!confirming) onSelect(section.id)
                       }}
                       aria-current={active ? 'true' : undefined}
-                      className="flex min-w-0 flex-1 items-center gap-1.5 rounded-md py-1.5 pl-1 pr-1 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-deep/40"
+                      className="flex min-w-0 flex-1 items-center gap-3 rounded-[8px] py-1 pl-0.5 pr-1 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     >
+                      <span
+                        aria-hidden="true"
+                        className={cn(
+                          'grid h-[26px] w-[26px] shrink-0 place-items-center rounded-[8px] transition-[opacity,transform] duration-[350ms] ease-[cubic-bezier(0.34,1.56,0.64,1)]',
+                          active ? 'scale-[1.06] opacity-100' : 'opacity-75 group-hover:opacity-100',
+                        )}
+                        style={{ background: tone.bg, color: tone.fg }}
+                      >
+                        <Icone className="h-[13px] w-[13px]" strokeWidth={2} />
+                      </span>
                       <span className="min-w-0 flex-1 truncate">{nom}</span>
                       {!section.isActive && (
                         <span className="shrink-0 rounded-full bg-stone/15 px-1.5 py-px text-[12px] font-medium text-stone">
@@ -353,6 +365,13 @@ export function SectionRail({
                   {!renaming && !confirming && (
                     <ActionMenu
                       label={`Actions de « ${nom} »`}
+                      /* Discret, comme le plan de Qeeps : visible au survol
+                         de la ligne, sur la ligne active, au clavier, et
+                         toujours au doigt (pas de survol). */
+                      className={cn(
+                        'transition-opacity duration-200 [@media(hover:none)]:opacity-100',
+                        active ? 'opacity-100' : 'opacity-0 focus-visible:opacity-100 group-hover:opacity-100 aria-expanded:opacity-100',
+                      )}
                       items={[
                         { label: 'Modifier', icon: <Pencil />, onSelect: () => onSelect(section.id) },
                         {
@@ -435,7 +454,7 @@ export function SectionRail({
           {insertY !== null && (
             <span
               aria-hidden="true"
-              className="pointer-events-none absolute inset-x-1 z-20 h-[2px] rounded-full bg-blue-deep"
+              className="pointer-events-none absolute inset-x-1 z-20 h-[2px] rounded-full bg-[#176c79]"
               style={{ top: insertY - 2 }}
             />
           )}
@@ -444,9 +463,12 @@ export function SectionRail({
         <button
           type="button"
           onClick={onAdd}
-          className="mt-2.5 flex w-full items-center justify-center gap-[7px] rounded-[9px] border border-dashed border-line-strong p-2.5 text-[12.5px] text-ink-soft transition-colors hover:border-blue-deep hover:bg-[#f2f6f8] hover:text-blue-deep focus-visible:border-blue-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-deep/40"
+          className="group/add mt-2 flex items-center gap-[7px] rounded-[8px] px-3 py-2 text-[13.5px] font-medium text-[#176c79] transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
-          <Plus className="h-[13px] w-[13px]" strokeWidth={1.7} />
+          <Plus
+            className="h-3.5 w-3.5 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/add:rotate-90"
+            strokeWidth={2}
+          />
           Ajouter une section
         </button>
       </div>

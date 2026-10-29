@@ -218,6 +218,12 @@
     transform: translateY(20px);
   }
 }
+@keyframes adm-ping {
+  to {
+    transform: scale(2.8);
+    opacity: 0;
+  }
+}
 @keyframes adm-pop {
   from {
     opacity: 0;

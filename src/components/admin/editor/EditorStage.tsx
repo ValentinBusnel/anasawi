@@ -84,7 +84,7 @@ export function EditorStage({
       onPointerMove={onPaneMove}
       onPointerLeave={onPaneLeave}
       onPointerDown={onPaneDown}
-      className="min-h-0 flex-1 overflow-auto bg-[#eae6df] p-2 md:min-w-[520px] md:p-[22px]"
+      className="min-h-0 flex-1 overflow-auto rounded-[18px] bg-[#eceeef] p-2 md:min-w-[420px] md:p-4"
     >
       {/* Page sans section : une invitation, au centre — pas une page
           blanche muette. */}

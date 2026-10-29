@@ -1,5 +1,6 @@
 'use client'
 
+import { MousePointerClick } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { AnchorsContext, type AnchorOption } from './anchors-context'
@@ -21,6 +22,7 @@ import { labelOf } from './SectionRail'
 import { TemplateLibrary } from './TemplateLibrary'
 import type { Breakpoint } from '@/lib/grid'
 import { identityCss } from '@/lib/identity'
+import { cn } from '@/lib/utils'
 import type { SavedSection, Section } from '@/server/db/schema'
 import type { SectionsViewData } from '@/components/site/SectionsView'
 
@@ -226,9 +228,20 @@ export function TemplateEditor({
   /* Calculé une fois par rendu (et non deux, à la garde puis au rendu). */
   const identityStyles = identityCss(data.settings.identity)
 
-  /* Sous 1280 px avec l'inspecteur ouvert, la liste se replie en une
-     bande à icône ; le canvas garde ≥ 520 px. */
-  const railCollapsed = (narrow || (!wide && selected !== null)) && !railOverlay
+  /* Sous 1280 px, la liste se replie en une bande à icône : le
+     formulaire et l'aperçu gardent leur place. */
+  const railCollapsed = (narrow || !wide) && !railOverlay
+
+  /* La section racine en cours (une sous-section renvoie à sa racine) :
+     son rang « Section 03 / 11 » et ses voisines pour « Précédente /
+     Suivante ». */
+  const rootIndex = selected
+    ? roots.findIndex((r) => r.id === (selected.parentId ?? selected.id))
+    : -1
+  const selectAndScroll = (id: string) => {
+    setSelectedId(id)
+    stage.scrollStageTo(id)
+  }
 
   return (
     <div className="flex h-full min-h-0 flex-1 flex-col bg-background">
@@ -285,7 +298,90 @@ export function TemplateEditor({
           />
         )}
 
-        {/* ── La page ──────────────────────────────────────────────── */}
+        {/* ── Le formulaire de la section — au centre, comme sur
+            l'espace Qeeps ────────────────────────────────────────── */}
+        {editing && (
+          <div
+            className={cn(
+              'flex min-h-0 w-full max-w-[600px] shrink-0 flex-col overflow-hidden lg:w-[44%] xl:w-[520px] 2xl:w-[600px]',
+              selected
+                ? /* Sous 1024 px, le formulaire est un volet posé sur
+                     l'aperçu : à côté, il ne restait plus de place. */
+                  'max-lg:absolute max-lg:inset-y-0 max-lg:right-0 max-lg:z-30 max-lg:w-[min(380px,94vw)] max-lg:bg-white max-lg:shadow-pop'
+                : 'max-lg:hidden',
+            )}
+          >
+            {selected ? (
+              <AnchorsContext.Provider value={anchorOptions}>
+                <SectionInspector
+                  key={selected.id}
+                  section={selected}
+                  library={data.media}
+                  onClose={() => setSelectedId(null)}
+                  pushHistory={pushHistory}
+                  onDraft={applyDraft}
+                  onSettings={applySettings}
+                  onSaved={onSavedCreated}
+                  onSaveStateChange={onSaveStateChange}
+                  runAction={enqueue}
+                  flushRef={flushDraftRef}
+                  initialOpen={
+                    selected.id === freshId ? { content: true } : undefined
+                  }
+                  position={{ index: rootIndex, total: roots.length }}
+                  previous={
+                    rootIndex > 0
+                      ? { label: labelOf(roots[rootIndex - 1]!), go: () => selectAndScroll(roots[rootIndex - 1]!.id) }
+                      : undefined
+                  }
+                  next={
+                    rootIndex >= 0 && rootIndex < roots.length - 1
+                      ? { label: labelOf(roots[rootIndex + 1]!), go: () => selectAndScroll(roots[rootIndex + 1]!.id) }
+                      : undefined
+                  }
+                />
+              </AnchorsContext.Provider>
+            ) : (
+              <div className="adm-page flex flex-1 flex-col items-start justify-center px-8 py-10 xl:px-10">
+                <span className="mb-4 grid h-[46px] w-[46px] place-items-center rounded-[14px] bg-accent text-[#176c79] animate-[adm-pop_0.5s_cubic-bezier(0.34,1.56,0.64,1)_both]">
+                  <MousePointerClick className="h-[21px] w-[21px]" strokeWidth={1.8} />
+                </span>
+                <p className="text-[14px] font-medium text-[#8aa4a8]">Votre page</p>
+                <p className="mt-1.5 text-[30px] font-semibold leading-[1.2] tracking-[-0.02em] text-foreground">
+                  Choisissez une section
+                </p>
+                <p className="mt-2 max-w-[42ch] text-[16px] leading-[22px] text-muted-foreground">
+                  Cliquez sur une section dans la liste ou dans l’aperçu pour
+                  modifier ses textes, ses photos et son apparence.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── L'aperçu en direct — une carte grise, comme sur l'espace
+            Qeeps ─────────────────────────────────────────────────── */}
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col p-3 lg:py-6 lg:pl-0 lg:pr-6">
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[24px] bg-block px-2 pb-2">
+            <div className="flex h-12 shrink-0 items-center gap-3 pl-3 pr-2">
+              <span className="flex items-center gap-2 whitespace-nowrap text-[13px] font-semibold text-foreground">
+                <span className="relative h-2 w-2 rounded-full bg-[#6eb382]">
+                  <span
+                    aria-hidden="true"
+                    className="absolute inset-0 rounded-full bg-inherit motion-safe:animate-[adm-ping_1.8s_cubic-bezier(0.22,1,0.36,1)_infinite]"
+                  />
+                </span>
+                {mode === 'edit' ? 'Aperçu en direct' : 'Aperçu avant publication'}
+              </span>
+              {selected && (
+                <span
+                  key={selected.id}
+                  className="min-w-0 flex-1 truncate text-[13px] text-[#8aa4a8] animate-[adm-fade_0.3s_ease_both]"
+                >
+                  → {labelOf(selected)}
+                </span>
+              )}
+            </div>
         <EditorStage
           paneRef={stage.paneRef}
           frameRef={stage.frameRef}
@@ -323,31 +419,8 @@ export function TemplateEditor({
           }}
         />
 
-        {/* ── Contenu de la section — seulement quand elle existe ──── */}
-        {editing && selected && (
-          /* Sous 1024 px, l'inspecteur devient un volet posé par-dessus la
-             scène : à côté, il ne restait plus de place pour la page. */
-          <aside className="flex w-[300px] shrink-0 flex-col overflow-hidden border-l border-border bg-ivory max-lg:absolute max-lg:inset-y-0 max-lg:right-0 max-lg:z-30 max-lg:w-[min(320px,92vw)] max-lg:shadow-[-8px_0_28px_rgba(28,32,30,0.14)]">
-            <AnchorsContext.Provider value={anchorOptions}>
-            <SectionInspector
-              key={selected.id}
-              section={selected}
-              library={data.media}
-              onClose={() => setSelectedId(null)}
-              pushHistory={pushHistory}
-              onDraft={applyDraft}
-              onSettings={applySettings}
-              onSaved={onSavedCreated}
-              onSaveStateChange={onSaveStateChange}
-              runAction={enqueue}
-              flushRef={flushDraftRef}
-              initialOpen={
-                selected.id === freshId ? { content: true } : undefined
-              }
-            />
-            </AnchorsContext.Provider>
-          </aside>
-        )}
+          </div>
+        </div>
       </div>
 
       <TemplateLibrary

@@ -27,7 +27,7 @@ type Payload = Record<string, unknown>
 
 /* Les valeurs exactes de la maquette (`.f`) : label 11,5 px encre douce,
    champ blanc bordé, rayon 8, texte 12,5 px, focus bleu profond. */
-const LABEL_CLASS = 'mb-1.5 block text-[13px] font-medium text-foreground/80'
+const LABEL_CLASS = 'mb-[7px] block text-[12.5px] font-medium leading-4 text-[#6b8186]'
 const FIELD_CLASS =
   'h-auto min-h-0 rounded-[9px] px-2.5 py-2 text-[13.5px]'
 

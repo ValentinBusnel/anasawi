@@ -1,6 +1,6 @@
 'use client'
 
-import { Bookmark, Check, ChevronDown, X } from 'lucide-react'
+import { Bookmark, Check, ChevronDown, ChevronLeft, ChevronRight, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState, useTransition } from 'react'
@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 
 import { BlockForm } from './BlockForm'
 import { ColorPicker } from './ColorPicker'
+import { toneOf } from './editor/sectionTone'
 import type { FieldDescriptor } from '@/blocks/field'
 import { getBlock } from '@/blocks/registry'
 import { Button } from '@/components/ui/button'
@@ -48,30 +49,42 @@ function Group({
   open,
   onToggle,
   children,
+  tone,
 }: {
   title: string
   open: boolean
   onToggle: () => void
   children: React.ReactNode
+  /** Encre de la section : la pastille devant le titre du bloc. */
+  tone?: string
 }) {
+  /* Un bloc gris de l'espace Qeeps : une pastille de la couleur de la
+     section, le titre, et les champs blancs posés dessus. */
   return (
-    <div className="border-b border-border py-[13px] last:border-b-0">
+    <div className="rounded-[24px] bg-block p-6">
       <button
         type="button"
         onClick={onToggle}
         aria-expanded={open}
-        className="flex w-full items-center justify-between text-[12.5px] font-medium text-foreground"
+        className="-m-1 flex w-[calc(100%+8px)] items-center gap-2.5 rounded-[10px] p-1 text-left text-[16px] font-semibold leading-[22px] text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
-        {title}
+        <span
+          aria-hidden="true"
+          className="h-2 w-2 shrink-0 rounded-full opacity-70"
+          style={{ background: tone ?? '#176c79' }}
+        />
+        <span className="flex-1">{title}</span>
         <ChevronDown
           className={cn(
-            'h-[10px] w-[10px] text-stone transition-transform duration-200',
+            'h-4 w-4 text-[#8aa4a8] transition-transform duration-[350ms] ease-[cubic-bezier(0.22,1,0.36,1)]',
             open && 'rotate-180',
           )}
           strokeWidth={2}
         />
       </button>
-      {open && <div className="pt-3">{children}</div>}
+      {open && (
+        <div className="flex flex-col gap-3.5 pt-5 animate-[adm-fade_0.3s_ease_both]">{children}</div>
+      )}
     </div>
   )
 }
@@ -113,6 +126,11 @@ type SectionInspectorProps = {
   /** Le constructeur y trouve de quoi écrire le reliquat de frappe
       AVANT une publication — sans attendre la fin du délai d'accalmie. */
   flushRef?: { current: (() => Promise<void>) | null }
+  /** Rang de la section dans la page (« Section 03 / 11 »). */
+  position?: { index: number; total: number }
+  /** Les voisines, pour « Précédente / Suivante » en bas du formulaire. */
+  previous?: { label: string; go: () => void }
+  next?: { label: string; go: () => void }
 }
 
 export function SectionInspector({
@@ -127,9 +145,14 @@ export function SectionInspector({
   onSaved,
   initialOpen,
   flushRef,
+  position,
+  previous,
+  next,
 }: SectionInspectorProps) {
   const router = useRouter()
   const block = getBlock(section.type)
+  const tone = toneOf(section.type)
+  const ToneIcon = tone.icon
 
   const [payload, setPayload] = useState<Record<string, unknown>>(
     (section.payload as Record<string, unknown>) ?? {},
@@ -410,30 +433,45 @@ export function SectionInspector({
 
   return (
     <>
-      <div className="flex shrink-0 items-start justify-between gap-2 border-b border-border bg-card px-4 py-3.5">
-        <div className="min-w-0">
+      <div className="adm-page min-h-0 flex-1 overflow-y-auto px-5 pb-8 pt-7 sm:px-8">
+        {/* ── En-tête de la section, comme sur l'espace Qeeps : la grande
+            icône teintée, le rang, le nom, le modèle d'où elle vient. ── */}
+        <div className="relative mb-4">
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Fermer le panneau"
+            className="absolute -right-2 -top-2 grid h-9 w-9 place-items-center rounded-[10px] text-[#8aa4a8] transition-colors hover:bg-block hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <X className="h-4 w-4" strokeWidth={1.8} />
+          </button>
+          <span
+            aria-hidden="true"
+            className="mb-3.5 grid h-[46px] w-[46px] place-items-center rounded-[14px] animate-[adm-pop_0.5s_cubic-bezier(0.34,1.56,0.64,1)_both]"
+            style={{ background: tone.bg, color: tone.fg }}
+          >
+            <ToneIcon className="h-[21px] w-[21px]" strokeWidth={1.8} />
+          </span>
+          {position && position.index >= 0 && (
+            <p className="text-[14px] font-medium leading-[17px]" style={{ color: tone.fg }}>
+              Section {String(position.index + 1).padStart(2, '0')}
+              <span className="opacity-60"> / {String(position.total).padStart(2, '0')}</span>
+            </p>
+          )}
           {/* Le nom de LA section (celui de la liste), puis le modèle dont
               elle vient — pas l'inverse : « Hero — L'arche » ne dit pas
               à Anne qu'elle est en train de modifier son ouverture. */}
-          <h2 className="truncate text-[15px] font-semibold tracking-[-0.01em]">{section.name ?? block.label}</h2>
+          <h2 className="mt-1.5 pr-10 text-[30px] font-semibold leading-[1.2] tracking-[-0.02em] text-foreground sm:text-[36px] sm:leading-[43px]">
+            {section.name ?? block.label}
+          </h2>
           {section.name && (
-            <p className="truncate text-[12.5px] text-muted-foreground">Modèle : {block.label}</p>
+            <p className="mt-2 text-[16px] leading-[22px] text-muted-foreground">Modèle : {block.label}</p>
           )}
         </div>
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Fermer le panneau"
-          className="-mr-1 grid h-8 w-8 shrink-0 place-items-center rounded-[8px] text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/30"
-        >
-          <X className="h-[15px] w-[15px]" strokeWidth={1.7} />
-        </button>
-      </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4 pt-1.5">
         {/* ── Contenu venu d'un autre écran ───────────────────────── */}
         {block.dataSource && (
-          <p className="mt-2.5 rounded-md border border-border bg-muted/50 px-3 py-2.5 text-[12.5px] leading-[1.6] text-ink-soft">
+          <p className="rounded-[16px] bg-accent px-4 py-3 text-[14px] leading-[1.5] text-foreground">
             {block.dataSource.label} se modifient dans{' '}
             <Link
               href={block.dataSource.href}
@@ -448,6 +486,7 @@ export function SectionInspector({
         {/* ── Contenu ─────────────────────────────────────────────── */}
         {contentFields.length > 0 && (
           <Group
+            tone={tone.fg}
             title="Contenu"
             open={open.content}
             onToggle={() => toggle('content')}
@@ -465,6 +504,7 @@ export function SectionInspector({
         {/* ── Bouton(s) : les paires libellé + lien ───────────────── */}
         {buttonFields.length > 0 && (
           <Group
+            tone={tone.fg}
             title={buttonTitle}
             open={open.button}
             onToggle={() => toggle('button')}
@@ -481,6 +521,7 @@ export function SectionInspector({
         {/* ── Style ───────────────────────────────────────────────── */}
         {hasStyleGroup && (
           <Group
+            tone={tone.fg}
             title="Apparence"
             open={open.style}
             onToggle={() => toggle('style')}
@@ -629,6 +670,7 @@ export function SectionInspector({
         {/* ── Options avancées ────────────────────────────────────── */}
         {isRoot && (
           <Group
+            tone={tone.fg}
             title="Options avancées"
             open={open.advanced}
             onToggle={() => toggle('advanced')}
@@ -720,14 +762,47 @@ export function SectionInspector({
             </div>
           </Group>
         )}
+
+        {/* ── Précédente / Suivante : on parcourt la page sans revenir à
+            la liste. ─────────────────────────────────────────────── */}
+        {(previous || next) && (
+          <nav aria-label="Sections voisines" className="mt-2 flex justify-between gap-3">
+            {previous && (
+              <button
+                type="button"
+                onClick={previous.go}
+                className="group/nav flex min-w-0 items-center gap-3 rounded-[16px] px-[18px] py-3.5 text-left text-[15px] font-medium text-foreground shadow-[0_0_0_1px_var(--color-border)] transition-[background-color,box-shadow] duration-[250ms] hover:bg-block hover:shadow-none"
+              >
+                <ChevronLeft className="h-4 w-4 shrink-0 transition-transform duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/nav:-translate-x-[3px]" />
+                <span className="min-w-0">
+                  <small className="block text-[12px] font-normal text-[#8aa4a8]">Précédente</small>
+                  <span className="block truncate">{previous.label}</span>
+                </span>
+              </button>
+            )}
+            {next && (
+              <button
+                type="button"
+                onClick={next.go}
+                className="group/nav ml-auto flex min-w-0 items-center gap-3 rounded-[16px] px-[18px] py-3.5 text-right text-[15px] font-medium text-foreground shadow-[0_0_0_1px_var(--color-border)] transition-[background-color,box-shadow] duration-[250ms] hover:bg-block hover:shadow-none"
+              >
+                <span className="min-w-0">
+                  <small className="block text-[12px] font-normal text-[#8aa4a8]">Suivante</small>
+                  <span className="block truncate">{next.label}</span>
+                </span>
+                <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/nav:translate-x-[3px]" />
+              </button>
+            )}
+          </nav>
+        )}
       </div>
 
       {/* Pied minimal — les actions (masquer, dupliquer, supprimer)
           vivent dans la liste des sections, à gauche. Ici, une seule
           information : l'état d'enregistrement. */}
-      <div className="shrink-0 border-t border-border">
+      <div className="shrink-0 border-t border-[#eef1f2]">
         <p
-          className="flex items-center justify-center gap-1.5 px-4 py-2.5 text-[12.5px] text-stone"
+          className="flex items-center justify-center gap-1.5 px-4 py-2.5 text-[13px] text-[#8aa4a8]"
           aria-live="polite"
         >
           {saveState === 'saving' && 'Enregistrement…'}
