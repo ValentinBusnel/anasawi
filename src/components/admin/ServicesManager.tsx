@@ -552,7 +552,7 @@ function LigneTitre({
         type="button"
         /* À la souris et au doigt, toute la ligne se glisse (au-delà de
            6 px : un clic reste un clic). Au clavier, Entrée ouvre le
-           titre ; le déplacement passe par la poignée, à droite. */
+           titre ; le déplacement passe par la poignée, à gauche. */
         onPointerDown={triable ? (sortable.listeners?.onPointerDown as React.PointerEventHandler | undefined) : undefined}
         onClick={onOpen}
         /* « Afficher… » : jamais le libellé seul — le titre lui-même, dans
@@ -562,7 +562,10 @@ function LigneTitre({
         aria-current={actif ? 'true' : undefined}
         className={cn(
           'group flex h-[52px] w-full items-center gap-3 rounded-[14px] px-3 text-left text-[14px] font-medium transition-[background-color,color,box-shadow] duration-[250ms] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-          triable && 'cursor-grab touch-none active:cursor-grabbing',
+          /* La poignée à GAUCHE, comme partout dans l'admin (lignes
+             d'accompagnements, questions, sections) : la ligne lui fait
+             de la place. */
+          triable && 'cursor-grab touch-none pl-8 active:cursor-grabbing',
           actif
             ? 'bg-white text-foreground shadow-[0_1px_2px_rgba(22,73,81,0.06)]'
             : 'text-[#46606c] hover:bg-white/60 hover:text-foreground',
@@ -581,7 +584,7 @@ function LigneTitre({
           )}
         </span>
         <span aria-hidden="true" className="min-w-0 flex-1 truncate">{ligne.label}</span>
-        <span aria-hidden="true" className={cn('text-[12px] tabular-nums text-[#8aa4a8]', triable && 'mr-6')}>{ligne.n}</span>
+        <span aria-hidden="true" className="text-[12px] tabular-nums text-[#8aa4a8]">{ligne.n}</span>
       </button>
       {triable && (
         <button
@@ -589,7 +592,7 @@ function LigneTitre({
           {...sortable.attributes}
           {...sortable.listeners}
           aria-label={`Déplacer le titre ${ligne.label}`}
-          className="absolute right-2 top-1/2 grid h-7 w-6 -translate-y-1/2 cursor-grab touch-none place-items-center rounded-[8px] text-[#8aa4a8] transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:cursor-grabbing"
+          className="absolute left-1.5 top-1/2 z-[1] grid h-7 w-6 -translate-y-1/2 cursor-grab touch-none place-items-center rounded-[8px] text-[#8aa4a8] transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:cursor-grabbing"
         >
           <GripVertical className="h-4 w-4" />
         </button>
