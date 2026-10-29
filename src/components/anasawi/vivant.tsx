@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowUpRight, Check, Menu, X } from 'lucide-react'
+import { ArrowUpRight, Check, Menu, Plus, X } from 'lucide-react'
 import Image from 'next/image'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 
@@ -193,13 +193,15 @@ export function Seuil({
   rdv: string
 }) {
   const ref = useAvancement<HTMLElement>('colle', true)
-  const base = 'min(420px, 62vw)'
-  const haut = 'min(580px, 64svh)'
+  /* Sur téléphone, la fenêtre est plus petite : le nom reste lisible
+     au-dessus et au-dessous. */
+  const base = 'min(420px, 56vw)'
+  const haut = 'min(580px, 50svh, 62vw * 1.35)'
   return (
     <section ref={ref} id="haut" className="relative h-[230vh] [--e:0] [--p:0]">
       <div className="sticky top-0 h-[100svh] overflow-hidden">
         {/* Le nom, très grand, DERRIÈRE l'arche. */}
-        <h1 className="pointer-events-none absolute inset-0 z-0 flex flex-col justify-between px-[5vw] pb-[13svh] pt-[16svh] text-[clamp(56px,11vw,184px)] leading-[0.92] text-[var(--ad-nuit)]">
+        <h1 className="pointer-events-none absolute inset-0 z-0 flex flex-col justify-between px-[5vw] pb-[10svh] pt-[12svh] text-[clamp(56px,11vw,184px)] md:pb-[13svh] md:pt-[16svh] leading-[0.92] text-[var(--ad-nuit)]">
           <span
             className="block overflow-hidden"
             style={{ transform: 'translateX(calc(var(--e) * -18vw))', opacity: 'calc(1 - var(--e) * 1.4)' }}
@@ -431,6 +433,16 @@ export function Arches({ services, rdv }: { services: ServiceWithMedia[]; rdv: s
                 s.media ? 'opacity-100' : 'opacity-0',
               )}
             />
+            {/* Le repère d'état : « + » fermé, « × » ouvert. */}
+            <span
+              aria-hidden="true"
+              className={cn(
+                'pointer-events-none absolute right-5 top-5 z-20 grid h-10 w-10 place-items-center rounded-full bg-white/85 text-[var(--ad-nuit)] backdrop-blur transition-transform duration-700 ease-[var(--ad-ease)] max-md:hidden',
+                actif && 'rotate-45',
+              )}
+            >
+              <Plus className="h-4 w-4" />
+            </span>
             {/* Fermée : le numéro et le titre, debout. */}
             <div
               className={cn(
@@ -583,9 +595,9 @@ export function Conversation({ faq, prenom, portrait }: { faq: FaqItem[]; prenom
           </li>
         ))}
       </ul>
-      <div className="relative min-h-[380px] rounded-[36px] bg-[var(--ad-sable)] p-6 sm:p-9" aria-live="polite">
+      <div className="relative flex min-h-[340px] flex-col rounded-[36px] bg-[var(--ad-sable)] p-6 sm:p-9" aria-live="polite">
         {q && (
-          <div key={q.id} className="flex flex-col gap-5">
+          <div key={q.id} className="flex flex-1 flex-col gap-5">
             <p className="ml-auto max-w-[80%] rounded-[22px] rounded-br-[6px] bg-white px-5 py-3.5 text-[15px] leading-[1.5] text-[var(--ad-nuit)] shadow-[0_8px_24px_-12px_rgba(20,35,46,0.25)] motion-safe:animate-[ad-monter_0.6s_var(--ad-ease)_backwards]">
               {q.question}
             </p>
@@ -606,6 +618,21 @@ export function Conversation({ faq, prenom, portrait }: { faq: FaqItem[]; prenom
               )}
             </div>
             <p className="pl-[52px] text-[12px] uppercase tracking-[0.18em] text-[var(--ad-gris)]">{prenom} · répond en personne</p>
+            <div className="mt-auto flex items-center justify-between gap-4 border-t border-[var(--ad-sable-fonce)] pt-5">
+              <span className="text-[13px] tabular-nums text-[var(--ad-gris)]">
+                {choisie + 1} / {faq.length}
+              </span>
+              <button
+                type="button"
+                onClick={() => setChoisie((choisie + 1) % faq.length)}
+                className="group inline-flex items-center gap-2 text-[14px] font-semibold text-[var(--ad-nuit)]"
+              >
+                Question suivante
+                <span className="grid h-8 w-8 place-items-center rounded-full bg-white transition-transform duration-500 ease-[var(--ad-ease)] group-hover:translate-x-1">
+                  <ArrowUpRight className="h-4 w-4 rotate-45" />
+                </span>
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -673,6 +700,7 @@ const LIGNE =
 
 export function Lettre({ prenom }: { prenom: string }) {
   const [etat, setEtat] = useState<'repos' | 'envoi' | 'envole' | 'ok'>('repos')
+  const [longueur, setLongueur] = useState(0)
   const [erreur, setErreur] = useState<string | null>(null)
 
   async function envoyer(e: React.FormEvent<HTMLFormElement>) {
@@ -766,11 +794,25 @@ export function Lettre({ prenom }: { prenom: string }) {
             minLength={20}
             rows={5}
             placeholder="Je vous écris parce que…"
+            onChange={(e) => setLongueur(e.currentTarget.value.trim().length)}
+            aria-describedby="lettre-longueur"
             className={cn(
               LIGNE,
               'resize-none border-b-0 bg-[linear-gradient(transparent_calc(2.4em_-_1px),var(--ad-sable-fonce)_calc(2.4em_-_1px),var(--ad-sable-fonce)_2.4em,transparent_2.4em)] bg-[length:100%_2.4em] leading-[2.4em] [background-attachment:local]',
             )}
           />
+          <span
+            id="lettre-longueur"
+            className={cn(
+              'mt-2 flex items-center gap-1.5 text-[12px] transition-colors duration-300',
+              longueur >= 20 ? 'text-[var(--ad-or)]' : 'text-[var(--ad-gris)]',
+            )}
+          >
+            <span className={cn('grid h-3.5 w-3.5 place-items-center rounded-full transition-colors', longueur >= 20 ? 'bg-[var(--ad-or)] text-white' : 'border border-current')}>
+              {longueur >= 20 && <Check className="h-2.5 w-2.5" />}
+            </span>
+            {longueur >= 20 ? 'C’est parfait.' : `Encore ${20 - longueur} caractère${20 - longueur > 1 ? 's' : ''} au moins`}
+          </span>
         </label>
       </div>
       <input name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" />
@@ -813,6 +855,21 @@ export function Fil({ liens, rdv }: { liens: { href: string; label: string }[]; 
   const ref = useRef<HTMLDivElement>(null)
   const [serre, setSerre] = useState(false)
   const [ouvert, setOuvert] = useState(false)
+  const [actif, setActif] = useState<string | null>(null)
+  /* Le lien de la section qu'on lit s'allume. */
+  useEffect(() => {
+    const io = new IntersectionObserver(
+      (entrees) => {
+        for (const e of entrees) if (e.isIntersecting) setActif(`#${e.target.id}`)
+      },
+      { rootMargin: '-45% 0px -50% 0px' },
+    )
+    for (const l of liens) {
+      const el = document.getElementById(l.href.slice(1))
+      if (el) io.observe(el)
+    }
+    return () => io.disconnect()
+  }, [liens])
   useEffect(() => {
     let image = 0
     const calcule = () => {
@@ -856,7 +913,8 @@ export function Fil({ liens, rdv }: { liens: { href: string; label: string }[]; 
               <a
                 key={l.href}
                 href={l.href}
-                className="relative rounded-full px-3.5 py-2 text-[14px] text-[var(--ad-pierre)] transition-colors duration-300 after:absolute after:inset-x-3.5 after:bottom-1.5 after:h-px after:origin-right after:scale-x-0 after:bg-current after:transition-transform after:duration-500 after:ease-[var(--ad-ease)] hover:text-[var(--ad-nuit)] hover:after:origin-left hover:after:scale-x-100"
+                aria-current={actif === l.href ? 'location' : undefined}
+                className="relative rounded-full px-3.5 py-2 text-[14px] text-[var(--ad-pierre)] transition-[color,background-color] duration-300 aria-[current=location]:bg-[var(--ad-sable)] aria-[current=location]:text-[var(--ad-nuit)] after:absolute after:inset-x-3.5 after:bottom-1.5 after:h-px after:origin-right after:scale-x-0 after:bg-current after:transition-transform after:duration-500 after:ease-[var(--ad-ease)] hover:text-[var(--ad-nuit)] hover:after:origin-left hover:after:scale-x-100"
               >
                 {l.label}
               </a>
@@ -923,5 +981,87 @@ export function Fil({ liens, rdv }: { liens: { href: string; label: string }[]; 
         </a>
       </div>
     </>
+  )
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   LE SOUFFLE — le cercle qui respire, et un exercice guidé d'une minute :
+   un anneau qui se remplit, le nombre de respirations, l'arrêt à tout
+   moment.
+   ══════════════════════════════════════════════════════════════════════ */
+
+const DUREE_EXERCICE = 64 // 8 respirations de 8 s
+
+export function Souffle() {
+  const [debut, setDebut] = useState<number | null>(null)
+  const [ecoule, setEcoule] = useState(0)
+  useEffect(() => {
+    if (debut === null) return
+    const t = window.setInterval(() => {
+      const s = (Date.now() - debut) / 1000
+      if (s >= DUREE_EXERCICE) {
+        setDebut(null)
+        setEcoule(DUREE_EXERCICE)
+      } else setEcoule(s)
+    }, 200)
+    return () => window.clearInterval(t)
+  }, [debut])
+  const enCours = debut !== null
+  const fini = !enCours && ecoule >= DUREE_EXERCICE
+  const respirations = Math.min(8, Math.floor(ecoule / 8) + (enCours ? 1 : 0))
+
+  return (
+    <div className="flex flex-col items-center gap-8">
+      <div className="relative grid aspect-square w-full max-w-[400px] place-items-center">
+        <span aria-hidden="true" className="absolute inset-0 rounded-full border border-[var(--ad-sable-fonce)]" />
+        {/* L'anneau de l'exercice. */}
+        <svg aria-hidden="true" viewBox="0 0 100 100" className="absolute inset-0 -rotate-90">
+          <circle
+            cx="50"
+            cy="50"
+            r="49.4"
+            fill="none"
+            stroke="var(--ad-or)"
+            strokeWidth="0.8"
+            strokeLinecap="round"
+            pathLength={1}
+            strokeDasharray="1"
+            style={{ strokeDashoffset: 1 - ecoule / DUREE_EXERCICE, transition: 'stroke-dashoffset 0.3s linear' }}
+          />
+        </svg>
+        <span aria-hidden="true" className="absolute inset-[13%] rounded-full border border-dashed border-[var(--ad-or)]/40 motion-safe:animate-[ad-tourner_60s_linear_infinite]" />
+        {/* La clé `debut` relance l'animation : l'exercice démarre sur une inspiration. */}
+        <span
+          key={`c-${debut ?? 'repos'}`}
+          aria-hidden="true"
+          className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_38%_32%,#ffffff_0%,var(--ad-brume)_48%,#c9e3ee_100%)] shadow-[0_40px_100px_-30px_rgba(47,111,147,0.45)] motion-safe:animate-[ad-souffle_8s_var(--ad-ease-lent)_infinite]"
+        />
+        <span key={`t-${debut ?? 'repos'}`} className="relative grid place-items-center text-[30px] font-semibold tracking-[-0.03em] text-[var(--ad-nuit)]">
+          <span className="col-start-1 row-start-1 motion-safe:animate-[ad-inspirez_8s_linear_infinite]">Inspirez</span>
+          <span className="col-start-1 row-start-1 opacity-0 motion-safe:animate-[ad-expirez_8s_linear_infinite]">Expirez</span>
+        </span>
+      </div>
+      <div className="flex items-center gap-4" aria-live="polite">
+        <button
+          type="button"
+          onClick={() => {
+            if (enCours) setDebut(null)
+            else {
+              setEcoule(0)
+              setDebut(Date.now())
+            }
+          }}
+          className="group inline-flex items-center gap-3 rounded-full bg-[var(--ad-nuit)] py-2 pl-5 pr-2 text-[14px] font-semibold text-white"
+        >
+          {enCours ? 'Arrêter' : fini ? 'Recommencer' : 'Respirer une minute'}
+          <span className="grid h-8 w-8 place-items-center rounded-full bg-white/15">
+            {enCours ? <X className="h-3.5 w-3.5" /> : <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-500 group-hover:rotate-45" />}
+          </span>
+        </button>
+        <span className="text-[13px] tabular-nums text-[var(--ad-gris)]">
+          {enCours ? `Respiration ${respirations} / 8` : fini ? 'Bravo. Prenez ce calme avec vous.' : '8 respirations · 4 s · 4 s'}
+        </span>
+      </div>
+    </div>
   )
 }

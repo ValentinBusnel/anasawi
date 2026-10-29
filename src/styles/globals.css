@@ -915,3 +915,16 @@
     transform: translateY(200%);
   }
 }
+@keyframes ad-onde {
+  0%,
+  100% {
+    transform: scaleY(0.3);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+:root:has(.ad) {
+  scroll-behavior: smooth;
+  scroll-padding-top: 96px;
+}

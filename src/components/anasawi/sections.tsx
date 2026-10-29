@@ -1,7 +1,7 @@
 import { ArrowUpRight, Mail, MapPin, Phone } from 'lucide-react'
 import Image from 'next/image'
 
-import { Arches, Chemin, Conversation, Encre, Lettre, Lignes, Promenade, Revele, Semaine, Seuil } from './vivant'
+import { Arches, Chemin, Conversation, Encre, Lettre, Lignes, Promenade, Revele, Semaine, Seuil, Souffle } from './vivant'
 import type { Contenu } from '@/components/qeeps/donnees'
 import { cn, toE164 } from '@/lib/utils'
 
@@ -63,7 +63,7 @@ export function SectionSeuil({ c }: P) {
 
 export function Respiration({ c }: P) {
   return (
-    <section className="relative overflow-hidden bg-[var(--ad-sable)] py-28 md:py-40">
+    <section className="relative overflow-hidden bg-[var(--ad-sable)] py-24 md:py-32">
       <div className="mx-auto grid max-w-[1200px] items-center gap-16 px-[5vw] md:grid-cols-2">
         <div>
           <Surtitre>Avant de commencer</Surtitre>
@@ -74,16 +74,8 @@ export function Respiration({ c }: P) {
             <p className="mt-8 max-w-[42ch] text-[17px] leading-[1.75] text-[var(--ad-pierre)]">{c.ouverture.intro || c.accroche}</p>
           </Revele>
         </div>
-        {/* Le cercle qui respire : 4 secondes pour inspirer, 4 pour expirer. */}
-        <div aria-hidden="true" className="relative mx-auto grid aspect-square w-full max-w-[420px] place-items-center">
-          <span className="absolute inset-0 rounded-full border border-[var(--ad-sable-fonce)]" />
-          <span className="absolute inset-[14%] rounded-full border border-dashed border-[var(--ad-or)]/40 motion-safe:animate-[ad-tourner_60s_linear_infinite]" />
-          <span className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_40%_35%,#ffffff_0%,var(--ad-brume)_45%,#d9e6ec_100%)] shadow-[0_40px_100px_-30px_rgba(70,114,138,0.45)] motion-safe:animate-[ad-souffle_8s_var(--ad-ease-lent)_infinite]" />
-          <span className="relative grid place-items-center font-[family-name:var(--ad-titre)] font-semibold tracking-[-0.03em] text-[34px] text-[var(--ad-nuit)]">
-            <span className="col-start-1 row-start-1 motion-safe:animate-[ad-inspirez_8s_linear_infinite]">Inspirez</span>
-            <span className="col-start-1 row-start-1 opacity-0 motion-safe:animate-[ad-expirez_8s_linear_infinite]">Expirez</span>
-          </span>
-        </div>
+        {/* Le cercle qui respire — et l'exercice guidé d'une minute. */}
+        <Souffle />
       </div>
     </section>
   )
@@ -177,6 +169,105 @@ export function SectionArches({ c }: P) {
         <Revele>
           <Arches services={c.services} rdv={c.rdv} />
         </Revele>
+      </div>
+    </section>
+  )
+}
+
+/* ── En pratique ────────────────────────────────────────────────────── */
+
+const JOURS_COURTS = ['lun', 'mar', 'mer', 'jeu', 'ven', 'sam', 'dim']
+
+/** Un « bento » : tout ce qu'on cherche avant d'appeler, en cartes
+    vivantes — le plan qui bat, l'onde de la visio, les séances. */
+export function EnPratique({ c }: P) {
+  const ouverts = c.horaires.filter((h) => !/ferm/i.test(h.hours))
+  const indice = (j: string) => JOURS_COURTS.findIndex((d) => j.toLowerCase().startsWith(d))
+  const tries = [...ouverts].sort((a, b) => indice(a.day) - indice(b.day))
+  const plage = tries.length ? `${tries[0]!.day} → ${tries.at(-1)!.day}` : 'Sur rendez-vous'
+  const carte = 'rounded-[28px] bg-white p-7 shadow-[0_1px_2px_rgba(20,35,46,0.05),0_20px_50px_-30px_rgba(20,35,46,0.25)]'
+  return (
+    <section className="py-24 md:py-32">
+      <div className="mx-auto max-w-[1200px] px-[5vw]">
+        <Surtitre>En pratique</Surtitre>
+        <h2 className="mb-12 text-[36px] md:text-[54px]">
+          <Lignes lignes={['Tout ce qu’il faut', <em key="s">savoir</em>]} />
+        </h2>
+        <div className="grid gap-4 md:auto-rows-[220px] md:grid-cols-4">
+          {/* Le plan : des rues dessinées, l'épingle qui bat. */}
+          <Revele className={cn(carte, 'relative overflow-hidden p-0 md:col-span-2 md:row-span-2')}>
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 bg-[var(--ad-brume)] [background-image:linear-gradient(115deg,transparent_46%,#fff_46%,#fff_49%,transparent_49%),linear-gradient(15deg,transparent_58%,#fff_58%,#fff_60%,transparent_60%),linear-gradient(90deg,transparent_30%,rgba(255,255,255,0.7)_30%,rgba(255,255,255,0.7)_31.5%,transparent_31.5%),linear-gradient(0deg,transparent_70%,rgba(255,255,255,0.7)_70%,rgba(255,255,255,0.7)_71.5%,transparent_71.5%)]"
+            />
+            <span aria-hidden="true" className="absolute left-[54%] top-[42%] grid -translate-x-1/2 -translate-y-1/2 place-items-center">
+              <span className="absolute h-16 w-16 rounded-full bg-[var(--ad-or)]/30 motion-safe:animate-[ad-pouls_2.4s_ease-out_infinite]" />
+              <span className="relative grid h-11 w-11 place-items-center rounded-full bg-[var(--ad-nuit)] text-white shadow-[0_10px_30px_-8px_rgba(20,35,46,0.5)]">
+                <MapPin className="h-5 w-5" />
+              </span>
+            </span>
+            <div className="relative flex h-full min-h-[300px] flex-col justify-end p-7">
+              <div className="rounded-[20px] bg-white/90 p-5 backdrop-blur">
+                <p className="text-[13px] font-semibold text-[var(--ad-gris)]">Le cabinet</p>
+                <p className="mt-1 text-[18px] font-semibold tracking-[-0.02em]">{c.adresse ?? c.ville}</p>
+                {c.adresse && (
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.adresse)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group mt-3 inline-flex items-center gap-1.5 text-[14px] font-semibold text-[var(--ad-bleu)]"
+                  >
+                    Itinéraire
+                    <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                  </a>
+                )}
+              </div>
+            </div>
+          </Revele>
+
+          {/* Les séances. */}
+          <Revele delai={0.08} className={cn(carte, 'md:col-span-2')}>
+            <p className="text-[13px] font-semibold text-[var(--ad-gris)]">Les séances</p>
+            <ul className="mt-4 flex flex-col gap-2.5">
+              {c.services.slice(0, 4).map((s) => (
+                <li key={s.id} className="flex items-center justify-between gap-4 text-[15px]">
+                  <span className="truncate font-medium">{s.title}</span>
+                  {s.duration && (
+                    <span className="shrink-0 rounded-full bg-[var(--ad-sable)] px-3 py-1 text-[12.5px] font-semibold tabular-nums text-[var(--ad-pierre)]">
+                      {s.duration.split(/[—–]/)[0]!.trim()}
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </Revele>
+
+          {/* La visio, et son onde. */}
+          <Revele delai={0.16} className={cn(carte, 'flex flex-col justify-between')}>
+            <div aria-hidden="true" className="flex h-12 items-center gap-1">
+              {[0.1, 0.35, 0.6, 0.2, 0.45, 0.7, 0.3].map((d, i) => (
+                <span
+                  key={i}
+                  className="h-full w-1.5 origin-center rounded-full bg-gradient-to-t from-[#2f6f93] to-[#36a39b] motion-safe:animate-[ad-onde_1.2s_ease-in-out_infinite]"
+                  style={{ animationDelay: `${d}s` }}
+                />
+              ))}
+            </div>
+            <div>
+              <p className="text-[18px] font-semibold tracking-[-0.02em]">En visio aussi</p>
+              <p className="mt-1 text-[14px] leading-[1.5] text-[var(--ad-gris)]">Si vous êtes loin, ou empêché.</p>
+            </div>
+          </Revele>
+
+          {/* Les jours. */}
+          <Revele delai={0.24} className={cn(carte, 'flex flex-col justify-between')}>
+            <p className="text-[13px] font-semibold text-[var(--ad-gris)]">Consultations</p>
+            <div>
+              <p className="text-[24px] font-semibold capitalize tracking-[-0.03em]">{plage}</p>
+              {tries[0] && <p className="mt-1 text-[14px] text-[var(--ad-gris)]">{tries[0].hours}</p>}
+            </div>
+          </Revele>
+        </div>
       </div>
     </section>
   )
@@ -297,6 +388,20 @@ export function Horizon({ c, liens, base }: P & { liens: { href: string; label: 
               <ArrowUpRight className="h-4 w-4" />
             </span>
           </a>
+        </Revele>
+        <Revele delai={0.4} className="mt-8 flex flex-wrap justify-center gap-2">
+          {c.telephone && (
+            <a href={`tel:${toE164(c.telephone)}`} className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-[14px] text-white/85 transition-colors hover:bg-white/15">
+              <Phone className="h-3.5 w-3.5" />
+              {c.telephone}
+            </a>
+          )}
+          {c.email && (
+            <a href={`mailto:${c.email}`} className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-[14px] text-white/85 transition-colors hover:bg-white/15">
+              <Mail className="h-3.5 w-3.5" />
+              {c.email}
+            </a>
+          )}
         </Revele>
         <div className="mt-24 flex flex-wrap items-end justify-between gap-8 border-t border-white/15 pt-8 text-[14px] text-white/60">
           <span className="font-[family-name:var(--ad-titre)] font-semibold tracking-[-0.03em] text-[28px] text-white">

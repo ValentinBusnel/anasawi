@@ -1,4 +1,5 @@
 import {
+  EnPratique,
   Horizon,
   Phrase,
   Rencontre,
@@ -33,6 +34,7 @@ export async function PageAnasawi({ base }: { base: string }) {
         <Rencontre c={c} />
         <SectionChemin c={c} />
         <SectionArches c={c} />
+        <EnPratique c={c} />
         <Phrase c={c} />
         <SectionPromenade c={c} />
         <SectionConversation c={c} />
@@ -45,10 +47,11 @@ export async function PageAnasawi({ base }: { base: string }) {
 
 const COMPOSANTS = [
   { nom: 'Seuil', idee: 'L’arche s’ouvre au défilement : on entre dans le cabinet.', C: SectionSeuil },
-  { nom: 'Respiration', idee: 'Un cercle qui respire, 4 secondes pour inspirer, 4 pour expirer.', C: Respiration },
+  { nom: 'Respiration', idee: 'Un cercle qui respire — et un exercice guidé d’une minute.', C: Respiration },
   { nom: 'Rencontre', idee: 'Le portrait en arche, son sceau qui tourne, un texte qui s’encre à la lecture.', C: Rencontre },
   { nom: 'Chemin', idee: 'Un trait d’or se dessine et allume chaque étape.', C: SectionChemin },
   { nom: 'Arches', idee: 'Une arche par accompagnement ; survolée, elle s’ouvre en fiche.', C: SectionArches },
+  { nom: 'En pratique', idee: 'Un bento : le plan qui bat, l’onde de la visio, les séances, les jours.', C: EnPratique },
   { nom: 'Phrase', idee: 'Une conviction en très grand, ligne après ligne.', C: Phrase },
   { nom: 'Promenade', idee: 'La page s’arrête, les pièces du cabinet glissent de côté.', C: SectionPromenade },
   { nom: 'Conversation', idee: 'Une question part, Anne « écrit »… la réponse arrive.', C: SectionConversation },
