@@ -1,153 +1,97 @@
 import Image from 'next/image'
 import Link from 'next/link'
 
-import { PASTELS } from '@/components/admin/editor/pastels'
 import { cn } from '@/lib/utils'
 import type { Media } from '@/server/db/schema'
 
 /**
- * Les briques de la direction artistique Qeeps, pour le site.
+ * Les briques du SITE VITRINE de Qeeps (byqeeps.com), pour le site
+ * d'Anne — pas son espace de travail.
  *
- * Le vocabulaire de l'espace de la candidature, transposé : Poppins, une
- * seule encre bleu pétrole, des BLOCS GRIS arrondis qui portent des
- * CARTES BLANCHES, des pastilles pastel pour reconnaître chaque chose,
- * des puces arrondies, des ombres à peine posées, et un halo qui dérive
- * doucement derrière l'ouverture.
+ * Ce qui fait la DA, relevé sur le site et repris de la candidature :
+ *   - fond #f7f7f7, barre du haut #f8f8f8 de 80 px, logo-mot « Anasawi. » ;
+ *   - titres en Poppins gras, le grand titre en dégradé pétrole ;
+ *   - surtitres gris 18 px CENTRÉS au-dessus de titres 36 px ;
+ *   - boutons 10 × 16 px, rayon 8 : pétrole plein, ou contour fin ;
+ *   - blocs gris #f2f3f4 de 24 px de rayon, 828 px de large ;
+ *   - cartes blanches rayon 10 sous une ombre longue et douce ;
+ *   - étiquettes de 24 px, rayon 6, contour ou turquoise doux ;
+ *   - chiffres géants en dégradé ; pied de page pétrole ;
+ *   - une seule apparition : 20 px de montée, 1,1 s.
  */
 
-export { PASTELS }
 export const ENCRE = '#164951'
-export const ENCRE_VIVE = '#176c79'
-export const GRIS = '#f2f3f4'
-export const MUET = '#6b8186'
-export const MUET_CLAIR = '#8aa4a8'
 
-export const pastel = (i: number) => PASTELS[((i % PASTELS.length) + PASTELS.length) % PASTELS.length]!
-
-/** Une section de page : largeur, marges, ancre. */
+/** Une section : 96 px en haut et en bas (56 sous 1200 px). */
 export function Section({
   id,
   className,
   children,
+  etroite = false,
 }: {
   id?: string
   className?: string
   children: React.ReactNode
+  /** La colonne étroite des blocs (828 px). */
+  etroite?: boolean
 }) {
   return (
-    <section id={id} className={cn('mx-auto w-full max-w-[1180px] scroll-mt-24 px-5 py-12 sm:px-8 sm:py-16', className)}>
-      {children}
+    <section id={id} className={cn('scroll-mt-24 py-14 xl:py-24', className)}>
+      <div className={cn('mx-auto w-full px-6', etroite ? 'max-w-[876px]' : 'max-w-[1200px]')}>{children}</div>
     </section>
   )
 }
 
-/** Surtitre, titre, chapeau — l'en-tête de page de l'espace Qeeps. */
-export function EnTete({
+/** Surtitre gris, titre centré — l'en-tête de section de byqeeps.com. */
+export function Titre({
   surtitre,
   titre,
-  intro,
-  action,
-  centre = false,
-  niveau = 'h2',
+  sous,
+  serre = false,
+  className,
 }: {
   surtitre?: string
-  titre: string
-  intro?: string | null
-  action?: React.ReactNode
-  centre?: boolean
-  niveau?: 'h1' | 'h2'
+  titre: React.ReactNode
+  sous?: React.ReactNode
+  /** 36 px sous le titre au lieu de 88. */
+  serre?: boolean
+  className?: string
 }) {
-  const H = niveau
   return (
-    <div
-      className={cn(
-        'mb-8 flex flex-wrap items-end justify-between gap-x-8 gap-y-4',
-        centre && 'flex-col items-center text-center',
-      )}
-    >
-      <div className={cn('min-w-0', centre ? 'max-w-[720px]' : 'max-w-[680px]')}>
-        {surtitre && <p className="mb-2 text-[14px] font-medium leading-[17px] text-[#8aa4a8]">{surtitre}</p>}
-        <H className="text-balance text-[30px] font-semibold leading-[1.15] tracking-[-0.02em] text-[#164951] sm:text-[38px]">
-          {titre}
-        </H>
-        {intro && <p className="mt-3 text-pretty text-[16px] leading-[1.6] text-[#6b8186]">{intro}</p>}
-      </div>
-      {action}
+    <div className={cn('flex flex-col items-center gap-1 text-center', serre ? 'mb-9' : 'mb-14 xl:mb-[88px]', className)}>
+      {surtitre && <p className="text-[14px] font-medium leading-[1.2] text-[#8aa4a8] xl:text-[18px]">{surtitre}</p>}
+      <h2 className="text-balance text-[24px] font-semibold leading-[1.2] text-[#164951] xl:text-[36px] xl:leading-[49px]">{titre}</h2>
+      {sous && <p className="mt-2 max-w-[620px] text-pretty text-[15px] font-medium leading-[1.5] text-[#8aa4a8]">{sous}</p>}
     </div>
   )
 }
 
-/** Le bloc gris qui porte les cartes. */
-export function Bloc({ className, children }: { className?: string; children: React.ReactNode }) {
-  return <div className={cn('rounded-[28px] bg-[#f2f3f4] p-2', className)}>{children}</div>
-}
-
-/** Une carte blanche, posée dans un bloc gris. */
-export function Carte({ className, children }: { className?: string; children: React.ReactNode }) {
-  return <div className={cn('rounded-[22px] bg-white p-6 sm:p-7', className)}>{children}</div>
-}
-
-/** La pastille d'icône, au pastel donné. */
-export function Tuile({
-  rang,
-  children,
-  taille = 'md',
-  className,
-}: {
-  rang: number
-  children: React.ReactNode
-  taille?: 'sm' | 'md' | 'lg'
-  className?: string
-}) {
-  const p = pastel(rang)
+/** Le texte courant « gris, avec des mots en pétrole » : *mot* = mis en avant. */
+export function Accent({ texte, className }: { texte: string; className?: string }) {
+  const morceaux = texte.split(/(\*[^*]+\*)/g)
   return (
-    <span
-      aria-hidden="true"
-      className={cn(
-        'grid shrink-0 place-items-center transition-transform duration-[350ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:scale-[1.06]',
-        taille === 'sm' && 'h-8 w-8 rounded-[10px] [&_svg]:h-4 [&_svg]:w-4',
-        taille === 'md' && 'h-10 w-10 rounded-[12px] [&_svg]:h-[18px] [&_svg]:w-[18px]',
-        taille === 'lg' && 'h-12 w-12 rounded-[14px] [&_svg]:h-5 [&_svg]:w-5',
-        className,
+    <p className={cn('text-pretty text-[15px] font-medium leading-[1.5] text-[#8aa4a8] xl:text-[16px]', className)}>
+      {morceaux.map((m, i) =>
+        m.startsWith('*') && m.endsWith('*') ? (
+          <strong key={i} className="font-medium text-[#164951]">
+            {m.slice(1, -1)}
+          </strong>
+        ) : (
+          m
+        ),
       )}
-      style={{ background: p.bg, color: p.fg }}
-    >
-      {children}
-    </span>
-  )
-}
-
-/** Une puce arrondie (« Site en ligne », « 50 min »…). */
-export function Puce({
-  children,
-  ton = 'blanc',
-  point,
-  className,
-}: {
-  children: React.ReactNode
-  ton?: 'blanc' | 'gris' | 'cyan'
-  /** Un point de couleur devant le texte. */
-  point?: string
-  className?: string
-}) {
-  return (
-    <span
-      className={cn(
-        'inline-flex h-[30px] items-center gap-[7px] whitespace-nowrap rounded-full px-3 text-[13px] font-medium',
-        ton === 'blanc' && 'bg-white/80 text-[#164951]',
-        ton === 'gris' && 'bg-[#f2f3f4] text-[#46606c]',
-        ton === 'cyan' && 'bg-[#ddf7f7] text-[#176c79]',
-        className,
-      )}
-    >
-      {point && <span aria-hidden="true" className="h-[7px] w-[7px] rounded-full" style={{ background: point }} />}
-      {children}
-    </span>
+    </p>
   )
 }
 
 const BOUTON =
-  'inline-flex h-11 items-center justify-center gap-2 whitespace-nowrap rounded-[12px] px-5 text-[14px] font-medium transition-[background-color,box-shadow,transform] duration-[250ms] ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#176c79] focus-visible:ring-offset-2 [&_svg]:h-4 [&_svg]:w-4'
+  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[8px] px-4 py-2.5 text-[16px] font-medium leading-[1.2] transition-[opacity,background-color,box-shadow,transform] duration-200 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-[#176c79] [&_svg]:h-[13px] [&_svg]:w-[13px] [&_svg]:shrink-0'
+
+export const classesBouton = {
+  plein: cn(BOUTON, 'bg-[#164951] text-white hover:opacity-85'),
+  contour: cn(BOUTON, 'bg-transparent text-[#164951] shadow-[inset_0_0_0_1px_#e1e6e7] hover:bg-[rgba(22,73,81,0.04)]'),
+  blanc: cn(BOUTON, 'bg-white text-[#164951] hover:opacity-90'),
+}
 
 export function Bouton({
   href,
@@ -157,7 +101,7 @@ export function Bouton({
 }: {
   href: string
   children: React.ReactNode
-  variante?: 'plein' | 'blanc' | 'lien'
+  variante?: keyof typeof classesBouton
   className?: string
 }) {
   const externe = /^https?:/.test(href)
@@ -165,36 +109,55 @@ export function Bouton({
     <Link
       href={href}
       {...(externe ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-      className={cn(
-        BOUTON,
-        variante === 'plein' && 'bg-[#164951] text-white hover:bg-[#176c79]',
-        variante === 'blanc' &&
-          'bg-white text-[#164951] shadow-[0_1px_2px_rgba(22,73,81,0.06),0_6px_18px_rgba(22,73,81,0.06)] hover:shadow-[0_2px_4px_rgba(22,73,81,0.08),0_10px_26px_rgba(22,73,81,0.10)]',
-        variante === 'lien' && 'h-auto px-0 text-[#176c79] hover:text-[#164951]',
-        className,
-      )}
+      className={cn(classesBouton[variante], className)}
     >
       {children}
     </Link>
   )
 }
 
-export const classeBouton = BOUTON
-
-/** Le halo pastel qui dérive derrière un bandeau. */
-export function Halo({ className }: { className?: string }) {
+/** L'étiquette de 24 px : contour, turquoise doux, ou vert. */
+export function Etiquette({
+  children,
+  ton = 'contour',
+  className,
+}: {
+  children: React.ReactNode
+  ton?: 'contour' | 'cyan' | 'vert'
+  className?: string
+}) {
   return (
-    <div
-      aria-hidden="true"
+    <span
       className={cn(
-        'absolute -inset-[40%] -z-10 bg-[radial-gradient(closest-side_at_18%_30%,rgba(221,247,247,1),transparent),radial-gradient(closest-side_at_62%_70%,rgba(209,237,224,0.85),transparent),radial-gradient(closest-side_at_92%_25%,rgba(243,221,226,0.9),transparent)] blur-[10px] motion-safe:animate-[adm-drift_18s_ease-in-out_infinite_alternate]',
+        'inline-flex h-6 items-center gap-[5px] whitespace-nowrap rounded-[6px] px-[9px] text-[12px] font-medium [&_svg]:h-3 [&_svg]:w-3',
+        ton === 'contour' && 'bg-white text-[#164951] shadow-[inset_0_0_0_1px_#e1e6e7]',
+        ton === 'cyan' && 'bg-[#ddf7f7] text-[#164951]',
+        ton === 'vert' && 'bg-[#d1ede0] text-[#3d8a56]',
         className,
       )}
-    />
+    >
+      {children}
+    </span>
   )
 }
 
-/** Une photo de la photothèque, dans un cadre arrondi. */
+/** Le logo-mot, avec son point turquoise (« Valentin. », « Qeeps. »). */
+export function LogoMot({ nom, clair = false, className }: { nom: string; clair?: boolean; className?: string }) {
+  return (
+    <span
+      className={cn(
+        'whitespace-nowrap text-[26px] font-semibold leading-[27px] tracking-[-0.02em]',
+        clair ? 'text-white' : 'text-[#164951]',
+        className,
+      )}
+    >
+      {nom}
+      <span className={clair ? 'text-white' : 'text-[#176c79]'}>.</span>
+    </span>
+  )
+}
+
+/** Une photo de la photothèque. */
 export function Photo({
   media,
   sizes,
@@ -207,7 +170,7 @@ export function Photo({
   priorite?: boolean
 }) {
   return (
-    <div className={cn('relative overflow-hidden bg-[#e9eced]', className)}>
+    <div className={cn('relative overflow-hidden bg-[#e1e6e7]', className)}>
       {media && (
         <Image
           src={media.url}
@@ -224,14 +187,11 @@ export function Photo({
 }
 
 /** Étiquette de variante, dans la vitrine des modèles. */
-export function Etiquette({ categorie, nom, rang }: { categorie: string; nom: string; rang: number }) {
-  const p = pastel(rang)
+export function Variante({ categorie, nom }: { categorie: string; nom: string }) {
   return (
-    <div className="mx-auto flex max-w-[1180px] items-center gap-3 px-5 pt-14 sm:px-8">
-      <span className="rounded-full px-3 py-1 text-[12px] font-semibold" style={{ background: p.bg, color: p.fg }}>
-        {categorie}
-      </span>
-      <span className="text-[14px] font-medium text-[#46606c]">{nom}</span>
+    <div className="mx-auto flex max-w-[1200px] items-center gap-3 px-6 pt-16">
+      <Etiquette ton="cyan">{categorie}</Etiquette>
+      <span className="text-[14px] font-medium text-[#6b8186]">{nom}</span>
       <span aria-hidden="true" className="h-px flex-1 bg-[#e1e6e7]" />
     </div>
   )

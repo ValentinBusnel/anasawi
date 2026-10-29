@@ -3,31 +3,29 @@ import Link from 'next/link'
 
 import { chargerContenu } from '@/components/qeeps/donnees'
 import {
-  AccompagnementsDossiersSection,
-  AccompagnementsGrille,
-  AccompagnementsLignes,
-  AproposCarte,
-  AproposProfil,
-  ContactBandeau,
-  ContactCartes,
-  GalerieDossiersSection,
-  GalerieMosaique,
-  MethodeCartes,
-  MethodeFil,
+  AccompagnementsCartes,
+  AccompagnementsVitrine,
+  Appel,
+  Chiffres,
+  Contact,
+  ContactBloc,
+  Defile,
+  Fonctionnement,
+  FonctionnementCartes,
   OuvertureCentree,
-  OuvertureDeuxColonnes,
-  OuvertureHalo,
-  QuestionsAccordeonSection,
-  QuestionsVoletsSection,
-  TexteChiffres,
-  TexteCitation,
+  OuvertureMaquette,
+  OuverturePortrait,
+  Profil,
+  ProfilPortrait,
+  Questions,
+  QuestionsDefile,
 } from '@/components/qeeps/sections'
-import { Etiquette, pastel } from '@/components/qeeps/ui'
+import { Etiquette, LogoMot, Variante } from '@/components/qeeps/ui'
 
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Modèles façon Qeeps — ANASAWI',
+  title: 'Sections dans la DA du site Qeeps — ANASAWI',
 }
 
 /**
@@ -39,59 +37,56 @@ const CATALOGUE = [
   {
     categorie: 'Ouverture',
     variantes: [
-      { nom: 'Bandeau à halo', C: OuvertureHalo },
-      { nom: 'Deux colonnes', C: OuvertureDeuxColonnes },
-      { nom: 'Centrée, minimale', C: OuvertureCentree },
+      { nom: 'Maquette fondue et titre en dégradé', C: OuvertureMaquette },
+      { nom: 'Centrée, photos qui défilent', C: OuvertureCentree },
+      { nom: 'Texte et portrait inclinable', C: OuverturePortrait },
     ],
+  },
+  {
+    categorie: 'Défilé',
+    variantes: [{ nom: 'Bande de tuiles', C: Defile }],
   },
   {
     categorie: 'Qui je suis',
     variantes: [
-      { nom: 'Portrait et carte', C: AproposCarte },
-      { nom: 'Profil en cartes', C: AproposProfil },
+      { nom: 'Carte de profil', C: Profil },
+      { nom: 'Grand portrait', C: ProfilPortrait },
     ],
   },
   {
-    categorie: 'Ma méthode',
+    categorie: 'Comment ça se passe',
     variantes: [
-      { nom: 'Étapes en cartes', C: MethodeCartes },
-      { nom: 'Fil vertical', C: MethodeFil },
+      { nom: 'Blocs animés (survolez-les)', C: Fonctionnement },
+      { nom: 'Étapes numérotées', C: FonctionnementCartes },
     ],
+  },
+  {
+    categorie: 'Chiffres',
+    variantes: [{ nom: 'Chiffres en dégradé', C: Chiffres }],
   },
   {
     categorie: 'Accompagnements',
     variantes: [
-      { nom: 'Dossiers et fiches', C: AccompagnementsDossiersSection },
-      { nom: 'Grille de cartes', C: AccompagnementsGrille },
-      { nom: 'Lignes', C: AccompagnementsLignes },
-    ],
-  },
-  {
-    categorie: 'Photos',
-    variantes: [
-      { nom: 'Dossiers et visionneuse', C: GalerieDossiersSection },
-      { nom: 'Mosaïque', C: GalerieMosaique },
+      { nom: 'Cartes', C: AccompagnementsCartes },
+      { nom: 'Vitrine inclinée', C: AccompagnementsVitrine },
     ],
   },
   {
     categorie: 'Questions',
     variantes: [
-      { nom: 'Deux volets', C: QuestionsVoletsSection },
-      { nom: 'Accordéon', C: QuestionsAccordeonSection },
+      { nom: 'Accordéon', C: Questions },
+      { nom: 'Cartes qui défilent', C: QuestionsDefile },
     ],
   },
   {
-    categorie: 'Textes',
-    variantes: [
-      { nom: 'Citation', C: TexteCitation },
-      { nom: 'Chiffres clés', C: TexteChiffres },
-    ],
+    categorie: 'Appel',
+    variantes: [{ nom: '« Pas encore décidé ? »', C: Appel }],
   },
   {
     categorie: 'Contact',
     variantes: [
-      { nom: 'Coordonnées et formulaire', C: ContactCartes },
-      { nom: 'Bandeau rendez-vous', C: ContactBandeau },
+      { nom: 'Formulaire centré', C: Contact },
+      { nom: 'Coordonnées et formulaire', C: ContactBloc },
     ],
   },
 ] as const
@@ -105,39 +100,32 @@ export default async function QeepsModelesPage() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-[#eef1f2] bg-white/85 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-[1180px] flex-wrap items-center gap-x-6 gap-y-3 px-5 py-4 sm:px-8">
-          <div className="mr-auto">
-            <p className="text-[13px] font-medium text-[#8aa4a8]">Modèles façon Qeeps · {total} variantes</p>
-            <h1 className="text-[20px] font-semibold tracking-[-0.01em] text-[#164951]">Bibliothèque de sections</h1>
-          </div>
+      <header className="sticky top-0 z-50 bg-[#f8f8f8]">
+        <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-x-8 gap-y-3 px-6 py-4">
+          <Link href="/qeeps" className="mr-auto flex items-baseline gap-3">
+            <LogoMot nom="Anasawi" />
+            <span className="text-[14px] font-medium text-[#8aa4a8]">{total} variantes</span>
+          </Link>
           <nav aria-label="Catégories" className="no-scrollbar -mx-1 max-w-full overflow-x-auto">
-            <ul className="flex gap-1 px-1">
-              {CATALOGUE.map((g, i) => (
+            <ul className="flex gap-1.5 px-1">
+              {CATALOGUE.map((g) => (
                 <li key={g.categorie}>
-                  <a
-                    href={`#${ancre(g.categorie)}`}
-                    className="inline-flex h-8 items-center gap-2 whitespace-nowrap rounded-full bg-[#f2f3f4] px-3 text-[13px] font-medium text-[#46606c] transition-colors hover:bg-[#e9eced] hover:text-[#164951]"
-                  >
-                    <span aria-hidden="true" className="h-2 w-2 rounded-full" style={{ background: pastel(i).fg }} />
-                    {g.categorie}
+                  <a href={`#${ancre(g.categorie)}`}>
+                    <Etiquette className="hover:bg-[#ddf7f7]">{g.categorie}</Etiquette>
                   </a>
                 </li>
               ))}
             </ul>
           </nav>
-          <Link href="/qeeps" className="text-[13px] font-medium text-[#176c79] hover:text-[#164951]">
-            ← La page complète
-          </Link>
         </div>
       </header>
 
       <main className="pb-24">
-        {CATALOGUE.map((g, i) => (
-          <div key={g.categorie} id={ancre(g.categorie)} className="scroll-mt-24">
+        {CATALOGUE.map((g) => (
+          <div key={g.categorie} id={ancre(g.categorie)} className="scroll-mt-20">
             {g.variantes.map((v) => (
               <div key={v.nom}>
-                <Etiquette categorie={g.categorie} nom={v.nom} rang={i} />
+                <Variante categorie={g.categorie} nom={v.nom} />
                 <v.C c={c} />
               </div>
             ))}

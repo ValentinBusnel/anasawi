@@ -489,14 +489,16 @@
     letter-spacing: -0.02em;
   }
 
-  /* La démonstration `/qeeps` (le site en DA Qeeps) : titres en Poppins,
-     fond blanc — comme l'admin, sans en reprendre les jetons. */
+  /* La démonstration `/qeeps` : le site d'Anne dans la DA du site
+     vitrine de Qeeps (byqeeps.com) — titres en Poppins, fond #f7f7f7. */
   .qeeps-da :is(h1, h2, h3, h4) {
     font-family: inherit;
+    font-weight: inherit;
+    line-height: inherit;
   }
   :root:has(.qeeps-da),
   :root:has(.qeeps-da) body {
-    background: #ffffff;
+    background: #f7f7f7;
   }
 
   /* Focus visible dédié — jamais outline:none */
@@ -671,5 +673,53 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   /qeeps — jetons du site vitrine de Qeeps (relevés sur byqeeps.com)
+   ══════════════════════════════════════════════════════════════════════ */
+.qeeps-da {
+  --q-shadow-btn: rgba(0, 0, 0, 0.024) 0 0.15px 0.73px, rgba(0, 0, 0, 0.04) 0 0.66px 1.5px, rgba(0, 0, 0, 0.05) 0 1.62px 3px, rgba(0, 0, 0, 0.06) 0 3.12px 5.87px, rgba(0, 0, 0, 0.075) 0 5.26px 10.8px, rgba(0, 0, 0, 0.1) 0 8.1px 18.4px;
+  --q-shadow-card: rgba(0, 0, 0, 0.016) 0 1.85px 3.15px, rgba(0, 0, 0, 0.027) 0 8.15px 6.52px, rgba(0, 0, 0, 0.035) 0 20px 13px, rgba(0, 0, 0, 0.043) 0 38.5px 25.5px, rgba(0, 0, 0, 0.055) 0 64.8px 46.9px, rgba(0, 0, 0, 0.07) 0 100px 80px;
+  --q-shadow-quote: rgba(0, 0, 0, 0.18) 0 0.6px 0.6px -1.25px, rgba(0, 0, 0, 0.16) 0 2.29px 2.29px -2.5px, rgba(0, 0, 0, 0.06) 0 10px 10px -3.75px;
+  --q-shadow-hero: rgba(0, 0, 0, 0.2) 0 -49px 70px -48px;
+  --q-ease-appear: cubic-bezier(0.02, 0.45, 0.56, 1);
+}
+
+/* Le titre en dégradé pétrole (« Développeur Full Stack » de la candidature). */
+@utility q-degrade {
+  background-image: linear-gradient(661deg, #164951 0%, #176c79 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* L'apparition Framer de Qeeps : 20 px de montée, 1,1 s. */
+@keyframes q-appear {
+  from {
+    opacity: 0.001;
+    transform: translateY(20px);
+  }
+}
+@keyframes q-defile {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes q-pulse {
+  from {
+    transform: scale(0.4);
+    opacity: 0.5;
+  }
+  to {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+@keyframes q-defile-v {
+  to {
+    transform: translateY(-50%);
   }
 }
