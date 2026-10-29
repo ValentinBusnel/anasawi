@@ -214,6 +214,8 @@ export function Seuil({
   /* Ce qui habille le premier écran s'efface dès qu'on entre. */
   const sFondu = { opacity: 'clamp(0, calc(1 - var(--e) * 7), 1)' }
   const sEfface = { ...sFondu, transform: 'translateY(calc(var(--e) * -24px))' }
+  const pastille =
+    'flex items-center gap-2 whitespace-nowrap rounded-full border border-white/80 bg-white/55 px-3 py-1.5 text-[12px] font-medium text-[var(--ad-pierre)] shadow-[0_8px_24px_-14px_rgba(20,35,46,0.35)] backdrop-blur-md'
   /* La fenêtre : sous le nom au départ, plein écran à l'arrivée. */
   const larg = 'min(460px, 64vw)'
   const haut = 'min(400px, 38svh)'
@@ -303,34 +305,36 @@ export function Seuil({
           </div>
         </div>
 
-        {/* De part et d'autre de la fenêtre : deux cartes de verre qui flottent. */}
-        <div className="pointer-events-none absolute inset-x-0 top-[66%] z-20 hidden -translate-y-1/2 justify-between px-[6vw] lg:flex" style={sFondu}>
-          <div className="w-[230px] motion-safe:animate-[ad-monter_1.2s_var(--ad-ease)_0.7s_backwards]">
-            {jour !== null && (
-              <div className="flex items-center gap-3 rounded-[18px] border border-white/70 bg-white/80 px-4 py-3 shadow-[0_20px_50px_-24px_rgba(20,35,46,0.35)] backdrop-blur-xl motion-safe:animate-[ad-flotter_6s_ease-in-out_infinite]">
-                <span className="relative grid h-3 w-3 place-items-center">
-                  {jour && <span className="absolute inset-0 rounded-full bg-[#4caf8b] motion-safe:animate-[ad-pouls_1.8s_ease-out_infinite]" />}
-                  <span className={cn('relative h-2 w-2 rounded-full', jour ? 'bg-[#4caf8b]' : 'bg-[var(--ad-gris)]')} />
+        {/* Autour de la fenêtre : trois petites pastilles de verre, posées
+            sur ses bords, qui flottent à peine — discrètes, pas des cartes. */}
+        <div
+          aria-hidden={jour === null || undefined}
+          className="pointer-events-none absolute left-1/2 top-[66%] z-20 max-sm:hidden"
+          style={{ ...sFondu, width: larg, height: haut, transform: 'translate(-50%, -50%)' }}
+        >
+          {jour !== null && (
+            <span className="absolute -left-[88px] top-[14%] motion-safe:animate-[ad-monter_1.2s_var(--ad-ease)_0.8s_backwards]">
+              <span className={pastille} style={{ animation: 'ad-flotter 7s ease-in-out infinite' }}>
+                <span className="relative grid h-2.5 w-2.5 place-items-center">
+                  {jour && <span className="absolute inset-0 rounded-full bg-[#4caf8b] motion-safe:animate-[ad-pouls_2.2s_ease-out_infinite]" />}
+                  <span className={cn('relative h-1.5 w-1.5 rounded-full', jour ? 'bg-[#4caf8b]' : 'bg-[var(--ad-gris)]')} />
                 </span>
-                <span>
-                  <span className="block text-[13px] font-semibold text-[var(--ad-nuit)]">{jour ? 'Ouvert aujourd’hui' : 'Fermé aujourd’hui'}</span>
-                  <span className="block text-[12px] text-[var(--ad-gris)]">{jour || 'Écrivez-moi, je vous réponds'}</span>
-                </span>
-              </div>
-            )}
-          </div>
-          <div className="w-[250px] motion-safe:animate-[ad-monter_1.2s_var(--ad-ease)_0.85s_backwards]">
-            <div className="rounded-[20px] border border-white/70 bg-white/80 p-4 shadow-[0_20px_50px_-24px_rgba(20,35,46,0.35)] backdrop-blur-xl motion-safe:animate-[ad-flotter_7s_ease-in-out_1.2s_infinite]">
-              <p className="text-[12px] font-semibold text-[var(--ad-gris)]">{services.length} accompagnements</p>
-              <ul className="mt-2.5 flex flex-wrap gap-1.5">
-                {services.slice(0, 4).map((x) => (
-                  <li key={x.titre} className="rounded-full bg-[var(--ad-sable)] px-2.5 py-1 text-[12px] font-medium text-[var(--ad-nuit)]">
-                    {x.titre}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
+                {jour ? `Ouvert aujourd’hui · ${jour}` : 'Fermé aujourd’hui'}
+              </span>
+            </span>
+          )}
+          <span className="absolute -right-[72px] top-[44%] motion-safe:animate-[ad-monter_1.2s_var(--ad-ease)_0.95s_backwards]">
+            <span className={pastille} style={{ animation: 'ad-flotter 8s ease-in-out 1.4s infinite' }}>
+              <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-[var(--ad-or)]" />
+              {services.length} accompagnements
+            </span>
+          </span>
+          <span className="absolute -left-[40px] bottom-[10%] motion-safe:animate-[ad-monter_1.2s_var(--ad-ease)_1.1s_backwards]">
+            <span className={pastille} style={{ animation: 'ad-flotter 9s ease-in-out 0.6s infinite' }}>
+              <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-[var(--ad-bleu)]" />
+              Au cabinet ou en visio
+            </span>
+          </span>
         </div>
 
         {/* En bas : les deux actions, et l'invitation à entrer. */}
