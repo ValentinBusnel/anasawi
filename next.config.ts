@@ -1,7 +1,9 @@
 import type { NextConfig } from 'next'
 
 /**
- * Content-Security-Policy — EN MODE RAPPORT UNIQUEMENT (décision client).
+ * Content-Security-Policy — APPLIQUÉE en production, observée en
+ * développement (voir `securityHeaders`). Historique : d'abord en mode
+ * rapport seul (décision client), le temps d'observer.
  *
  * `Content-Security-Policy-Report-Only` ne bloque rien : le navigateur se
  * contente de signaler en console ce qu'une CSP stricte aurait refusé. C'est
@@ -39,7 +41,7 @@ import type { NextConfig } from 'next'
  */
 const CSP_REPORT_GROUP = 'csp'
 const CSP_REPORT_PATH = '/api/csp-report'
-const CONTENT_SECURITY_POLICY_REPORT_ONLY = [
+const CONTENT_SECURITY_POLICY = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
@@ -49,6 +51,10 @@ const CONTENT_SECURITY_POLICY_REPORT_ONLY = [
   /* Vidéos : servies par /api/media ; `blob:` pour la recompression dans
      l'admin (la source lue depuis un objet blob) et l'aperçu. */
   "media-src 'self' blob:",
+  /* Filet pour un éventuel calcul en tâche de fond (recompression) : sans
+     cette ligne, un worker créé depuis un `blob:` tomberait sur
+     `script-src` et serait refusé. */
+  "worker-src 'self' blob:",
   "frame-src 'self' https://www.youtube-nocookie.com https://player.vimeo.com https://www.google.com",
   "frame-ancestors 'self'",
   "object-src 'none'",
@@ -65,9 +71,23 @@ const securityHeaders = [
     key: 'Reporting-Endpoints',
     value: `${CSP_REPORT_GROUP}="${CSP_REPORT_PATH}"`,
   },
+  /*
+   * APPLIQUÉE EN PRODUCTION (build + start, Netlify, et donc les tests
+   * e2e qui tournent sur un build) ; seulement observée en développement,
+   * où le rechargement à chaud passe par un websocket que `connect-src
+   * 'self'` refuserait.
+   *
+   * Passage en blocage décidé après relevé, page par page (accueil du
+   * site, tous les écrans de l'admin, l'éditeur, la bibliothèque de
+   * modèles) : une seule violation, sur `/templates` — une photo de semis
+   * proposée à un aperçu vidéo, qui ne s'y lisait de toute façon pas.
+   */
   {
-    key: 'Content-Security-Policy-Report-Only',
-    value: CONTENT_SECURITY_POLICY_REPORT_ONLY,
+    key:
+      process.env.NODE_ENV === 'production'
+        ? 'Content-Security-Policy'
+        : 'Content-Security-Policy-Report-Only',
+    value: CONTENT_SECURITY_POLICY,
   },
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
