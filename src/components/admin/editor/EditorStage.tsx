@@ -12,6 +12,7 @@ import {
   type SectionsViewData,
 } from '@/components/site/SectionsView'
 import type { Breakpoint } from '@/lib/grid'
+import { toneOf } from './sectionTone'
 import { cn } from '@/lib/utils'
 import type { Section } from '@/server/db/schema'
 
@@ -155,18 +156,31 @@ export function EditorStage({
           </StageFrame>
         </div>
 
-        {/* Cadre de la section sélectionnée */}
-        {editing && selectionRect && (
-          /* Une clé par section : à chaque nouvelle sélection, le cadre
-             est recréé et rejoue son halo — le geste de l'espace Qeeps. */
-          <div
-            key={selectedId ?? 'aucune'}
-            className="pointer-events-none absolute inset-x-0 rounded-[3px] shadow-[0_0_0_3px_rgba(23,108,121,0.5),0_0_0_10px_rgba(221,247,247,0.8)] motion-safe:animate-[adm-flash-inset_1.4s_cubic-bezier(0.22,1,0.36,1)]"
-            style={{
-              top: selectionRect.top * scale,
-              height: selectionRect.height * scale,
-            }}
-          />
+        {/* Les halos de l'espace Qeeps : la section survolée et la section
+            choisie se teintent et respirent ; au clic, une onde part. */}
+        {editing &&
+          sectionRects
+            .filter((r) => r.id === hoverId && r.id !== selectedId)
+            .map((r) => (
+              <div
+                key={`survol-${r.id}`}
+                className="pv-hover inset-x-0"
+                style={haloStyle(r, byId.get(r.id)?.type, scale)}
+              />
+            ))}
+        {editing && selectionRect && selectedId && (
+          <>
+            <div
+              className="pv-hover inset-x-0"
+              style={haloStyle(selectionRect, byId.get(selectedId)?.type, scale)}
+            />
+            {/* Une clé par sélection : l'onde se rejoue à chaque choix. */}
+            <div
+              key={`onde-${selectedId}`}
+              className="pv-spot inset-x-0"
+              style={haloStyle(selectionRect, byId.get(selectedId)?.type, scale)}
+            />
+          </>
         )}
 
         {/* ── Contrôles au survol de chaque section ─────────────── */}
@@ -182,11 +196,8 @@ export function EditorStage({
                   key={r.id}
                   className={cn(
                     'absolute inset-x-0',
-                    /* Survol : liseré intérieur bleu à 35 % — la
-                       sélection garde son liseré plein. */
-                    hoverId === r.id &&
-                      selectedId !== r.id &&
-                      'ring-[1.5px] ring-inset ring-blue-deep/35',
+                    /* Le survol et la sélection sont dessinés par les
+                       halos ci-dessus : aucun liseré ici. */
                   )}
                   style={{ top: r.top * scale, height: r.height * scale }}
                 >
@@ -245,4 +256,19 @@ export function EditorStage({
       </div>
     </div>
   )
+}
+
+/** Position et couleur d'un halo : la boîte de la section, sa teinte. */
+function haloStyle(
+  rect: { top: number; height: number },
+  type: string | undefined,
+  scale: number,
+): React.CSSProperties {
+  const tone = toneOf(type ?? '')
+  return {
+    top: rect.top * scale,
+    height: rect.height * scale,
+    '--hv-fg': tone.fg,
+    '--hv-bg': tone.bg,
+  } as React.CSSProperties
 }

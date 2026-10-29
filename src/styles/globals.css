@@ -232,26 +232,76 @@
     box-shadow: 0 0 0 0 rgba(23, 108, 121, 0);
   }
 }
-/* Le cadre de la section choisie dans l'aperçu : exactement le halo de
-   l'espace Qeeps (anneau pétrole + lueur cyan, à l'extérieur), qui monte
-   puis se pose — et reste tant que la section est choisie. */
-@keyframes adm-flash-inset {
-  0% {
+/* ── L'aperçu de l'éditeur : les halos de l'espace Qeeps ─────────────
+   Calques posés par-dessus la scène, dans la couleur de la section
+   (`--hv-fg` / `--hv-bg`). Survol et section choisie : un voile teinté,
+   un anneau qui respire et une onde qui part du bord en continu. Au
+   clic : une onde unique qui s'échappe et s'efface. */
+.pv-hover {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--hv-bg) 16%, transparent);
+  animation: pv-breathe 2.8s ease-in-out infinite alternate;
+  transition:
+    top 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.pv-hover::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  animation: pv-ripple 2.8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+@keyframes pv-breathe {
+  from {
     box-shadow:
-      0 0 0 0 rgba(23, 108, 121, 0),
-      0 0 0 0 rgba(221, 247, 247, 0);
+      0 0 0 1.5px color-mix(in srgb, var(--hv-fg) 34%, transparent),
+      0 0 0 3px color-mix(in srgb, var(--hv-fg) 8%, transparent);
   }
-  25% {
+  to {
     box-shadow:
-      0 0 0 4px rgba(23, 108, 121, 0.55),
-      0 0 0 14px rgba(221, 247, 247, 0.9);
-  }
-  100% {
-    box-shadow:
-      0 0 0 3px rgba(23, 108, 121, 0.5),
-      0 0 0 10px rgba(221, 247, 247, 0.8);
+      0 0 0 1.5px color-mix(in srgb, var(--hv-fg) 24%, transparent),
+      0 0 0 7px color-mix(in srgb, var(--hv-fg) 7%, transparent);
   }
 }
+@keyframes pv-ripple {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--hv-fg) 22%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 18px color-mix(in srgb, var(--hv-fg) 0%, transparent);
+  }
+}
+.pv-spot {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 4px;
+  animation: pv-spot 2.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes pv-spot {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--hv-fg) 35%, transparent);
+  }
+  25% {
+    box-shadow: 0 0 0 10px color-mix(in srgb, var(--hv-fg) 12%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 22px color-mix(in srgb, var(--hv-fg) 0%, transparent);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pv-hover,
+  .pv-hover::after,
+  .pv-spot {
+    animation: none;
+  }
+  .pv-hover {
+    box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--hv-fg) 40%, transparent);
+  }
+}
+
 @keyframes adm-ping {
   to {
     transform: scale(2.8);
