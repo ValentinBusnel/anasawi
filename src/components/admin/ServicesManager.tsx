@@ -561,11 +561,12 @@ function LigneTitre({
         aria-roledescription={triable ? 'titre déplaçable' : undefined}
         aria-current={actif ? 'true' : undefined}
         className={cn(
-          'group flex h-[52px] w-full items-center gap-3 rounded-[14px] px-3 text-left text-[14px] font-medium transition-[background-color,color,box-shadow] duration-[250ms] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+          'group flex h-[52px] w-full items-center gap-3 rounded-[14px] pl-8 pr-3 text-left text-[14px] font-medium transition-[background-color,color,box-shadow] duration-[250ms] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
           /* La poignée à GAUCHE, comme partout dans l'admin (lignes
              d'accompagnements, questions, sections) : la ligne lui fait
-             de la place. */
-          triable && 'cursor-grab touch-none pl-8 active:cursor-grabbing',
+             de la place — sur toutes les lignes, pour que les pastilles
+             restent alignées. */
+          triable && 'cursor-grab touch-none active:cursor-grabbing',
           actif
             ? 'bg-white text-foreground shadow-[0_1px_2px_rgba(22,73,81,0.06)]'
             : 'text-[#46606c] hover:bg-white/60 hover:text-foreground',
