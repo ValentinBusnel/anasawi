@@ -9,18 +9,18 @@ import type { Media } from '@/server/db/schema'
  * d'Anne — pas son espace de travail.
  *
  * Ce qui fait la DA, relevé sur le site et repris de la candidature :
- *   - fond #f7f7f7, barre du haut #f8f8f8 de 80 px, logo-mot « Anasawi. » ;
+ *   - fond var(--a-bg), barre du haut var(--a-nav) de 80 px, logo-mot « Anasawi. » ;
  *   - titres en Poppins gras, le grand titre en dégradé pétrole ;
  *   - surtitres gris 18 px CENTRÉS au-dessus de titres 36 px ;
  *   - boutons 10 × 16 px, rayon 8 : pétrole plein, ou contour fin ;
- *   - blocs gris #f2f3f4 de 24 px de rayon, 828 px de large ;
+ *   - blocs gris var(--a-block) de 24 px de rayon, 828 px de large ;
  *   - cartes blanches rayon 10 sous une ombre longue et douce ;
  *   - étiquettes de 24 px, rayon 6, contour ou turquoise doux ;
  *   - chiffres géants en dégradé ; pied de page pétrole ;
  *   - une seule apparition : 20 px de montée, 1,1 s.
  */
 
-export const ENCRE = '#164951'
+export const ENCRE = 'var(--a-ink)'
 
 /** Une section : 96 px en haut et en bas (56 sous 1200 px). */
 export function Section({
@@ -59,9 +59,9 @@ export function Titre({
 }) {
   return (
     <div className={cn('flex flex-col items-center gap-1 text-center', serre ? 'mb-9' : 'mb-14 xl:mb-[88px]', className)}>
-      {surtitre && <p className="text-[14px] font-medium leading-[1.2] text-[#8aa4a8] xl:text-[18px]">{surtitre}</p>}
-      <h2 className="text-balance text-[24px] font-semibold leading-[1.2] text-[#164951] xl:text-[36px] xl:leading-[49px]">{titre}</h2>
-      {sous && <p className="mt-2 max-w-[620px] text-pretty text-[15px] font-medium leading-[1.5] text-[#8aa4a8]">{sous}</p>}
+      {surtitre && <p className="a-surtitre text-[14px] font-medium leading-[1.2] text-[var(--a-muted)] xl:text-[18px]">{surtitre}</p>}
+      <h2 className="text-balance text-[24px] font-semibold leading-[1.2] text-[var(--a-ink)] xl:text-[36px] xl:leading-[49px]">{titre}</h2>
+      {sous && <p className="mt-2 max-w-[620px] text-pretty text-[15px] font-medium leading-[1.5] text-[var(--a-muted)]">{sous}</p>}
     </div>
   )
 }
@@ -70,10 +70,10 @@ export function Titre({
 export function Accent({ texte, className }: { texte: string; className?: string }) {
   const morceaux = texte.split(/(\*[^*]+\*)/g)
   return (
-    <p className={cn('text-pretty text-[15px] font-medium leading-[1.5] text-[#8aa4a8] xl:text-[16px]', className)}>
+    <p className={cn('text-pretty text-[15px] font-medium leading-[1.5] text-[var(--a-muted)] xl:text-[16px]', className)}>
       {morceaux.map((m, i) =>
         m.startsWith('*') && m.endsWith('*') ? (
-          <strong key={i} className="font-medium text-[#164951]">
+          <strong key={i} className="font-medium text-[var(--a-ink)]">
             {m.slice(1, -1)}
           </strong>
         ) : (
@@ -85,12 +85,12 @@ export function Accent({ texte, className }: { texte: string; className?: string
 }
 
 const BOUTON =
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[8px] px-4 py-2.5 text-[16px] font-medium leading-[1.2] transition-[opacity,background-color,box-shadow,transform] duration-200 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-[#176c79] [&_svg]:h-[13px] [&_svg]:w-[13px] [&_svg]:shrink-0'
+  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[var(--a-r-btn)] px-4 py-2.5 text-[16px] font-medium leading-[1.2] transition-[opacity,background-color,box-shadow,transform] duration-200 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-[var(--a-accent)] [&_svg]:h-[13px] [&_svg]:w-[13px] [&_svg]:shrink-0'
 
 export const classesBouton = {
-  plein: cn(BOUTON, 'bg-[#164951] text-white hover:opacity-85'),
-  contour: cn(BOUTON, 'bg-transparent text-[#164951] shadow-[inset_0_0_0_1px_#e1e6e7] hover:bg-[rgba(22,73,81,0.04)]'),
-  blanc: cn(BOUTON, 'bg-white text-[#164951] hover:opacity-90'),
+  plein: cn(BOUTON, 'bg-[var(--a-ink)] text-white hover:opacity-85'),
+  contour: cn(BOUTON, 'bg-transparent text-[var(--a-ink)] shadow-[inset_0_0_0_1px_var(--a-line)] hover:bg-[rgba(var(--a-ombre),0.04)]'),
+  blanc: cn(BOUTON, 'bg-white text-[var(--a-ink)] hover:opacity-90'),
 }
 
 export function Bouton({
@@ -129,9 +129,9 @@ export function Etiquette({
   return (
     <span
       className={cn(
-        'inline-flex h-6 items-center gap-[5px] whitespace-nowrap rounded-[6px] px-[9px] text-[12px] font-medium [&_svg]:h-3 [&_svg]:w-3',
-        ton === 'contour' && 'bg-white text-[#164951] shadow-[inset_0_0_0_1px_#e1e6e7]',
-        ton === 'cyan' && 'bg-[#ddf7f7] text-[#164951]',
+        'inline-flex h-6 items-center gap-[5px] whitespace-nowrap rounded-[var(--a-r-tag)] px-[9px] text-[12px] font-medium [&_svg]:h-3 [&_svg]:w-3',
+        ton === 'contour' && 'bg-white text-[var(--a-ink)] shadow-[inset_0_0_0_1px_var(--a-line)]',
+        ton === 'cyan' && 'bg-[var(--a-tint)] text-[var(--a-ink)]',
         ton === 'vert' && 'bg-[#d1ede0] text-[#3d8a56]',
         className,
       )}
@@ -146,13 +146,13 @@ export function LogoMot({ nom, clair = false, className }: { nom: string; clair?
   return (
     <span
       className={cn(
-        'whitespace-nowrap text-[26px] font-semibold leading-[27px] tracking-[-0.02em]',
-        clair ? 'text-white' : 'text-[#164951]',
+        'a-logo whitespace-nowrap text-[26px] font-semibold leading-[27px] tracking-[-0.02em]',
+        clair ? 'text-white' : 'text-[var(--a-ink)]',
         className,
       )}
     >
       {nom}
-      <span className={clair ? 'text-white' : 'text-[#176c79]'}>.</span>
+      <span className={clair ? 'text-white' : 'text-[var(--a-accent)]'}>.</span>
     </span>
   )
 }
@@ -170,7 +170,7 @@ export function Photo({
   priorite?: boolean
 }) {
   return (
-    <div className={cn('relative overflow-hidden bg-[#e1e6e7]', className)}>
+    <div className={cn('relative overflow-hidden bg-[var(--a-line)]', className)}>
       {media && (
         <Image
           src={media.url}
@@ -191,8 +191,8 @@ export function Variante({ categorie, nom }: { categorie: string; nom: string })
   return (
     <div className="mx-auto flex max-w-[1200px] items-center gap-3 px-6 pt-16">
       <Etiquette ton="cyan">{categorie}</Etiquette>
-      <span className="text-[14px] font-medium text-[#6b8186]">{nom}</span>
-      <span aria-hidden="true" className="h-px flex-1 bg-[#e1e6e7]" />
+      <span className="text-[14px] font-medium text-[var(--a-soft)]">{nom}</span>
+      <span aria-hidden="true" className="h-px flex-1 bg-[var(--a-line)]" />
     </div>
   )
 }

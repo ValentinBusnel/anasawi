@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function QeepsLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="qeeps-da min-h-screen scroll-smooth bg-[#f7f7f7] font-[family-name:var(--font-poppins)] text-[#164951] antialiased">
+    <div className="qeeps-da min-h-screen scroll-smooth bg-[var(--a-bg)] font-[family-name:var(--font-poppins)] text-[var(--a-ink)] antialiased">
       {children}
     </div>
   )

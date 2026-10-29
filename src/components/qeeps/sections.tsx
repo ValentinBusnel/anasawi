@@ -16,7 +16,6 @@ import Link from 'next/link'
 import type { Contenu } from './donnees'
 import { Accordeon, Apparait, FormulaireContact, Inclinaison } from './interactifs'
 import { Accent, Bouton, Etiquette, LogoMot, Photo, Section, Titre } from './ui'
-import { PASTELS } from '@/components/admin/editor/pastels'
 import { cn, toE164 } from '@/lib/utils'
 
 /**
@@ -27,7 +26,12 @@ import { cn, toE164 } from '@/lib/utils'
 type P = { c: Contenu }
 type Service = Contenu['services'][number]
 
-const pastel = (i: number) => PASTELS[((i % PASTELS.length) + PASTELS.length) % PASTELS.length]!
+/** Les six teintes douces de la DA en cours — des variables CSS : la
+    même section prend les pastels de Qeeps ou ceux d'Anasawi. */
+const pastel = (i: number) => {
+  const n = ((i % 6) + 6) % 6
+  return { bg: `var(--a-p${n}-bg)`, fg: `var(--a-p${n}-fg)` }
+}
 const sansEtoiles = (t: string) => t.replace(/\*/g, '')
 /** La durée courte d'un accompagnement (« 1 h · 80 € » → « 1 h »). */
 const dureeCourte = (s: Service) => s.duration?.split(/[·—-]/)[0]?.trim() || null
@@ -45,18 +49,18 @@ export function OuvertureMaquette({ c }: P) {
     <section id="haut" className="relative flex flex-col items-center overflow-x-clip px-6 pb-14 pt-24 xl:pb-24 xl:pt-[78px]">
       <Inclinaison className="w-full max-w-[876px] motion-safe:animate-[q-appear_1.1s_cubic-bezier(0,0.37,0.56,1)_0.1s_backwards]">
         <div className="grid h-[300px] grid-cols-[minmax(0,1fr)] overflow-hidden rounded-[12px] bg-white shadow-[var(--q-shadow-hero)] [mask-image:linear-gradient(to_bottom,#000_0%,#000_52%,transparent_96%)] sm:h-[460px] sm:grid-cols-[160px_minmax(0,1fr)] xl:h-[557px]">
-          <aside className="flex flex-col gap-4 border-r border-[#f1f3f4] p-4 max-sm:hidden">
+          <aside className="flex flex-col gap-4 border-r border-[var(--a-line-soft)] p-4 max-sm:hidden">
             <LogoMot nom="Anasawi" className="text-center text-[17px] leading-none" />
-            <div className="flex items-center gap-2 rounded-[6px] border border-[#eef1f2] p-1.5">
+            <div className="flex items-center gap-2 rounded-[6px] border border-[var(--a-line-soft)] p-1.5">
               <Photo media={c.portrait} sizes="24px" className="h-6 w-6 shrink-0 rounded-full" />
               <span className="min-w-0">
-                <span className="block truncate text-[9px] font-medium text-[#164951]">{c.nom}</span>
-                <span className="block truncate text-[7px] text-[#8aa4a8]">{c.metier}</span>
+                <span className="block truncate text-[9px] font-medium text-[var(--a-ink)]">{c.nom}</span>
+                <span className="block truncate text-[7px] text-[var(--a-muted)]">{c.metier}</span>
               </span>
             </div>
-            <ul className="flex flex-col gap-4 px-1 py-2 text-[9px] font-medium text-[#164951]">
+            <ul className="flex flex-col gap-4 px-1 py-2 text-[9px] font-medium text-[var(--a-ink)]">
               {['Accueil', 'Accompagnements', 'Le cabinet', 'Questions'].map((l, i) => (
-                <li key={l} className={cn('flex items-center gap-1.5', i > 1 && 'text-[#8aa4a8]')}>
+                <li key={l} className={cn('flex items-center gap-1.5', i > 1 && 'text-[var(--a-muted)]')}>
                   <span className="h-1.5 w-1.5 rounded-full" style={{ background: pastel(i).fg }} />
                   {l}
                 </li>
@@ -64,23 +68,23 @@ export function OuvertureMaquette({ c }: P) {
             </ul>
           </aside>
           <div className="flex min-w-0 flex-col gap-3 p-5 sm:pt-6">
-            <p className="text-[15px] font-medium text-[#164951]">Bienvenue au cabinet</p>
-            <Photo media={c.ambiance} sizes="(max-width: 640px) 100vw, 700px" priorite className="h-[150px] shrink-0 rounded-[8px] sm:h-[190px]" />
-            <div className="rounded-[6px] border border-[#eef1f2] p-2.5">
-              <p className="mb-2.5 flex items-center gap-1.5 text-[11px] font-medium text-[#164951]">
+            <p className="text-[15px] font-medium text-[var(--a-ink)]">Bienvenue au cabinet</p>
+            <Photo media={c.ambiance} sizes="(max-width: 640px) 100vw, 700px" priorite className="a-arche-large h-[150px] shrink-0 rounded-[8px] sm:h-[190px]" />
+            <div className="rounded-[6px] border border-[var(--a-line-soft)] p-2.5">
+              <p className="mb-2.5 flex items-center gap-1.5 text-[11px] font-medium text-[var(--a-ink)]">
                 Les accompagnements
-                <span className="rounded-[10px] bg-[#fdf6dc] px-1.5 text-[8px] text-[#c9a227]">{c.services.length}</span>
+                <span className="rounded-[var(--a-r-carte)] bg-[#fdf6dc] px-1.5 text-[8px] text-[#c9a227]">{c.services.length}</span>
               </p>
               <div className="grid gap-2 sm:grid-cols-3">
                 {fiches.map((s, i) => (
-                  <div key={s.id} className="flex min-w-0 items-center gap-2 rounded-[6px] border border-[#eef1f2] p-2">
+                  <div key={s.id} className="flex min-w-0 items-center gap-2 rounded-[6px] border border-[var(--a-line-soft)] p-2">
                     <span className="grid h-9 w-10 shrink-0 place-items-center rounded-[4px]" style={{ background: pastel(i).bg, color: pastel(i).fg }}>
                       <HeartHandshake className="h-3.5 w-3.5" />
                     </span>
                     <span className="min-w-0">
-                      <span className="block truncate text-[8.5px] font-semibold text-[#164951]">{s.title}</span>
+                      <span className="block truncate text-[8.5px] font-semibold text-[var(--a-ink)]">{s.title}</span>
                       {dureeCourte(s) && (
-                        <span className="mt-1 inline-block rounded-[3px] bg-[#ddf7f7] px-1.5 py-px text-[6.5px] text-[#164951]">{dureeCourte(s)}</span>
+                        <span className="mt-1 inline-block rounded-[3px] bg-[var(--a-tint)] px-1.5 py-px text-[6.5px] text-[var(--a-ink)]">{dureeCourte(s)}</span>
                       )}
                     </span>
                   </div>
@@ -92,15 +96,15 @@ export function OuvertureMaquette({ c }: P) {
       </Inclinaison>
 
       {/* La bande floutée sur laquelle le titre se pose. */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-[230px] h-64 bg-gradient-to-b from-[#f7f7f7]/0 via-[#f7f7f7]/90 to-[#f7f7f7] sm:top-[360px] xl:top-[388px] xl:bg-[rgba(247,247,247,0.01)] xl:bg-none xl:backdrop-blur-[8.5px]" />
+      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-[230px] h-64 bg-gradient-to-b from-[var(--a-bg)]/0 via-[var(--a-bg)]/90 to-[var(--a-bg)] sm:top-[360px] xl:top-[388px] xl:bg-[transparent] xl:bg-none xl:backdrop-blur-[8.5px]" />
 
       <div className="relative -mt-12 flex flex-col items-center text-center sm:-mt-36 xl:-mt-[247px]">
         <h1 className="q-degrade text-balance text-[30px] font-bold leading-[1.2] sm:text-[42px] xl:text-[52px] motion-safe:animate-[q-appear_1.1s_cubic-bezier(0.02,0.45,0.56,1)_0.25s_backwards]">
           {c.nom}
           <br />
-          {c.metier}
+          <em>{c.metier}</em>
         </h1>
-        <p className="mt-1.5 max-w-[820px] text-pretty text-[14px] font-medium leading-[1.4] text-[#8aa4a8] xl:text-[16px] motion-safe:animate-[q-appear_1.1s_cubic-bezier(0.02,0.45,0.56,1)_0.35s_backwards]">
+        <p className="mt-1.5 max-w-[820px] text-pretty text-[14px] font-medium leading-[1.4] text-[var(--a-muted)] xl:text-[16px] motion-safe:animate-[q-appear_1.1s_cubic-bezier(0.02,0.45,0.56,1)_0.35s_backwards]">
           {c.ouverture.intro || c.accroche}
         </p>
         <div className="mt-12 flex flex-wrap justify-center gap-4 max-sm:flex-col-reverse max-sm:items-stretch motion-safe:animate-[q-appear_1.1s_cubic-bezier(0.02,0.45,0.56,1)_0.45s_backwards]">
@@ -132,7 +136,7 @@ export function OuvertureCentree({ c }: P) {
         <h1 className="q-degrade mt-5 text-balance text-[32px] font-bold leading-[1.15] sm:text-[44px] xl:text-[60px] motion-safe:animate-[q-appear_1.1s_cubic-bezier(0.02,0.45,0.56,1)_0.1s_backwards]">
           {c.ouverture.titre}
         </h1>
-        <p className="mt-3 max-w-[640px] text-pretty text-[15px] font-medium leading-[1.5] text-[#8aa4a8] xl:text-[16px] motion-safe:animate-[q-appear_1.1s_cubic-bezier(0.02,0.45,0.56,1)_0.2s_backwards]">
+        <p className="mt-3 max-w-[640px] text-pretty text-[15px] font-medium leading-[1.5] text-[var(--a-muted)] xl:text-[16px] motion-safe:animate-[q-appear_1.1s_cubic-bezier(0.02,0.45,0.56,1)_0.2s_backwards]">
           {c.ouverture.intro || c.accroche}
         </p>
         <div className="mt-10 flex flex-wrap justify-center gap-4 motion-safe:animate-[q-appear_1.1s_cubic-bezier(0.02,0.45,0.56,1)_0.3s_backwards]">
@@ -173,7 +177,7 @@ export function OuverturePortrait({ c }: P) {
     <Section id="haut" className="xl:pt-16">
       <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
         <div className="motion-safe:animate-[q-appear_1.1s_cubic-bezier(0.02,0.45,0.56,1)_backwards]">
-          <p className="text-[14px] font-medium text-[#8aa4a8] xl:text-[18px]">{c.ouverture.surtitre}</p>
+          <p className="a-surtitre text-[14px] font-medium text-[var(--a-muted)] xl:text-[18px]">{c.ouverture.surtitre}</p>
           <h1 className="q-degrade mt-2 text-balance text-[34px] font-bold leading-[1.15] xl:text-[52px] xl:leading-[1.2]">{c.ouverture.titre}</h1>
           <Accent className="mt-4 max-w-[52ch]" texte={c.ouverture.intro || c.accroche} />
           <div className="mt-6 flex flex-wrap gap-2">
@@ -196,11 +200,11 @@ export function OuverturePortrait({ c }: P) {
         </div>
         <Inclinaison className="mx-auto w-full max-w-[400px] motion-safe:animate-[q-appear_1.1s_cubic-bezier(0,0.37,0.56,1)_0.15s_backwards]">
           <div className="rounded-[20px] bg-white p-2.5 shadow-[var(--q-shadow-card)]">
-            <Photo media={c.portrait} sizes="400px" priorite className="aspect-[4/5] rounded-[14px]" />
+            <Photo media={c.portrait} sizes="400px" priorite className="a-arche aspect-[4/5] rounded-[14px]" />
             <div className="flex items-center justify-between gap-3 px-2.5 pb-1.5 pt-3.5">
               <span>
-                <span className="block text-[16px] font-semibold text-[#164951]">{c.nom}</span>
-                <span className="block text-[13px] font-medium text-[#8aa4a8]">{c.metier}</span>
+                <span className="block text-[16px] font-semibold text-[var(--a-ink)]">{c.nom}</span>
+                <span className="block text-[13px] font-medium text-[var(--a-muted)]">{c.metier}</span>
               </span>
               <Etiquette ton="vert">Disponible</Etiquette>
             </div>
@@ -228,7 +232,7 @@ export function Defile({ c }: P) {
   ]
   return (
     <Section className="xl:py-14">
-      <Titre surtitre="Ce que j’accompagne" titre="Des situations très diverses" serre />
+      <Titre surtitre="Ce que j’accompagne" titre={<>Des situations très <em>diverses</em></>} serre />
       <div className="mx-auto max-w-[759px] overflow-hidden [mask-image:linear-gradient(to_right,transparent_0%,#000_15%,#000_85%,transparent_100%)]">
         <div className="flex w-max motion-safe:animate-[q-defile_40s_linear_infinite]">
           {[0, 1].map((tour) => (
@@ -238,7 +242,7 @@ export function Defile({ c }: P) {
                   <span className="grid h-[46px] w-[46px] place-items-center rounded-[12px]" style={{ background: pastel(i).bg, color: pastel(i).fg }}>
                     {i % 3 === 0 ? <HeartHandshake className="h-[22px] w-[22px]" /> : i % 3 === 1 ? <Sparkles className="h-[22px] w-[22px]" /> : <Check className="h-[22px] w-[22px]" />}
                   </span>
-                  <span className="whitespace-nowrap text-[12px] font-medium text-[#8aa4a8]">{m}</span>
+                  <span className="whitespace-nowrap text-[12px] font-medium text-[var(--a-muted)]">{m}</span>
                 </li>
               ))}
             </ul>
@@ -271,13 +275,13 @@ function Bloc({
     <Apparait>
       <div
         className={cn(
-          'group/bloc relative grid overflow-hidden rounded-[24px] bg-[#f2f3f4] xl:h-[310px] xl:grid-cols-[331px_minmax(0,1fr)]',
+          'group/bloc relative grid overflow-hidden rounded-[var(--a-r-bloc)] bg-[var(--a-block)] xl:h-[310px] xl:grid-cols-[331px_minmax(0,1fr)]',
           inverse && 'xl:grid-cols-[minmax(0,1fr)_331px]',
-          turquoise && 'xl:bg-[linear-gradient(104deg,rgba(33,139,156,0.16)_0%,#f2f3f4_60%)]',
+          turquoise && 'xl:bg-[linear-gradient(104deg,var(--a-glow)_0%,var(--a-block)_60%)]',
         )}
       >
         <div className={cn('relative z-[2] flex flex-col justify-center gap-1.5 px-6 pb-10 pt-2 max-xl:mx-auto max-xl:max-w-[340px] max-xl:text-center xl:px-12 xl:py-0', inverse && 'xl:order-2 xl:pl-0')}>
-          <h3 className="text-[23px] font-semibold leading-[1.2] text-[#164951] xl:text-[24px]">{titre}</h3>
+          <h3 className="text-[23px] font-semibold leading-[1.2] text-[var(--a-ink)] xl:text-[24px]">{titre}</h3>
           <Accent texte={texte} className="max-xl:text-[14px]" />
         </div>
         <div className={cn('relative h-[260px] max-xl:order-first xl:h-full', inverse && 'xl:order-1')}>{visuel}</div>
@@ -292,10 +296,10 @@ function VisuelMessages({ c }: P) {
   const qs = c.faq.slice(0, 3)
   const carte = (q: (typeof qs)[number] | undefined, i: number, principale = false) =>
     q && (
-      <div className="flex w-[280px] flex-col rounded-[10.36px] bg-white px-3 pb-2.5 pt-2 shadow-[var(--q-shadow-card)]">
+      <div className="flex w-[280px] flex-col rounded-[var(--a-r-carte)] bg-white px-3 pb-2.5 pt-2 shadow-[var(--q-shadow-card)]">
         <div className="mb-3 flex h-[26px] items-center justify-between">
           <span className="flex items-center gap-2 text-[12px] font-light uppercase tracking-wide text-[#adadad]">
-            <span className="grid h-[18px] w-[18px] place-items-center rounded-[4px] bg-[#2f80ed] text-white">
+            <span className="grid h-[18px] w-[18px] place-items-center rounded-[4px] bg-[var(--a-accent)] text-white">
               <Mail className="h-3 w-3" />
             </span>
             Message
@@ -307,10 +311,10 @@ function VisuelMessages({ c }: P) {
             {q.category || 'Question'}
           </span>
         </div>
-        <p className="text-[14px] font-semibold leading-[1.2] text-[#164951]">Vous</p>
-        <p className="mb-2.5 mt-1 line-clamp-2 text-[12px] font-medium leading-[1.25] text-[rgba(22,73,81,0.5)]">{q.question}</p>
+        <p className="text-[14px] font-semibold leading-[1.2] text-[var(--a-ink)]">Vous</p>
+        <p className="mb-2.5 mt-1 line-clamp-2 text-[12px] font-medium leading-[1.25] text-[rgba(var(--a-ombre),0.5)]">{q.question}</p>
         {principale && (
-          <span className="flex h-7 items-center justify-center rounded-[5.9px] bg-[#164951] text-[10.3px] font-medium text-white shadow-[var(--q-shadow-btn)]">
+          <span className="flex h-7 items-center justify-center rounded-[5.9px] bg-[var(--a-ink)] text-[10.3px] font-medium text-white shadow-[var(--q-shadow-btn)]">
             Écrire à {c.nom.split(' ')[0]}
           </span>
         )}
@@ -344,7 +348,7 @@ function VisuelTuiles({ c }: P) {
           <span className="h-9 rounded-[7.9px] bg-gradient-to-b from-transparent to-white" />
         </div>
         {tuiles.map((s) => (
-          <div key={s.id} className="flex h-[93px] w-[153px] flex-col items-center justify-center gap-2 rounded-[7.9px] bg-white text-[#164951] shadow-[var(--q-shadow-card),inset_0_0_0_1.19px_#f2f2f2]">
+          <div key={s.id} className="flex h-[93px] w-[153px] flex-col items-center justify-center gap-2 rounded-[7.9px] bg-white text-[var(--a-ink)] shadow-[var(--q-shadow-card),inset_0_0_0_1.19px_var(--a-line-soft)]">
             <span className="flex items-center gap-1.5 text-[22px] font-semibold leading-none">
               <Clock className="h-[11px] w-[11px]" />
               {dureeCourte(s)}
@@ -354,7 +358,7 @@ function VisuelTuiles({ c }: P) {
         ))}
         <a
           href="#accompagnements"
-          className="group/tuile flex h-[93px] w-[153px] flex-col items-center justify-center gap-2 rounded-[7.7px] bg-[#d7e0e1] text-[8px] font-semibold text-[#164951] shadow-[var(--q-shadow-card),inset_0_0_0_1.16px_rgba(138,164,168,0.2)] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.08]"
+          className="group/tuile flex h-[93px] w-[153px] flex-col items-center justify-center gap-2 rounded-[7.7px] bg-[var(--a-block-2)] text-[8px] font-semibold text-[var(--a-ink)] shadow-[var(--q-shadow-card),inset_0_0_0_1.16px_rgba(138,164,168,0.2)] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.08]"
         >
           <Settings2 className="h-8 w-8 transition-transform duration-500 group-hover/tuile:-rotate-[150deg]" strokeWidth={1.5} />
           + Voir tous les accompagnements
@@ -373,14 +377,14 @@ function VisuelFiches({ c }: P) {
       <div className="mx-auto w-[min(380px,90%)] motion-safe:animate-[q-defile-v_26s_linear_infinite] group-hover/bloc:[animation-play-state:paused]">
         <ul className="flex flex-col gap-4 py-2">
           {fiches.map((s, i) => (
-            <li key={`${s.id}-${i}`} aria-hidden={i >= c.services.length || undefined} className="flex items-center gap-3 rounded-[10px] bg-white px-5 py-2.5 shadow-[0_1px_2px_rgba(22,73,81,0.04),0_4px_12px_-6px_rgba(22,73,81,0.08)]">
+            <li key={`${s.id}-${i}`} aria-hidden={i >= c.services.length || undefined} className="flex items-center gap-3 rounded-[var(--a-r-carte)] bg-white px-5 py-2.5 shadow-[0_1px_2px_rgba(var(--a-ombre),0.04),0_4px_12px_-6px_rgba(var(--a-ombre),0.08)]">
               <span className="grid h-[49px] w-[49px] shrink-0 place-items-center rounded-[12.26px] text-[15px] font-bold shadow-[var(--q-shadow-btn)]" style={{ background: pastel(i).bg, color: pastel(i).fg }}>
                 {s.title.charAt(0)}
               </span>
               <span className="min-w-0">
-                <span className="block truncate text-[12px] font-medium text-[#164951]">{s.title}</span>
-                <span className="block truncate text-[8px] font-light text-[#164951]">{sansEtoiles(s.excerpt)}</span>
-                <span className="mt-2 flex gap-2.5 text-[8px] font-medium text-[#164951]">
+                <span className="block truncate text-[12px] font-medium text-[var(--a-ink)]">{s.title}</span>
+                <span className="block truncate text-[8px] font-light text-[var(--a-ink)]">{sansEtoiles(s.excerpt)}</span>
+                <span className="mt-2 flex gap-2.5 text-[8px] font-medium text-[var(--a-ink)]">
                   {s.method && (
                     <span className="flex items-center gap-1">
                       <Sparkles className="h-2 w-2" />
@@ -409,30 +413,30 @@ function VisuelCarte({ c }: P) {
   return (
     <div className="absolute inset-0 flex items-center justify-center">
       <div className="relative w-[min(400px,88%)] [perspective:1200px]">
-        <div aria-hidden="true" className="absolute inset-0 -translate-x-4 -translate-y-3 -rotate-6 rounded-[20.9px] bg-[#e1e6e7] shadow-[var(--q-shadow-card)]" />
-        <div className="relative flex min-h-[220px] flex-col justify-between gap-5 overflow-hidden rounded-[20.9px] bg-[#164951] p-6 text-white shadow-[var(--q-shadow-card)] transition-[transform,filter] duration-[800ms] ease-[cubic-bezier(0.12,0.23,0.5,1)] group-hover/bloc:[transform:rotateX(10deg)_rotateY(-5deg)_scale(1.0125)] group-hover/bloc:brightness-110">
+        <div aria-hidden="true" className="absolute inset-0 -translate-x-4 -translate-y-3 -rotate-6 rounded-[20.9px] bg-[var(--a-line)] shadow-[var(--q-shadow-card)]" />
+        <div className="relative flex min-h-[220px] flex-col justify-between gap-5 overflow-hidden rounded-[20.9px] bg-[var(--a-ink)] p-6 text-white shadow-[var(--q-shadow-card)] transition-[transform,filter] duration-[800ms] ease-[cubic-bezier(0.12,0.23,0.5,1)] group-hover/bloc:[transform:rotateX(10deg)_rotateY(-5deg)_scale(1.0125)] group-hover/bloc:brightness-110">
           <span aria-hidden="true" className="pointer-events-none absolute -inset-[40%] -translate-x-[70%] bg-[linear-gradient(105deg,transparent_38%,rgba(255,255,255,0.22)_47%,rgba(255,255,255,0.05)_53%,transparent_60%)] transition-transform duration-[1100ms] group-hover/bloc:translate-x-[70%]" />
           <div className="relative flex items-center justify-between">
             <LogoMot nom="Anasawi" clair className="text-[24px]" />
-            <span className="inline-flex h-[30px] items-center gap-2 rounded-[9.9px] bg-[#e1e6e7] px-2.5 text-[14px] font-medium text-[#164951]">
+            <span className="inline-flex h-[30px] items-center gap-2 rounded-[9.9px] bg-[var(--a-line)] px-2.5 text-[14px] font-medium text-[var(--a-ink)]">
               <MapPin className="h-4 w-4" />
               Cabinet
             </span>
           </div>
           <div className="relative grid grid-cols-2 gap-3">
             <span className="flex flex-col gap-1">
-              <span className="text-[11.6px] font-medium text-[#8aa4a8]">Ville</span>
+              <span className="text-[11.6px] font-medium text-[var(--a-muted)]">Ville</span>
               <span className="text-[18px] font-semibold leading-[1.2]">{c.ville}</span>
             </span>
             {c.horaires[0] && (
               <span className="flex flex-col items-end gap-1 text-right">
-                <span className="text-[11.6px] font-medium text-[#8aa4a8]">{c.horaires[0].day}</span>
+                <span className="text-[11.6px] font-medium text-[var(--a-muted)]">{c.horaires[0].day}</span>
                 <span className="text-[18px] font-semibold leading-[1.2]">{c.horaires[0].hours}</span>
               </span>
             )}
             {c.telephone && (
               <span className="col-span-2 flex flex-col gap-1">
-                <span className="text-[11.6px] font-medium text-[#8aa4a8]">Téléphone</span>
+                <span className="text-[11.6px] font-medium text-[var(--a-muted)]">Téléphone</span>
                 <span className="text-[18px] font-semibold leading-[1.2]">{c.telephone}</span>
               </span>
             )}
@@ -487,10 +491,10 @@ export function FonctionnementCartes({ c }: P) {
         {c.methode.etapes.slice(0, 3).map((e, i) => (
           <li key={e.titre}>
             <Apparait delai={i * 0.1} className="h-full">
-              <div className="flex h-full flex-col gap-4 rounded-[24px] bg-[#f2f3f4] p-8 transition-[transform,box-shadow] duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(22,73,81,0.1)]">
-                <span className="q-degrade text-[44px] font-bold leading-none">{String(i + 1).padStart(2, '0')}</span>
-                <h3 className="text-[20px] font-semibold leading-[1.25] text-[#164951]">{e.titre}</h3>
-                <p className="text-[15px] font-medium leading-[1.5] text-[#8aa4a8]">{e.texte}</p>
+              <div className="flex h-full flex-col gap-4 rounded-[var(--a-r-bloc)] bg-[var(--a-block)] p-8 transition-[transform,box-shadow] duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(var(--a-ombre),0.1)]">
+                <span className="a-titre q-degrade text-[44px] font-bold leading-none">{String(i + 1).padStart(2, '0')}</span>
+                <h3 className="text-[20px] font-semibold leading-[1.25] text-[var(--a-ink)]">{e.titre}</h3>
+                <p className="text-[15px] font-medium leading-[1.5] text-[var(--a-muted)]">{e.texte}</p>
               </div>
             </Apparait>
           </li>
@@ -512,13 +516,13 @@ export function Chiffres({ c }: P) {
   ]
   return (
     <Section>
-      <Titre surtitre="En quelques chiffres" titre="Un cadre simple et disponible" serre />
+      <Titre surtitre="En quelques chiffres" titre={<>Un cadre simple et <em>disponible</em></>} serre />
       <div className="flex flex-col items-center justify-center gap-0 sm:flex-row sm:flex-wrap sm:gap-[72px]">
         {chiffres.map((ch, i) => (
           <Apparait key={ch.libelle} delai={i * 0.1}>
             <div className="flex h-[190px] flex-col justify-center rounded-[20px] p-2.5 text-center">
-              <span className="q-degrade pb-px text-[62px] font-bold leading-[1.2]">{ch.valeur}</span>
-              <span className="mt-px whitespace-pre-line text-[18px] font-medium leading-[1.2] text-[#8aa4a8]">{ch.libelle}</span>
+              <span className="a-titre q-degrade pb-px text-[62px] font-bold leading-[1.2]">{ch.valeur}</span>
+              <span className="mt-px whitespace-pre-line text-[18px] font-medium leading-[1.2] text-[var(--a-muted)]">{ch.libelle}</span>
             </div>
           </Apparait>
         ))}
@@ -540,7 +544,7 @@ function Faits({ c }: P) {
     c.horaires[0] && { icone: <Clock />, texte: `${c.horaires[0].day} · ${c.horaires[0].hours}` },
   ].filter(Boolean) as { icone: React.ReactNode; texte: string; href?: string }[]
   return (
-    <ul className="mb-1.5 mt-3.5 flex flex-col gap-[9px] text-[12.5px] font-medium text-[#164951] [&_svg]:h-[13px] [&_svg]:w-[13px] [&_svg]:shrink-0">
+    <ul className="mb-1.5 mt-3.5 flex flex-col gap-[9px] text-[12.5px] font-medium text-[var(--a-ink)] [&_svg]:h-[13px] [&_svg]:w-[13px] [&_svg]:shrink-0">
       {faits.map((f) => (
         <li key={f.texte} className="flex items-center gap-2 [overflow-wrap:anywhere]">
           {f.icone}
@@ -563,13 +567,13 @@ export function Profil({ c }: P) {
     <Section id="a-propos" etroite>
       <Titre surtitre={c.apropos.surtitre} titre={c.nom} serre />
       <Apparait>
-        <div className="grid items-start gap-6 rounded-[24px] bg-[#f2f3f4] p-6 md:grid-cols-[283px_minmax(0,1fr)] md:gap-12 md:px-12 md:py-10">
-          <div className="flex flex-col items-start gap-1.5 rounded-[10.36px] bg-white p-6 shadow-[var(--q-shadow-card)]">
+        <div className="grid items-start gap-6 rounded-[var(--a-r-bloc)] bg-[var(--a-block)] p-6 md:grid-cols-[283px_minmax(0,1fr)] md:gap-12 md:px-12 md:py-10">
+          <div className="flex flex-col items-start gap-1.5 rounded-[var(--a-r-carte)] bg-white p-6 shadow-[var(--q-shadow-card)]">
             <div className="mb-2.5 flex items-center gap-3">
-              <Photo media={c.portrait} sizes="49px" className="h-[49px] w-[49px] shrink-0 rounded-[12px]" />
+              <Photo media={c.portrait} sizes="49px" className="a-arche h-[49px] w-[49px] shrink-0 rounded-[12px]" />
               <span>
-                <span className="block text-[20px] font-semibold leading-[1.2] text-[#164951]">{c.nom}</span>
-                <span className="block text-[13px] font-medium leading-[18px] text-[#8aa4a8]">{c.metier}</span>
+                <span className="block text-[20px] font-semibold leading-[1.2] text-[var(--a-ink)]">{c.nom}</span>
+                <span className="block text-[13px] font-medium leading-[18px] text-[var(--a-muted)]">{c.metier}</span>
               </span>
             </div>
             <Faits c={c} />
@@ -579,10 +583,10 @@ export function Profil({ c }: P) {
             </div>
           </div>
           <div className="flex flex-col gap-4">
-            <p className="text-[16px] font-medium leading-[1.5] text-[#164951]">{premier}</p>
-            {reste.length > 0 && <p className="whitespace-pre-line text-[15px] font-medium leading-[1.5] text-[#8aa4a8]">{reste.join('\n\n')}</p>}
+            <p className="text-[16px] font-medium leading-[1.5] text-[var(--a-ink)]">{premier}</p>
+            {reste.length > 0 && <p className="whitespace-pre-line text-[15px] font-medium leading-[1.5] text-[var(--a-muted)]">{reste.join('\n\n')}</p>}
             {c.apropos.citation && (
-              <blockquote className="rounded-[10px] bg-white p-5 text-[14px] font-medium leading-[1.6] text-[#8aa4a8] shadow-[var(--q-shadow-quote)]">
+              <blockquote className="rounded-[var(--a-r-carte)] bg-white p-5 text-[14px] font-medium leading-[1.6] text-[var(--a-muted)] shadow-[var(--q-shadow-quote)]">
                 « {c.apropos.citation} »
               </blockquote>
             )}
@@ -605,15 +609,15 @@ export function ProfilPortrait({ c }: P) {
     <Section id="a-propos">
       <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
         <Apparait>
-          <Photo media={c.portrait} sizes="(max-width: 1024px) 100vw, 560px" className="aspect-[4/5] rounded-[24px] shadow-[var(--q-shadow-card)]" />
+          <Photo media={c.portrait} sizes="(max-width: 1024px) 100vw, 560px" className="a-arche aspect-[4/5] rounded-[var(--a-r-bloc)] shadow-[var(--q-shadow-card)]" />
         </Apparait>
         <Apparait delai={0.1}>
-          <p className="text-[14px] font-medium text-[#8aa4a8] xl:text-[18px]">{c.apropos.surtitre}</p>
-          <h2 className="mt-1 text-balance text-[24px] font-semibold leading-[1.2] text-[#164951] xl:text-[36px] xl:leading-[49px]">{c.apropos.titre}</h2>
-          <p className="mt-4 whitespace-pre-line text-[15px] font-medium leading-[1.6] text-[#8aa4a8] xl:text-[16px]">{c.apropos.texte}</p>
+          <p className="a-surtitre text-[14px] font-medium text-[var(--a-muted)] xl:text-[18px]">{c.apropos.surtitre}</p>
+          <h2 className="mt-1 text-balance text-[24px] font-semibold leading-[1.2] text-[var(--a-ink)] xl:text-[36px] xl:leading-[49px]">{c.apropos.titre}</h2>
+          <p className="mt-4 whitespace-pre-line text-[15px] font-medium leading-[1.6] text-[var(--a-muted)] xl:text-[16px]">{c.apropos.texte}</p>
           <ul className="mt-6 flex flex-col gap-[7px]">
             {[...new Set(c.services.map((s) => s.method).filter(Boolean))].slice(0, 4).map((m) => (
-              <li key={m} className="flex gap-2 text-[14px] leading-5 text-[#6b8186]">
+              <li key={m} className="flex gap-2 text-[14px] leading-5 text-[var(--a-soft)]">
                 <Check className="mt-0.5 h-[15px] w-[15px] shrink-0 text-[#6eb382]" />
                 {m}
               </li>
@@ -634,14 +638,14 @@ export function ProfilPortrait({ c }: P) {
 export function AccompagnementsCartes({ c }: P) {
   return (
     <Section id="accompagnements">
-      <Titre surtitre="Accompagnements" titre="Ce que je vous propose" />
+      <Titre surtitre="Accompagnements" titre={<>Ce que je vous <em>propose</em></>} />
       <ul className="grid gap-6 [grid-template-columns:repeat(auto-fit,minmax(280px,1fr))]">
         {c.services.map((s, i) => (
           <li key={s.id}>
             <Apparait delai={(i % 3) * 0.08} className="h-full">
               <a
                 href={c.rdv}
-                className="group flex h-full flex-col gap-3 rounded-[24px] bg-[#f2f3f4] p-8 transition-[transform,box-shadow] duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(22,73,81,0.1)]"
+                className="group flex h-full flex-col gap-3 rounded-[var(--a-r-bloc)] bg-[var(--a-block)] p-8 transition-[transform,box-shadow] duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(var(--a-ombre),0.1)]"
               >
                 <div className="flex items-center justify-between">
                   {s.group ? <Etiquette ton="cyan">{s.group.label}</Etiquette> : <span />}
@@ -652,10 +656,10 @@ export function AccompagnementsCartes({ c }: P) {
                     </Etiquette>
                   )}
                 </div>
-                {s.media && <Photo media={s.media} sizes="(max-width: 640px) 100vw, 360px" className="mt-2 aspect-[16/10] rounded-[10px]" />}
-                <h3 className="mt-2 text-[24px] font-semibold leading-[1.2] text-[#164951]">{s.title}</h3>
-                <p className="line-clamp-3 text-[15px] font-medium leading-[1.5] text-[#8aa4a8]">{sansEtoiles(s.excerpt)}</p>
-                <span className="mt-auto inline-flex items-center gap-1.5 pt-2 text-[14px] font-semibold text-[#164951]">
+                {s.media && <Photo media={s.media} sizes="(max-width: 640px) 100vw, 360px" className="a-arche-large mt-2 aspect-[16/10] rounded-[var(--a-r-carte)]" />}
+                <h3 className="mt-2 text-[24px] font-semibold leading-[1.2] text-[var(--a-ink)]">{s.title}</h3>
+                <p className="line-clamp-3 text-[15px] font-medium leading-[1.5] text-[var(--a-muted)]">{sansEtoiles(s.excerpt)}</p>
+                <span className="mt-auto inline-flex items-center gap-1.5 pt-2 text-[14px] font-semibold text-[var(--a-ink)]">
                   Prendre rendez-vous
                   <ArrowRight className="h-4 w-4 transition-transform duration-[350ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-[5px]" />
                 </span>
@@ -673,23 +677,23 @@ export function AccompagnementsCartes({ c }: P) {
 export function AccompagnementsVitrine({ c }: P) {
   return (
     <Section id="accompagnements">
-      <Titre surtitre="Accompagnements" titre="Ce que je vous propose" />
+      <Titre surtitre="Accompagnements" titre={<>Ce que je vous <em>propose</em></>} />
       <div className="flex flex-col gap-8">
         {c.services.map((s, i) => (
           <Apparait key={s.id}>
-            <article className="group grid items-center gap-8 overflow-hidden rounded-[24px] bg-[radial-gradient(70%_90%_at_85%_50%,rgba(255,255,255,0.6),transparent_70%),#f2f3f4] px-6 pt-7 md:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] md:py-11 md:pl-12 md:pr-0">
+            <article className="group grid items-center gap-8 overflow-hidden rounded-[var(--a-r-bloc)] bg-[radial-gradient(70%_90%_at_85%_50%,rgba(255,255,255,0.6),transparent_70%),var(--a-block)] px-6 pt-7 md:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] md:py-11 md:pl-12 md:pr-0">
               <div className="flex flex-col items-start gap-3">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="grid h-[52px] w-[52px] place-items-center rounded-[12px] text-[18px] font-bold text-white" style={{ background: i % 2 ? '#176c79' : '#164951' }}>
+                  <span className="grid h-[52px] w-[52px] place-items-center rounded-[12px] text-[18px] font-bold text-white" style={{ background: i % 2 ? 'var(--a-accent)' : 'var(--a-ink)' }}>
                     {s.title.charAt(0)}
                   </span>
                   {s.group && <Etiquette ton="cyan">{s.group.label}</Etiquette>}
                   {s.method && <Etiquette>{s.method}</Etiquette>}
                 </div>
-                <h3 className="text-[32px] font-bold leading-[38px] tracking-[-0.01em] text-[#164951] md:text-[40px] md:leading-[46px]">{s.title}</h3>
-                <p className="max-w-[46ch] text-[15px] font-medium leading-[1.5] text-[#8aa4a8]">{sansEtoiles(s.excerpt)}</p>
+                <h3 className="text-[32px] font-bold leading-[38px] tracking-[-0.01em] text-[var(--a-ink)] md:text-[40px] md:leading-[46px]">{s.title}</h3>
+                <p className="max-w-[46ch] text-[15px] font-medium leading-[1.5] text-[var(--a-muted)]">{sansEtoiles(s.excerpt)}</p>
                 {s.duration && (
-                  <p className="flex items-center gap-1.5 text-[13px] font-medium text-[#8aa4a8]">
+                  <p className="flex items-center gap-1.5 text-[13px] font-medium text-[var(--a-muted)]">
                     <Clock className="h-3.5 w-3.5" />
                     {s.duration}
                   </p>
@@ -702,12 +706,12 @@ export function AccompagnementsVitrine({ c }: P) {
                 </div>
               </div>
               <div className="relative md:h-full md:min-h-[300px]">
-                <div className="overflow-hidden rounded-t-[10px] bg-white shadow-[0_30px_80px_rgba(22,73,81,0.16)] transition-transform duration-[800ms] ease-[cubic-bezier(0.22,1,0.36,1)] md:absolute md:left-0 md:top-1/2 md:w-[520px] md:rounded-[10px] md:[transform:translateY(-50%)_perspective(1200px)_rotateY(-8deg)] md:group-hover:[transform:translateY(-50%)_perspective(1200px)_rotateY(-2deg)_translateX(-8px)]">
-                  <div className="flex items-center gap-[5px] border-b border-[#eef1f2] px-3 py-[9px]">
-                    <span className="h-2 w-2 rounded-full bg-[#e2e6e7]" />
-                    <span className="h-2 w-2 rounded-full bg-[#e2e6e7]" />
-                    <span className="h-2 w-2 rounded-full bg-[#e2e6e7]" />
-                    <span className="ml-2.5 rounded-[4px] bg-[#f4f6f6] px-2.5 py-0.5 text-[10px] text-[#8aa4a8]">anasawi.fr/{s.slug}</span>
+                <div className="overflow-hidden rounded-t-[10px] bg-white shadow-[0_30px_80px_rgba(var(--a-ombre),0.16)] transition-transform duration-[800ms] ease-[cubic-bezier(0.22,1,0.36,1)] md:absolute md:left-0 md:top-1/2 md:w-[520px] md:rounded-[var(--a-r-carte)] md:[transform:translateY(-50%)_perspective(1200px)_rotateY(-8deg)] md:group-hover:[transform:translateY(-50%)_perspective(1200px)_rotateY(-2deg)_translateX(-8px)]">
+                  <div className="flex items-center gap-[5px] border-b border-[var(--a-line-soft)] px-3 py-[9px]">
+                    <span className="h-2 w-2 rounded-full bg-[var(--a-line-soft)]" />
+                    <span className="h-2 w-2 rounded-full bg-[var(--a-line-soft)]" />
+                    <span className="h-2 w-2 rounded-full bg-[var(--a-line-soft)]" />
+                    <span className="ml-2.5 rounded-[4px] bg-[var(--a-line-soft)] px-2.5 py-0.5 text-[10px] text-[var(--a-muted)]">anasawi.fr/{s.slug}</span>
                   </div>
                   {s.media ? (
                     <Photo media={s.media} sizes="520px" className="aspect-[16/10]" />
@@ -734,7 +738,7 @@ export function Questions({ c }: P) {
   if (!c.faq.length) return null
   return (
     <Section id="questions" etroite>
-      <Titre surtitre="Questions fréquentes" titre="Avant de venir" serre />
+      <Titre surtitre="Questions fréquentes" titre={<>Avant de <em>venir</em></>} serre />
       <Apparait>
         <Accordeon faq={c.faq} />
       </Apparait>
@@ -748,7 +752,7 @@ export function QuestionsDefile({ c }: P) {
   if (!c.faq.length) return null
   return (
     <section id="questions" className="scroll-mt-24 overflow-x-clip pb-14 pt-24 xl:py-24">
-      <Titre surtitre="Questions fréquentes" titre="Ce qu’on me demande souvent" serre />
+      <Titre surtitre="Questions fréquentes" titre={<>Ce qu’on me demande <em>souvent</em></>} serre />
       <div className="overflow-hidden [mask-image:linear-gradient(to_right,transparent_0%,#000_10%,#000_90%,transparent_100%)]">
         <div className="flex w-max py-5 motion-safe:animate-[q-defile_70s_linear_infinite] hover:[animation-play-state:paused]">
           {[0, 1].map((tour) => (
@@ -759,9 +763,9 @@ export function QuestionsDefile({ c }: P) {
                     <span className="grid h-16 w-16 shrink-0 place-items-center rounded-full" style={{ background: pastel(i).bg, color: pastel(i).fg }}>
                       <MessageCircle className="h-[26px] w-[26px]" />
                     </span>
-                    <span className="text-[18px] font-semibold leading-[1.25] text-[#164951]">{f.question}</span>
+                    <span className="text-[18px] font-semibold leading-[1.25] text-[var(--a-ink)]">{f.question}</span>
                   </div>
-                  <p className="line-clamp-6 text-[14px] font-medium leading-[1.6] text-[#8aa4a8]">{sansEtoiles(f.answer)}</p>
+                  <p className="line-clamp-6 text-[14px] font-medium leading-[1.6] text-[var(--a-muted)]">{sansEtoiles(f.answer)}</p>
                 </li>
               ))}
             </ul>
@@ -780,8 +784,8 @@ export function Appel({ c }: P) {
   return (
     <section className="px-10 pb-24 pt-10 xl:py-[100px]">
       <Apparait className="flex flex-col items-center gap-2 text-center">
-        <p className="text-[16px] font-medium leading-[1.2] text-[#8aa4a8] xl:text-[18px]">Pas encore décidé ?</p>
-        <h2 className="text-balance text-[24px] font-semibold leading-[49px] text-[#164951] xl:text-[36px]">{c.citation.texte}</h2>
+        <p className="a-surtitre text-[16px] font-medium leading-[1.2] text-[var(--a-muted)] xl:text-[18px]">Pas encore décidé ?</p>
+        <h2 className="text-balance text-[24px] font-semibold leading-[49px] text-[var(--a-ink)] xl:text-[36px]">{c.citation.texte}</h2>
         <Bouton href={c.rdv} className="mt-10">
           <CalendarDays />
           Prendre rendez-vous
@@ -798,7 +802,7 @@ export function Appel({ c }: P) {
 export function Contact({ c }: P) {
   return (
     <Section id="contact" etroite>
-      <Titre surtitre="Contact" titre="Écrivez-moi" sous="Je réponds personnellement, en général sous 48 heures." serre />
+      <Titre surtitre="Contact" titre={<>Écrivez-<em>moi</em></>} sous="Je réponds personnellement, en général sous 48 heures." serre />
       <Apparait>
         <div className="mb-6 flex flex-wrap justify-center gap-2">
           {c.telephone && (
@@ -832,23 +836,23 @@ export function Contact({ c }: P) {
 export function ContactBloc({ c }: P) {
   return (
     <Section id="contact">
-      <Titre surtitre="Contact" titre="Prenons le temps d’en parler" serre />
+      <Titre surtitre="Contact" titre={<>Prenons le temps d’en <em>parler</em></>} serre />
       <Apparait>
-        <div className="grid gap-6 rounded-[24px] bg-[#f2f3f4] p-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-12 lg:p-12">
+        <div className="grid gap-6 rounded-[var(--a-r-bloc)] bg-[var(--a-block)] p-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-12 lg:p-12">
           <div className="flex flex-col gap-5">
             <div>
-              <h3 className="text-[24px] font-semibold leading-[1.2] text-[#164951]">{c.nom}</h3>
-              <p className="mt-1 text-[15px] font-medium text-[#8aa4a8]">{c.metier}</p>
+              <h3 className="text-[24px] font-semibold leading-[1.2] text-[var(--a-ink)]">{c.nom}</h3>
+              <p className="mt-1 text-[15px] font-medium text-[var(--a-muted)]">{c.metier}</p>
             </div>
             <Faits c={c} />
             {c.horaires.length > 0 && (
-              <div className="rounded-[10px] bg-white p-5 shadow-[var(--q-shadow-quote)]">
-                <p className="mb-3 text-[15px] font-semibold text-[#164951]">Horaires</p>
+              <div className="rounded-[var(--a-r-carte)] bg-white p-5 shadow-[var(--q-shadow-quote)]">
+                <p className="mb-3 text-[15px] font-semibold text-[var(--a-ink)]">Horaires</p>
                 <dl className="grid gap-1.5 text-[13px]">
                   {c.horaires.map((h) => (
                     <div key={h.day} className="flex justify-between gap-4">
-                      <dt className="font-medium text-[#164951]">{h.day}</dt>
-                      <dd className="font-medium text-[#8aa4a8]">{h.hours}</dd>
+                      <dt className="font-medium text-[var(--a-ink)]">{h.day}</dt>
+                      <dd className="font-medium text-[var(--a-muted)]">{h.hours}</dd>
                     </div>
                   ))}
                 </dl>
@@ -867,9 +871,9 @@ export function ContactBloc({ c }: P) {
    PIED DE PAGE — pétrole, logo-mot en grand, deux colonnes de liens.
    ══════════════════════════════════════════════════════════════════════ */
 
-export function PiedDePage({ c, liens }: P & { liens: { href: string; label: string }[] }) {
+export function PiedDePage({ c, liens, base = '/qeeps' }: P & { liens: { href: string; label: string }[]; base?: string }) {
   return (
-    <footer className="bg-[#164951] p-16 text-white">
+    <footer className="bg-[var(--a-ink)] p-16 text-white">
       <div className="mx-auto grid max-w-[1000px] gap-12 xl:grid-cols-[1fr_223px]">
         <div className="flex flex-col gap-2.5 xl:pt-1.5">
           <LogoMot nom="Anasawi" clair className="text-[44px] leading-[48px]" />
@@ -901,7 +905,7 @@ export function PiedDePage({ c, liens }: P & { liens: { href: string; label: str
       </div>
       <p className="mx-auto mt-6 max-w-[1000px] text-center text-[14px] font-medium leading-[21px] tracking-[-0.5px] text-white/60">
         © {new Date().getFullYear()} {c.nom} ·{' '}
-        <Link href="/qeeps/modeles" className="underline-offset-2 hover:underline">
+        <Link href={`${base}/modeles`} className="underline-offset-2 hover:underline">
           Démonstration — toutes les variantes
         </Link>
       </p>

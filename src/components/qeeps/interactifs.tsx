@@ -61,7 +61,7 @@ export function Apparait({
 }
 
 /* ══════════════════════════════════════════════════════════════════════
-   La barre du haut de byqeeps.com : 80 px, fond #f8f8f8, logo-mot, liens
+   La barre du haut de byqeeps.com : 80 px, fond var(--a-nav), logo-mot, liens
    soulignés au survol et pour la section lue, deux boutons à droite.
    Sous 1200 px : 64 px et un menu qui se déroule en panneau arrondi.
    ══════════════════════════════════════════════════════════════════════ */
@@ -99,7 +99,7 @@ export function BarreSite({
       onClick={() => setOuvert(false)}
       aria-current={actif === l.href ? 'location' : undefined}
       className={cn(
-        'text-[15px] font-medium leading-[30px] tracking-[-0.01em] text-[#164951] underline-offset-[3px] hover:underline',
+        'text-[15px] font-medium leading-[30px] tracking-[-0.01em] text-[var(--a-ink)] underline-offset-[3px] hover:underline',
         actif === l.href && 'underline',
       )}
     >
@@ -112,9 +112,9 @@ export function BarreSite({
       <div
         aria-hidden="true"
         className={cn(
-          'absolute inset-x-0 top-0 bg-[#f8f8f8] transition-[height,border-radius,box-shadow] duration-[450ms] ease-[cubic-bezier(0.44,0,0.56,1)]',
+          'absolute inset-x-0 top-0 bg-[var(--a-nav)] transition-[height,border-radius,box-shadow] duration-[450ms] ease-[cubic-bezier(0.44,0,0.56,1)]',
           'h-16 xl:h-20',
-          ouvert && 'max-xl:h-[197px] max-xl:rounded-b-[16px] max-xl:shadow-[0_12px_30px_rgba(22,73,81,0.08),0_2px_6px_rgba(22,73,81,0.04)]',
+          ouvert && 'max-xl:h-[197px] max-xl:rounded-b-[16px] max-xl:shadow-[0_12px_30px_rgba(var(--a-ombre),0.08),0_2px_6px_rgba(var(--a-ombre),0.04)]',
         )}
       />
       <div className="relative flex h-16 items-center justify-between gap-4 pl-5 pr-2.5 xl:h-20 xl:py-5 xl:pl-[50px] xl:pr-5">
@@ -143,13 +143,13 @@ export function BarreSite({
         >
           <i
             className={cn(
-              'absolute left-3 h-0.5 w-5 rounded-[10px] bg-[#999] transition-[transform,top] duration-[350ms] ease-[cubic-bezier(0.44,0,0.56,1)]',
+              'absolute left-3 h-0.5 w-5 rounded-[var(--a-r-carte)] bg-[#999] transition-[transform,top] duration-[350ms] ease-[cubic-bezier(0.44,0,0.56,1)]',
               ouvert ? 'top-[21px] rotate-45' : 'top-4',
             )}
           />
           <i
             className={cn(
-              'absolute left-3 h-0.5 w-5 rounded-[10px] bg-[#999] transition-[transform,top] duration-[350ms] ease-[cubic-bezier(0.44,0,0.56,1)]',
+              'absolute left-3 h-0.5 w-5 rounded-[var(--a-r-carte)] bg-[#999] transition-[transform,top] duration-[350ms] ease-[cubic-bezier(0.44,0,0.56,1)]',
               ouvert ? 'top-[21px] -rotate-45' : 'top-[27px]',
             )}
           />
@@ -220,21 +220,21 @@ export function Accordeon({ faq }: { faq: FaqItem[] }) {
             key={f.id}
             className={cn(
               'rounded-[20px] transition-[background-color,box-shadow] duration-500',
-              open ? 'bg-white shadow-[var(--q-shadow-quote)]' : 'bg-[#f2f3f4]',
+              open ? 'bg-white shadow-[var(--q-shadow-quote)]' : 'bg-[var(--a-block)]',
             )}
           >
             <button
               type="button"
               onClick={() => setOuverte(open ? null : f.id)}
               aria-expanded={open}
-              className="flex w-full items-center gap-4 rounded-[20px] px-6 py-5 text-left focus-visible:outline-2 focus-visible:outline-[#176c79]"
+              className="flex w-full items-center gap-4 rounded-[20px] px-6 py-5 text-left focus-visible:outline-2 focus-visible:outline-[var(--a-accent)]"
             >
-              <span className="min-w-0 flex-1 text-[16px] font-semibold leading-[1.35] text-[#164951] xl:text-[18px]">{f.question}</span>
+              <span className="min-w-0 flex-1 text-[16px] font-semibold leading-[1.35] text-[var(--a-ink)] xl:text-[18px]">{f.question}</span>
               <span
                 aria-hidden="true"
                 className={cn(
                   'grid h-8 w-8 shrink-0 place-items-center rounded-full transition-[transform,background-color,color] duration-300',
-                  open ? 'rotate-45 bg-[#164951] text-white' : 'bg-white text-[#164951]',
+                  open ? 'rotate-45 bg-[var(--a-ink)] text-white' : 'bg-white text-[var(--a-ink)]',
                 )}
               >
                 <Plus className="h-4 w-4" />
@@ -242,7 +242,7 @@ export function Accordeon({ faq }: { faq: FaqItem[] }) {
             </button>
             <div className={cn('grid transition-[grid-template-rows] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]', open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]')}>
               <div className="overflow-hidden">
-                <p className="whitespace-pre-line px-6 pb-6 text-[15px] font-medium leading-[1.6] text-[#8aa4a8]">
+                <p className="whitespace-pre-line px-6 pb-6 text-[15px] font-medium leading-[1.6] text-[var(--a-muted)]">
                   {f.answer.replace(/\*/g, '')}
                 </p>
               </div>
@@ -260,8 +260,8 @@ export function Accordeon({ faq }: { faq: FaqItem[] }) {
    ══════════════════════════════════════════════════════════════════════ */
 
 const CHAMP =
-  'h-11 w-full rounded-[8px] border border-[#e1e6e7] bg-white px-3.5 text-[15px] text-[#164951] outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-[#8aa4a8] focus:border-[#176c79] focus:shadow-[0_0_0_4px_#ddf7f7]'
-const LIBELLE = 'flex flex-col gap-1.5 text-[14px] font-medium text-[#164951]'
+  'h-11 w-full rounded-[var(--a-r-champ)] border border-[var(--a-line)] bg-white px-3.5 text-[15px] text-[var(--a-ink)] outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-[var(--a-muted)] focus:border-[var(--a-accent)] focus:shadow-[0_0_0_4px_var(--a-tint)]'
+const LIBELLE = 'flex flex-col gap-1.5 text-[14px] font-medium text-[var(--a-ink)]'
 
 export function FormulaireContact({ className }: { className?: string }) {
   const [etat, setEtat] = useState<'repos' | 'envoi' | 'ok' | 'erreur'>('repos')
@@ -297,18 +297,18 @@ export function FormulaireContact({ className }: { className?: string }) {
 
   if (etat === 'ok') {
     return (
-      <div className={cn('flex flex-col items-center justify-center gap-2 rounded-[10px] bg-white p-10 text-center shadow-[var(--q-shadow-card)]', className)}>
+      <div className={cn('flex flex-col items-center justify-center gap-2 rounded-[var(--a-r-carte)] bg-white p-10 text-center shadow-[var(--q-shadow-card)]', className)}>
         <span className="mb-2 grid h-12 w-12 place-items-center rounded-full bg-[#d1ede0] text-[#3d8a56]">
           <Check className="h-5 w-5" />
         </span>
-        <p className="text-[24px] font-semibold text-[#164951]">Message envoyé</p>
-        <p className="max-w-[36ch] text-[15px] font-medium text-[#8aa4a8]">Merci. Je vous réponds personnellement, en général sous 48 heures.</p>
+        <p className="text-[24px] font-semibold text-[var(--a-ink)]">Message envoyé</p>
+        <p className="max-w-[36ch] text-[15px] font-medium text-[var(--a-muted)]">Merci. Je vous réponds personnellement, en général sous 48 heures.</p>
       </div>
     )
   }
 
   return (
-    <form onSubmit={envoyer} className={cn('flex flex-col gap-4 rounded-[10px] bg-white p-6 shadow-[var(--q-shadow-card)] sm:p-8', className)}>
+    <form onSubmit={envoyer} className={cn('flex flex-col gap-4 rounded-[var(--a-r-carte)] bg-white p-6 shadow-[var(--q-shadow-card)] sm:p-8', className)}>
       <div className="grid gap-4 sm:grid-cols-2">
         <label className={LIBELLE}>
           Nom
@@ -329,8 +329,8 @@ export function FormulaireContact({ className }: { className?: string }) {
       </label>
       {/* Champ piège : invisible pour un humain. */}
       <input name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" />
-      <label className="flex items-start gap-2.5 text-[13px] font-medium leading-[1.5] text-[#8aa4a8]">
-        <input name="consent" type="checkbox" required className="mt-0.5 h-4 w-4 accent-[#164951]" />
+      <label className="flex items-start gap-2.5 text-[13px] font-medium leading-[1.5] text-[var(--a-muted)]">
+        <input name="consent" type="checkbox" required className="mt-0.5 h-4 w-4 accent-[var(--a-ink)]" />
         J’accepte que mes coordonnées servent uniquement à me répondre.
       </label>
       {message && (

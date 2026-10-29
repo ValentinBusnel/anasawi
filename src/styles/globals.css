@@ -498,7 +498,11 @@
   }
   :root:has(.qeeps-da),
   :root:has(.qeeps-da) body {
-    background: #f7f7f7;
+    background: var(--a-bg-racine, #f7f7f7);
+  }
+  :root:has(.anasawi-da),
+  :root:has(.anasawi-da) body {
+    --a-bg-racine: #fbf8f2;
   }
 
   /* Focus visible dédié — jamais outline:none */
@@ -680,6 +684,33 @@
    /qeeps — jetons du site vitrine de Qeeps (relevés sur byqeeps.com)
    ══════════════════════════════════════════════════════════════════════ */
 .qeeps-da {
+  /* Couleurs — Qeeps (byqeeps.com). */
+  --a-ink: #164951;
+  --a-accent: #176c79;
+  --a-muted: #8aa4a8;
+  --a-soft: #6b8186;
+  --a-bg: #f7f7f7;
+  --a-nav: #f8f8f8;
+  --a-block: #f2f3f4;
+  --a-block-2: #d7e0e1;
+  --a-line: #e1e6e7;
+  --a-line-soft: #eef1f2;
+  --a-tint: #ddf7f7;
+  --a-ombre: 22, 73, 81;
+  --a-glow: rgba(33, 139, 156, 0.16);
+  --a-p0-bg: #ddf7f7; --a-p0-fg: #176c79;
+  --a-p1-bg: #d1ede0; --a-p1-fg: #2f7d55;
+  --a-p2-bg: #f3dde2; --a-p2-fg: #a4475f;
+  --a-p3-bg: #f6e9d3; --a-p3-fg: #94681f;
+  --a-p4-bg: #e6e1f7; --a-p4-fg: #5b4a9e;
+  --a-p5-bg: #dbeafa; --a-p5-fg: #2d5f93;
+  /* Formes. */
+  --a-r-btn: 8px;
+  --a-r-tag: 6px;
+  --a-r-champ: 8px;
+  --a-r-carte: 10px;
+  --a-r-bloc: 24px;
+
   --q-shadow-btn: rgba(0, 0, 0, 0.024) 0 0.15px 0.73px, rgba(0, 0, 0, 0.04) 0 0.66px 1.5px, rgba(0, 0, 0, 0.05) 0 1.62px 3px, rgba(0, 0, 0, 0.06) 0 3.12px 5.87px, rgba(0, 0, 0, 0.075) 0 5.26px 10.8px, rgba(0, 0, 0, 0.1) 0 8.1px 18.4px;
   --q-shadow-card: rgba(0, 0, 0, 0.016) 0 1.85px 3.15px, rgba(0, 0, 0, 0.027) 0 8.15px 6.52px, rgba(0, 0, 0, 0.035) 0 20px 13px, rgba(0, 0, 0, 0.043) 0 38.5px 25.5px, rgba(0, 0, 0, 0.055) 0 64.8px 46.9px, rgba(0, 0, 0, 0.07) 0 100px 80px;
   --q-shadow-quote: rgba(0, 0, 0, 0.18) 0 0.6px 0.6px -1.25px, rgba(0, 0, 0, 0.16) 0 2.29px 2.29px -2.5px, rgba(0, 0, 0, 0.06) 0 10px 10px -3.75px;
@@ -687,9 +718,107 @@
   --q-ease-appear: cubic-bezier(0.02, 0.45, 0.56, 1);
 }
 
+/* ══════════════════════════════════════════════════════════════════════
+   /nouvelle-da — la DA PROPRE d'Anasawi, dans la même mise en page
+   moderne. Ce qui change, et pourquoi :
+   - l'ivoire (#fbf8f2) et le sable de la charte au lieu des gris froids ;
+   - une encre « nuit » (#2e424f) et le bleu profond (#46728a) d'Anasawi,
+     plus un sable doré (#b8935a) en contrepoint, au lieu du pétrole ;
+   - les titres en Cormorant Garamond, légers, avec un mot en italique —
+     la voix d'Anne, posée — et le texte en Karla ;
+   - des boutons en pilule et des étiquettes arrondies : rien d'anguleux ;
+   - l'ARCHE de la charte sur les photos (portrait, cabinet) ;
+   - des ombres chaudes (brun très léger) au lieu du noir.
+   ══════════════════════════════════════════════════════════════════════ */
+.anasawi-da {
+  --a-ink: #2e424f;
+  --a-accent: #46728a;
+  --a-muted: #7d7a72;
+  --a-soft: #5f635e;
+  --a-bg: #fbf8f2;
+  --a-nav: #fbf8f2;
+  --a-block: #f4eee3;
+  --a-block-2: #eae2d2;
+  --a-line: #e7dfd0;
+  --a-line-soft: #efe8db;
+  --a-tint: #eaf1f4;
+  --a-ombre: 66, 52, 30;
+  --a-glow: rgba(184, 147, 90, 0.2);
+  --a-p0-bg: #eaf1f4; --a-p0-fg: #46728a;
+  --a-p1-bg: #f1e6d3; --a-p1-fg: #8c6a35;
+  --a-p2-bg: #e5ece1; --a-p2-fg: #55704f;
+  --a-p3-bg: #f3e1db; --a-p3-fg: #9a5a48;
+  --a-p4-bg: #e9e5ef; --a-p4-fg: #66597f;
+  --a-p5-bg: #e6eef0; --a-p5-fg: #3e6a73;
+  --a-r-btn: 999px;
+  --a-r-tag: 999px;
+  --a-r-champ: 14px;
+  --a-r-carte: 18px;
+  --a-r-bloc: 32px;
+
+  --q-shadow-btn: 0 1px 2px rgba(66, 52, 30, 0.06), 0 6px 16px -6px rgba(66, 52, 30, 0.18);
+  --q-shadow-card: 0 2px 4px rgba(66, 52, 30, 0.03), 0 18px 40px -12px rgba(66, 52, 30, 0.14), 0 60px 90px -40px rgba(66, 52, 30, 0.16);
+  --q-shadow-quote: 0 1px 2px rgba(66, 52, 30, 0.08), 0 10px 24px -10px rgba(66, 52, 30, 0.16);
+  --q-shadow-hero: 0 -40px 80px -50px rgba(66, 52, 30, 0.35);
+
+  font-family: var(--font-karla), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* La voix d'Anne : des titres en Cormorant, légers, un peu plus grands
+   (à corps égal, Cormorant paraît plus petit que Poppins). */
+.anasawi-da :is(h1, h2, h3),
+.anasawi-da .a-titre {
+  font-family: var(--font-cormorant), Georgia, serif !important;
+  font-weight: 400 !important;
+  letter-spacing: -0.01em !important;
+  font-size-adjust: 0.5;
+  line-height: 1.08 !important;
+}
+.anasawi-da :is(h1, h2) em,
+.anasawi-da .a-italique {
+  font-style: italic;
+  color: var(--a-accent);
+}
+.anasawi-da .a-logo {
+  font-family: var(--font-cormorant), Georgia, serif;
+  font-weight: 500;
+  font-style: italic;
+  font-size-adjust: 0.5;
+  letter-spacing: 0;
+}
+.anasawi-da .a-logo > span {
+  color: #b8935a;
+}
+/* Les surtitres en petites capitales espacées, couleur sable doré. */
+.anasawi-da .a-surtitre {
+  font-size: 12px !important;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #a07f4c !important;
+}
+/* Dans la DA Qeeps, `em` ne penche pas ; chez Anasawi, le mot en
+   italique garde sa couleur même dans un titre en dégradé. */
+.qeeps-da em {
+  font-style: normal;
+}
+.anasawi-da em {
+  font-style: italic;
+}
+.anasawi-da .q-degrade em {
+  -webkit-text-fill-color: var(--a-accent);
+}
+
+/* L'arche de la charte. */
+.anasawi-da .a-arche {
+  border-radius: 999px 999px 18px 18px !important;
+}
+.anasawi-da .a-arche-large {
+  border-radius: 220px 220px 14px 14px / 160px 160px 14px 14px !important;
+}
+
 /* Le titre en dégradé pétrole (« Développeur Full Stack » de la candidature). */
 @utility q-degrade {
-  background-image: linear-gradient(661deg, #164951 0%, #176c79 100%);
+  background-image: linear-gradient(661deg, var(--a-ink, #164951) 0%, var(--a-accent, #176c79) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
