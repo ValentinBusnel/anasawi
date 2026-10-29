@@ -10,7 +10,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 
-import { ESPACES, espaceDe, estCourant } from './spaces'
+import { ESPACES, estCourant } from './spaces'
 import { LogoMark } from '@/components/site/Logo'
 import { cn } from '@/lib/utils'
 import { signOutAction } from '@/server/actions/auth'
@@ -78,7 +78,9 @@ function Espaces({ nonLus }: { nonLus: number }) {
           style={{
             left: indicateur.left,
             width: indicateur.width,
-            background: `color-mix(in srgb, ${espaceDe(pathname).tone.bg} 40%, white)`,
+            /* Une seule teinte pour toute la barre, quel que soit l'onglet :
+               le pastel par espace changeait de couleur à chaque clic. */
+            background: 'color-mix(in srgb, #ddf7f7 40%, white)',
           }}
         />
       )}
@@ -104,7 +106,7 @@ function Espaces({ nonLus }: { nonLus: number }) {
             >
               <Icone
                 className="h-4 w-4 shrink-0 transition-colors duration-300 max-lg:h-[19px] max-lg:w-[19px]"
-                style={actif ? { color: espace.tone.fg } : undefined}
+                style={actif ? { color: '#176c79' } : undefined}
                 strokeWidth={1.8}
               />
               {/* Le nom : en entier sur ordinateur, sous l'icône sur
