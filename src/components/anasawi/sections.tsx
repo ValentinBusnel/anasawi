@@ -65,7 +65,7 @@ export function SectionSeuil({ c }: P) {
 
 /* ── Respiration ────────────────────────────────────────────────────── */
 
-export function Respiration({ c }: P) {
+export function Respiration(_: P) {
   return (
     <section className="relative overflow-hidden bg-[var(--ad-sable)] py-24 md:py-32">
       <div className="mx-auto grid max-w-[1200px] items-center gap-16 px-[5vw] md:grid-cols-2">
