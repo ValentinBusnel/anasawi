@@ -941,6 +941,16 @@ export function Fil({ liens, rdv, logo }: { liens: { href: string; label: string
   const [serre, setSerre] = useState(false)
   const [ouvert, setOuvert] = useState(false)
   const [actif, setActif] = useState<string | null>(null)
+  const [survol, setSurvol] = useState<string | null>(null)
+  const navRef = useRef<HTMLElement>(null)
+  const [pastille, setPastille] = useState<{ left: number; width: number } | null>(null)
+  /* La pastille glisse sous le lien survolé, sinon sous celui de la
+     section qu'on lit — avec un léger rebond à l'arrivée. */
+  const cible = survol ?? actif
+  useLayoutEffect(() => {
+    const a = cible ? navRef.current?.querySelector<HTMLElement>(`a[href="${cible}"]`) : null
+    setPastille(a ? { left: a.offsetLeft, width: a.offsetWidth } : null)
+  }, [cible, serre])
   /* Le lien de la section qu'on lit s'allume. */
   useEffect(() => {
     const io = new IntersectionObserver(
@@ -961,6 +971,16 @@ export function Fil({ liens, rdv, logo }: { liens: { href: string; label: string
       image = 0
       const max = document.documentElement.scrollHeight - window.innerHeight
       ref.current?.style.setProperty('--lu', String(max > 0 ? window.scrollY / max : 0))
+      /* L'avancement DANS la section en cours : la pastille se remplit. */
+      let sec = 0
+      for (const l of liens) {
+        const el = document.getElementById(l.href.slice(1))
+        if (!el) continue
+        const r = el.getBoundingClientRect()
+        const milieu = window.innerHeight * 0.5
+        if (r.top <= milieu && r.bottom > milieu) sec = (milieu - r.top) / r.height
+      }
+      ref.current?.style.setProperty('--sec', String(Math.min(1, Math.max(0, sec))))
       setSerre(window.scrollY > 80)
     }
     const demande = () => {
@@ -972,7 +992,7 @@ export function Fil({ liens, rdv, logo }: { liens: { href: string; label: string
       cancelAnimationFrame(image)
       window.removeEventListener('scroll', demande)
     }
-  }, [])
+  }, [liens])
   useEffect(() => {
     document.body.style.overflow = ouvert ? 'hidden' : ''
     return () => {
@@ -986,23 +1006,71 @@ export function Fil({ liens, rdv, logo }: { liens: { href: string; label: string
         <div
           ref={ref}
           className={cn(
-            'pointer-events-auto relative flex items-center gap-2 overflow-hidden rounded-full border border-white/60 bg-white/75 shadow-[0_10px_40px_-20px_rgba(20,35,46,0.3)] backdrop-blur-xl transition-[padding,gap,box-shadow] duration-700 ease-[var(--ad-ease)] [--lu:0]',
-            serre ? 'py-1.5 pl-5 pr-1.5' : 'py-2.5 pl-6 pr-2.5',
+            'pointer-events-auto relative flex items-center gap-2 overflow-hidden rounded-full border border-white/60 bg-white/75 shadow-[0_10px_40px_-20px_rgba(20,35,46,0.3)] backdrop-blur-xl transition-[padding,gap,box-shadow] duration-700 ease-[var(--ad-ease)] [--lu:0] [--sec:0]',
+            serre ? 'py-1.5 pl-2 pr-1.5' : 'py-2 pl-2.5 pr-2.5',
           )}
         >
           <a href="#haut" className="group/logo mr-3 flex items-center gap-2.5 text-[20px] font-bold leading-none tracking-[-0.03em] text-[var(--ad-nuit)]">
-            <LogoMark src={logo} priority className="h-8 w-8 transition-transform duration-700 ease-[var(--ad-ease)] group-hover/logo:rotate-[-12deg]" />
+            {/* Le logo, cerclé d'un anneau qui se dessine à mesure qu'on lit. */}
+            <span className="relative grid h-10 w-10 place-items-center">
+              <svg aria-hidden="true" viewBox="0 0 40 40" className="absolute inset-0 -rotate-90">
+                <defs>
+                  <linearGradient id="ad-anneau" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stopColor="#2f6f93" />
+                    <stop offset="100%" stopColor="#36a39b" />
+                  </linearGradient>
+                </defs>
+                <circle cx="20" cy="20" r="18.5" fill="none" stroke="var(--ad-sable-fonce)" strokeWidth="1.5" />
+                <circle
+                  cx="20"
+                  cy="20"
+                  r="18.5"
+                  fill="none"
+                  stroke="url(#ad-anneau)"
+                  strokeWidth="1.75"
+                  strokeLinecap="round"
+                  pathLength={1}
+                  strokeDasharray="1"
+                  style={{ strokeDashoffset: 'calc(1 - var(--lu))' }}
+                />
+              </svg>
+              <LogoMark src={logo} priority className="h-7 w-7 transition-transform duration-700 ease-[var(--ad-ease)] group-hover/logo:rotate-[-12deg]" />
+            </span>
             <span className={cn('transition-[opacity,max-width] duration-700 ease-[var(--ad-ease)]', serre ? 'max-w-0 opacity-0 md:max-w-[120px] md:opacity-100' : 'max-w-[120px]')}>
               Anasawi<span className="text-[var(--ad-or)]">.</span>
             </span>
           </a>
-          <nav aria-label="Sections" className="flex items-center max-md:hidden">
+          <nav ref={navRef} aria-label="Sections" className="relative flex items-center max-md:hidden" onMouseLeave={() => setSurvol(null)}>
+            {/* La pastille qui glisse d'un lien à l'autre, et qui se
+                remplit d'un dégradé pendant qu'on lit la section. */}
+            <span
+              aria-hidden="true"
+              className={cn(
+                'absolute inset-y-0 overflow-hidden rounded-full bg-[var(--ad-sable)] transition-[left,width,opacity] duration-[650ms] ease-[cubic-bezier(0.34,1.45,0.64,1)]',
+                pastille ? 'opacity-100' : 'opacity-0',
+              )}
+              style={pastille ? { left: pastille.left, width: pastille.width } : { left: 0, width: 0 }}
+            >
+              <span
+                className={cn(
+                  'absolute inset-y-0 left-0 w-full origin-left bg-[linear-gradient(90deg,rgba(47,111,147,0.16),rgba(54,163,155,0.26))] transition-opacity duration-300',
+                  survol && survol !== actif ? 'opacity-0' : 'opacity-100',
+                )}
+                style={{ transform: 'scaleX(var(--sec))' }}
+              />
+            </span>
             {liens.map((l) => (
               <a
                 key={l.href}
                 href={l.href}
+                onMouseEnter={() => setSurvol(l.href)}
+                onFocus={() => setSurvol(l.href)}
+                onBlur={() => setSurvol(null)}
                 aria-current={actif === l.href ? 'location' : undefined}
-                className="relative rounded-full px-3.5 py-2 text-[14px] text-[var(--ad-pierre)] transition-[color,background-color] duration-300 aria-[current=location]:bg-[var(--ad-sable)] aria-[current=location]:text-[var(--ad-nuit)] after:absolute after:inset-x-3.5 after:bottom-1.5 after:h-px after:origin-right after:scale-x-0 after:bg-current after:transition-transform after:duration-500 after:ease-[var(--ad-ease)] hover:text-[var(--ad-nuit)] hover:after:origin-left hover:after:scale-x-100"
+                className={cn(
+                  'relative z-[1] rounded-full px-3.5 py-2 text-[14px] transition-colors duration-300',
+                  cible === l.href ? 'text-[var(--ad-nuit)]' : 'text-[var(--ad-pierre)]',
+                )}
               >
                 {l.label}
               </a>
@@ -1025,8 +1093,6 @@ export function Fil({ liens, rdv, logo }: { liens: { href: string; label: string
           >
             <Menu className="h-4 w-4" />
           </button>
-          {/* Le fil d'or : ce qu'on a lu de la page. */}
-          <span aria-hidden="true" className="absolute inset-x-6 bottom-0 h-[1.5px] origin-left bg-[var(--ad-or)]" style={{ transform: 'scaleX(var(--lu))' }} />
         </div>
       </div>
 
