@@ -38,27 +38,49 @@ function useAvancement<T extends HTMLElement>(mode: 'colle' | 'passage', lisse =
       el.style.setProperty('--e', '0')
       return
     }
+    /*
+     * INERTIE. La valeur affichée ne saute pas à la position de la
+     * molette : elle la rejoint, un peu à chaque image (12 % de l'écart),
+     * comme un objet qui a du poids. C'est ce qui rend le mouvement
+     * soyeux, même avec une molette qui avance par crans.
+     */
+    let cible = 0
+    let affiche = -1
     let image = 0
-    const calcule = () => {
-      image = 0
+    const mesure = () => {
       const r = el.getBoundingClientRect()
       const h = window.innerHeight
-      const p =
-        mode === 'colle'
-          ? -r.top / Math.max(1, r.height - h)
-          : (h - r.top) / (h + r.height)
-      const c = Math.min(1, Math.max(0, p))
-      el.style.setProperty('--p', c.toFixed(4))
+      const p = mode === 'colle' ? -r.top / Math.max(1, r.height - h) : (h - r.top) / (h + r.height)
+      cible = Math.min(1, Math.max(0, p))
+    }
+    const peint = (v: number) => {
+      el.style.setProperty('--p', v.toFixed(4))
       if (lisse) {
         /* Une courbe douce au départ et à l'arrivée. */
-        const e = c < 0.5 ? 4 * c * c * c : 1 - Math.pow(-2 * c + 2, 3) / 2
+        const e = v < 0.5 ? 4 * v * v * v : 1 - Math.pow(-2 * v + 2, 3) / 2
         el.style.setProperty('--e', e.toFixed(4))
       }
     }
-    const demande = () => {
-      if (!image) image = requestAnimationFrame(calcule)
+    const boucle = () => {
+      const ecart = cible - affiche
+      if (Math.abs(ecart) < 0.0004) {
+        affiche = cible
+        peint(affiche)
+        image = 0
+        return
+      }
+      affiche += ecart * 0.12
+      peint(affiche)
+      image = requestAnimationFrame(boucle)
     }
-    calcule()
+    const demande = () => {
+      mesure()
+      if (!image) image = requestAnimationFrame(boucle)
+    }
+    /* Premier rendu : en place tout de suite, sans glissement. */
+    mesure()
+    affiche = cible
+    peint(affiche)
     window.addEventListener('scroll', demande, { passive: true })
     window.addEventListener('resize', demande)
     return () => {
@@ -246,10 +268,10 @@ export function Seuil({
           }}
         >
           <span className="block overflow-hidden pb-[0.06em] md:inline-block">
-            <span className="block motion-safe:animate-[ad-sortir_1.2s_var(--ad-ease)_0.15s_backwards]">{prenom}</span>
+            <span className="block motion-safe:animate-[ad-resserrer_1.6s_var(--ad-ease)_0.15s_backwards]">{prenom}</span>
           </span>{' '}
           <span className="block overflow-hidden pb-[0.06em] md:inline-block">
-            <em className="block motion-safe:animate-[ad-sortir_1.2s_var(--ad-ease)_0.28s_backwards]">{nom}</em>
+            <em className="block motion-safe:animate-[ad-resserrer_1.6s_var(--ad-ease)_0.32s_backwards]">{nom}</em>
           </span>
         </h1>
 
@@ -340,6 +362,7 @@ export function Seuil({
         {/* En bas : les deux actions, et l'invitation à entrer. */}
         <div className="absolute inset-x-0 bottom-6 z-30 flex flex-col items-center gap-5 px-6" style={sEfface}>
           <div className="flex flex-wrap justify-center gap-2 motion-safe:animate-[ad-monter_1.2s_var(--ad-ease)_0.6s_backwards]">
+            <Aimant>
             <a
               href={rdv}
               className="pointer-events-auto group inline-flex items-center gap-2.5 rounded-full bg-[var(--ad-nuit)] py-1.5 pl-5 pr-1.5 text-[14px] font-semibold text-white shadow-[0_14px_30px_-14px_rgba(20,35,46,0.6)]"
@@ -349,6 +372,7 @@ export function Seuil({
                 <ArrowUpRight className="h-3.5 w-3.5" />
               </span>
             </a>
+            </Aimant>
             <a
               href="#accompagnements"
               className="pointer-events-auto inline-flex items-center rounded-full border border-[var(--ad-sable-fonce)] bg-white px-5 text-[14px] font-semibold text-[var(--ad-nuit)] transition-colors hover:border-[var(--ad-nuit)]"
@@ -441,6 +465,11 @@ export function Chemin({ etapes }: { etapes: { titre: string; texte: string }[] 
               aria-hidden="true"
               className="absolute left-[18px] top-1/2 grid h-11 w-11 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-[var(--ad-sable-fonce)] bg-[var(--ad-ivoire)] font-[family-name:var(--ad-titre)] font-semibold tracking-[-0.03em] text-[20px] text-[var(--ad-gris)] md:left-1/2"
             >
+              {/* Le halo d'arrivée : un anneau qui s'élargit quand le trait atteint l'étape. */}
+              <span
+                className="absolute -inset-2 rounded-full border border-[var(--ad-or)]"
+                style={{ transform: `scale(calc(0.7 + ${allume} * 0.4))`, opacity: `calc(${allume} * 0.5)` }}
+              />
               <span
                 className="absolute inset-0 rounded-full bg-[var(--ad-nuit)]"
                 style={{ transform: `scale(${allume})`, opacity: allume }}
@@ -485,7 +514,7 @@ export function Arches({ services, rdv }: { services: ServiceWithMedia[]; rdv: s
             key={s.id}
             onMouseEnter={() => setOuverte(i)}
             className={cn(
-              'group relative overflow-hidden rounded-[28px] transition-[flex-grow,height] duration-[900ms] ease-[var(--ad-ease)]',
+              'group relative overflow-hidden rounded-[28px] transition-[flex-grow,height] duration-[1000ms] ease-[cubic-bezier(0.65,0,0.35,1)]',
               actif ? 'h-[460px] md:h-auto md:flex-[3.4]' : 'h-[120px] md:h-auto md:flex-1',
             )}
             style={{ background: TEINTES[i % TEINTES.length] }}
@@ -683,7 +712,7 @@ export function Conversation({ faq, prenom, portrait }: { faq: FaqItem[]; prenom
       <div className="relative flex min-h-[340px] flex-col rounded-[36px] bg-[var(--ad-sable)] p-6 sm:p-9" aria-live="polite">
         {q && (
           <div key={q.id} className="flex flex-1 flex-col gap-5">
-            <p className="ml-auto max-w-[80%] rounded-[22px] rounded-br-[6px] bg-white px-5 py-3.5 text-[15px] leading-[1.5] text-[var(--ad-nuit)] shadow-[0_8px_24px_-12px_rgba(20,35,46,0.25)] motion-safe:animate-[ad-monter_0.6s_var(--ad-ease)_backwards]">
+            <p className="ml-auto max-w-[80%] rounded-[22px] rounded-br-[6px] bg-white px-5 py-3.5 text-[15px] leading-[1.5] text-[var(--ad-nuit)] shadow-[0_8px_24px_-12px_rgba(20,35,46,0.25)] origin-bottom-right motion-safe:animate-[ad-bulle_0.55s_cubic-bezier(0.34,1.4,0.64,1)_backwards]">
               {q.question}
             </p>
             <div className="flex items-end gap-3">
@@ -697,7 +726,7 @@ export function Conversation({ faq, prenom, portrait }: { faq: FaqItem[]; prenom
                   ))}
                 </span>
               ) : (
-                <p className="max-w-[88%] whitespace-pre-line rounded-[22px] rounded-bl-[6px] bg-[var(--ad-nuit)] px-5 py-4 text-[15px] leading-[1.65] text-white/90 motion-safe:animate-[ad-monter_0.7s_var(--ad-ease)_backwards]">
+                <p className="max-w-[88%] whitespace-pre-line rounded-[22px] rounded-bl-[6px] bg-[var(--ad-nuit)] px-5 py-4 text-[15px] leading-[1.65] text-white/90 origin-bottom-left motion-safe:animate-[ad-bulle_0.6s_cubic-bezier(0.34,1.3,0.64,1)_backwards]">
                   {q.answer.replace(/\*/g, '')}
                 </p>
               )}
@@ -1076,6 +1105,7 @@ export function Fil({ liens, rdv, logo }: { liens: { href: string; label: string
               </a>
             ))}
           </nav>
+          <Aimant force={0.25} className="max-md:hidden">
           <a
             href={rdv}
             className={cn(
@@ -1085,6 +1115,7 @@ export function Fil({ liens, rdv, logo }: { liens: { href: string; label: string
           >
             Rendez-vous
           </a>
+          </Aimant>
           <button
             type="button"
             onClick={() => setOuvert(true)}
@@ -1218,5 +1249,35 @@ export function Souffle() {
         </span>
       </div>
     </div>
+  )
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   L'AIMANT — un bouton qui se laisse attirer par le pointeur, de
+   quelques pixels, et revient en place avec un léger ressort.
+   ══════════════════════════════════════════════════════════════════════ */
+
+export function Aimant({ children, force = 0.3, className }: { children: React.ReactNode; force?: number; className?: string }) {
+  const ref = useRef<HTMLSpanElement>(null)
+  const bouge = (e: React.PointerEvent) => {
+    const el = ref.current
+    if (!el || e.pointerType !== 'mouse' || reduit()) return
+    const r = el.getBoundingClientRect()
+    const x = (e.clientX - (r.left + r.width / 2)) * force
+    const y = (e.clientY - (r.top + r.height / 2)) * force * 1.2
+    el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`
+  }
+  const relache = () => {
+    if (ref.current) ref.current.style.transform = ''
+  }
+  return (
+    <span
+      ref={ref}
+      onPointerMove={bouge}
+      onPointerLeave={relache}
+      className={cn('inline-flex transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] will-change-transform', className)}
+    >
+      {children}
+    </span>
   )
 }

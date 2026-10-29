@@ -937,3 +937,18 @@
     transform: translateY(-10px);
   }
 }
+/* Le nom qui « inspire » : les lettres se resserrent en se précisant. */
+@keyframes ad-resserrer {
+  from {
+    opacity: 0;
+    letter-spacing: 0.14em;
+    filter: blur(10px);
+  }
+}
+/* Une bulle de conversation qui éclot depuis son coin. */
+@keyframes ad-bulle {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.92);
+  }
+}

@@ -1,7 +1,7 @@
 import { ArrowUpRight, Mail, MapPin, Phone } from 'lucide-react'
 import Image from 'next/image'
 
-import { Arches, Chemin, Conversation, Encre, Lettre, Lignes, Promenade, Revele, Semaine, Seuil, Souffle } from './vivant'
+import { Aimant, Arches, Chemin, Conversation, Encre, Lettre, Lignes, Promenade, Revele, Semaine, Seuil, Souffle } from './vivant'
 import type { Contenu } from '@/components/qeeps/donnees'
 import { LogoMark } from '@/components/site/Logo'
 import { cn, toE164 } from '@/lib/utils'
@@ -386,6 +386,7 @@ export function Horizon({ c, liens, base }: P & { liens: { href: string; label: 
           <Lignes lignes={['Prenons', <span key="t" className="text-[var(--ad-or)]">le temps.</span>]} />
         </p>
         <Revele delai={0.3} className="mt-12 flex justify-center">
+          <Aimant>
           <a
             href={c.rdv}
             className="group inline-flex items-center gap-3 rounded-full bg-white py-2 pl-7 pr-2 text-[16px] font-medium text-[var(--ad-nuit)]"
@@ -395,6 +396,7 @@ export function Horizon({ c, liens, base }: P & { liens: { href: string; label: 
               <ArrowUpRight className="h-4 w-4" />
             </span>
           </a>
+          </Aimant>
         </Revele>
         <Revele delai={0.4} className="mt-8 flex flex-wrap justify-center gap-2">
           {c.telephone && (
