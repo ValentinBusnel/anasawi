@@ -5,9 +5,15 @@ import {
   defaultDropAnimationSideEffects,
   DndContext,
   DragOverlay,
+  useDroppable,
   type DropAnimation,
 } from '@dnd-kit/core'
-import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import { GripVertical, HeartHandshake, Layers, Plus } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
@@ -18,13 +24,13 @@ import { useActionForm } from './hooks/useActionForm'
 import { useSortableSensors } from './hooks/useSortableSensors'
 import { PASTELS } from './editor/pastels'
 import { PageHeader } from './PageHeader'
-import { useServiceArrangement } from './services/hooks/useServiceArrangement'
+import { NAV, useServiceArrangement } from './services/hooks/useServiceArrangement'
 import {
   emptyServiceDraft,
   ServiceFormDialog,
   type ServiceDraft,
 } from './services/ServiceFormDialog'
-import { Famille } from './services/ServiceGroup'
+import { Famille, SANS_FAMILLE } from './services/ServiceGroup'
 import { Button } from '@/components/ui/button'
 import { cn, slugify } from '@/lib/utils'
 import {
@@ -345,67 +351,65 @@ export function ServicesManager({
           </div>
         </div>
       ) : (
+        <DndContext
+          /* Identifiant fixe : sans lui, dnd-kit génère un compteur différent
+             côté serveur et côté client (`DndDescribedBy-N`) — erreur
+             d'hydratation React à chaque ouverture de l'écran. */
+          id="services-sortable"
+          sensors={sensors}
+          /* `closestCorners` plutôt que `closestCenter` : avec plusieurs
+             conteneurs, c'est lui qui vise juste près des bordures. */
+          collisionDetection={closestCorners}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+          onDragCancel={handleDragCancel}
+        >
         <div className="bloc-ecran grid gap-2 rounded-[24px] bg-block p-2 lg:grid-cols-[260px_minmax(0,1fr)]">
-          {/* ── Le sommaire ───────────────────────────────────────── */}
+          {/* ── Les titres — les « dossiers » ─────────────────────────
+              On les réordonne en les glissant ICI ; on y dépose aussi un
+              accompagnement tiré de la liste pour le ranger sous ce titre. */}
           <nav aria-label="Titres" className="min-h-0 overflow-y-auto overscroll-contain p-1 [scrollbar-width:thin] lg:p-2">
             <ul className="flex flex-col gap-0.5">
-              {lignes.map((l, index) => {
-                const actif = vueValide === l.cle
-                return (
-                  <li key={l.cle}>
-                    {index === 1 && (
-                      <p className="px-3 pb-1.5 pt-4 text-[13px] font-medium text-[#8aa4a8]">Titres</p>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => setVue(l.cle)}
-                      /* « Afficher… » : jamais le libellé seul — le titre
-                         lui-même, dans la liste, est le bouton qui le renomme. */
-                      aria-label={`Afficher « ${l.label} »`}
-                      aria-current={actif ? 'true' : undefined}
-                      className={cn(
-                        'group flex h-[52px] w-full items-center gap-3 rounded-[14px] px-3 text-left text-[14px] font-medium transition-[background-color,color,box-shadow] duration-[250ms] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                        actif
-                          ? 'bg-white text-foreground shadow-[0_1px_2px_rgba(22,73,81,0.06)]'
-                          : 'text-[#46606c] hover:bg-white/60 hover:text-foreground',
-                      )}
-                    >
-                      <span
-                        aria-hidden="true"
-                        className="grid h-8 w-8 shrink-0 place-items-center rounded-[10px] transition-transform duration-[350ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:scale-[1.06]"
-                        style={{ background: l.tone.bg, color: l.tone.fg }}
-                      >
-                        {l.cle === 'tous' ? (
-                          <Layers className="h-4 w-4" strokeWidth={1.8} />
-                        ) : (
-                          <HeartHandshake className="h-4 w-4" strokeWidth={1.8} />
-                        )}
-                      </span>
-                      <span aria-hidden="true" className="min-w-0 flex-1 truncate">{l.label}</span>
-                      <span aria-hidden="true" className="text-[12px] tabular-nums text-[#8aa4a8]">{l.n}</span>
-                    </button>
-                  </li>
-                )
-              })}
-              <li className="pt-1">
-                <button
-                  type="button"
-                  onClick={() => {
-                    /* Le nouveau titre arrive en bas de la liste entière. */
-                    setVue('tous')
-                    ajouterFamille()
-                  }}
-                  disabled={pending}
-                  className="group/add flex items-center gap-[7px] rounded-[8px] px-3 py-2 text-[13.5px] font-medium text-[#176c79] transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
-                >
-                  <Plus className="h-4 w-4 transition-transform duration-300 group-hover/add:rotate-90" strokeWidth={1.8} />
-                  Ajouter un titre
-                </button>
-              </li>
+              {lignes.slice(0, 1).map((l) => (
+                <LigneTitre key={l.cle} ligne={l} actif={vueValide === l.cle} onOpen={() => setVue(l.cle)} />
+              ))}
             </ul>
+            <p className="px-3 pb-1.5 pt-4 text-[13px] font-medium text-[#8aa4a8]">Titres</p>
+            <SortableContext
+              items={groups.map((g) => `${NAV}${g.id}`)}
+              strategy={verticalListSortingStrategy}
+            >
+              <ul className="flex flex-col gap-0.5">
+                {lignes.slice(1).map((l) => (
+                  <LigneTitre
+                    key={l.cle}
+                    ligne={l}
+                    actif={vueValide === l.cle}
+                    onOpen={() => setVue(l.cle)}
+                    triable={l.cle !== 'seuls'}
+                    glisseEnCours={dragged !== null}
+                  />
+                ))}
+                <li className="pt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      /* Le nouveau titre arrive en bas de la liste entière. */
+                      setVue('tous')
+                      ajouterFamille()
+                    }}
+                    disabled={pending}
+                    className="group/add flex items-center gap-[7px] rounded-[8px] px-3 py-2 text-[13.5px] font-medium text-[#176c79] transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
+                  >
+                    <Plus className="h-4 w-4 transition-transform duration-300 group-hover/add:rotate-90" strokeWidth={1.8} />
+                    Ajouter un titre
+                  </button>
+                </li>
+              </ul>
+            </SortableContext>
           </nav>
 
-          {/* ── La liste, toute entière ───────────────────────────── */}
+          {/* ── La liste ─────────────────────────────────────────────── */}
           <section aria-label="Vos accompagnements" className="flex min-h-0 min-w-0 flex-col overflow-hidden rounded-[20px] bg-white">
             <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-[#eef1f2] px-5 py-4 sm:px-6">
               <h2 key={vueValide} className="text-[16px] font-semibold text-foreground animate-[adm-fade_0.3s_ease_both]">
@@ -413,101 +417,74 @@ export function ServicesManager({
                 <span className="ml-2 text-[13px] font-medium text-[#8aa4a8]">{nVue}</span>
               </h2>
               <p className="text-[13px] text-[#8aa4a8]">
-                {vueValide === 'tous'
-                  ? 'Glissez une ligne pour la déplacer, y compris d’un titre à l’autre'
-                  : 'Glissez une ligne pour changer l’ordre'}
+                Glissez une ligne pour la déplacer — sur un titre à gauche pour l’y ranger
               </p>
             </div>
-            <div
-              className="relative min-h-0 flex-1 overflow-y-auto overscroll-contain p-3 [scrollbar-width:thin] sm:p-4"
-            >
-              <DndContext
-                /* Identifiant fixe : sans lui, dnd-kit génère un compteur différent
-                   côté serveur et côté client (`DndDescribedBy-N`) — erreur
-                   d'hydratation React à chaque ouverture de l'écran. */
-                id="services-sortable"
-                sensors={sensors}
-                /* `closestCorners` plutôt que `closestCenter` : avec plusieurs
-                   conteneurs, c'est lui qui vise juste près des bordures. */
-                collisionDetection={closestCorners}
-                onDragStart={handleDragStart}
-                onDragEnd={handleDragEnd}
-                onDragCancel={handleDragCancel}
-              >
-                <div className="space-y-3">
-                  {/* Deux niveaux de tri imbriqués : les familles entre elles, et
-                      les accompagnements dans chacune. dnd-kit distingue les deux
-                      par l'identifiant saisi au départ du glisser. */}
-                  <SortableContext
-                    items={groupesVisibles.map((g) => g.id)}
-                    strategy={verticalListSortingStrategy}
-                  >
-                    {groupesVisibles.map((group) => (
-                      <div key={group.id} className="animate-[adm-fade_0.3s_ease_both]">
-                        <Famille
-                          group={group}
-                          services={blocs.parFamille.get(group.id) ?? []}
-                          dragged={dragged}
-                          onRename={(label) => renommerFamille(group.id, label)}
-                          onDelete={() => supprimerFamille(group.id)}
-                          onEdit={ouvrirDraft}
-                          onToggle={basculer}
-                          onDeleted={supprimer}
-                        />
-                      </div>
-                    ))}
-                  </SortableContext>
-
-                  {seulsVisibles && (
+            <div className="relative min-h-0 flex-1 overflow-y-auto overscroll-contain p-3 [scrollbar-width:thin] sm:p-4">
+              <div className="space-y-3">
+                {groupesVisibles.map((group) => (
+                  <div key={group.id} className="animate-[adm-fade_0.3s_ease_both]">
                     <Famille
-                      group={null}
-                      services={blocs.orphelins}
+                      group={group}
+                      services={blocs.parFamille.get(group.id) ?? []}
                       dragged={dragged}
+                      onRename={(label) => renommerFamille(group.id, label)}
+                      onDelete={() => supprimerFamille(group.id)}
                       onEdit={ouvrirDraft}
                       onToggle={basculer}
                       onDeleted={supprimer}
                     />
-                  )}
-                </div>
+                  </div>
+                ))}
 
-                {/* Calque de glisser : une copie qui suit le pointeur au pixel.
-                    Sans lui, avec deux niveaux de tri imbriqués, les mesures se
-                    chassent et l'élément paraît sauter d'une position à l'autre. */}
-                <DragOverlay dropAnimation={dropAnimation}>
-                  {draggedGroup ? (
-                    <div className="w-full overflow-hidden rounded-[20px] bg-white shadow-[0_16px_40px_rgba(22,73,81,0.18)]">
-                      <p className="px-5 pb-1 pt-4 text-[15px] font-semibold text-foreground">
-                        {draggedGroup.label}
-                      </p>
-                      <p className="px-5 pb-4 text-[13px] text-muted-foreground">
-                        {(blocs.parFamille.get(draggedGroup.id) ?? []).length}{' '}
-                        accompagnement(s)
-                      </p>
-                    </div>
-                  ) : draggedService ? (
-                    <div className="flex items-center gap-3 rounded-[16px] bg-white px-4 py-3 shadow-[0_16px_40px_rgba(22,73,81,0.18)]">
-                      <GripVertical className="h-4 w-4 text-muted-foreground/50" />
-                      <span className="relative h-11 w-11 shrink-0 overflow-hidden rounded-[10px] bg-muted">
-                        {draggedService.media && (
-                          <Image
-                            src={draggedService.media.url}
-                            alt={draggedService.media.alt}
-                            fill
-                            sizes="44px"
-                            className="object-cover"
-                          />
-                        )}
-                      </span>
-                      <span className="text-[14px] font-medium">
-                        {draggedService.title}
-                      </span>
-                    </div>
-                  ) : null}
-                </DragOverlay>
-              </DndContext>
+                {seulsVisibles && (
+                  <Famille
+                    group={null}
+                    services={blocs.orphelins}
+                    dragged={dragged}
+                    onEdit={ouvrirDraft}
+                    onToggle={basculer}
+                    onDeleted={supprimer}
+                  />
+                )}
+              </div>
             </div>
           </section>
         </div>
+
+          {/* Calque de glisser : une copie qui suit le pointeur au pixel.
+              Sans lui, avec deux niveaux de tri imbriqués, les mesures se
+              chassent et l'élément paraît sauter d'une position à l'autre. */}
+          <DragOverlay dropAnimation={dropAnimation}>
+            {draggedGroup ? (
+              <div className="flex h-[52px] w-[244px] items-center gap-3 rounded-[14px] bg-white px-3 text-[14px] font-medium text-foreground shadow-[0_16px_40px_rgba(22,73,81,0.18)]">
+                <GripVertical className="h-4 w-4 shrink-0 text-muted-foreground/50" />
+                <span className="min-w-0 flex-1 truncate">{draggedGroup.label}</span>
+                <span className="text-[12px] tabular-nums text-[#8aa4a8]">
+                  {(blocs.parFamille.get(draggedGroup.id) ?? []).length}
+                </span>
+              </div>
+            ) : draggedService ? (
+              <div className="flex items-center gap-3 rounded-[16px] bg-white px-4 py-3 shadow-[0_16px_40px_rgba(22,73,81,0.18)]">
+                <GripVertical className="h-4 w-4 text-muted-foreground/50" />
+                <span className="relative h-11 w-11 shrink-0 overflow-hidden rounded-[10px] bg-muted">
+                  {draggedService.media && (
+                    <Image
+                      src={draggedService.media.url}
+                      alt={draggedService.media.alt}
+                      fill
+                      sizes="44px"
+                      className="object-cover"
+                    />
+                  )}
+                </span>
+                <span className="text-[14px] font-medium">
+                  {draggedService.title}
+                </span>
+              </div>
+            ) : null}
+          </DragOverlay>
+        </DndContext>
       )}
 
       <ServiceFormDialog
@@ -520,5 +497,103 @@ export function ServicesManager({
         library={library}
       />
     </>
+  )
+}
+
+/* ── Une ligne de la colonne des titres ───────────────────────────────
+   Un clic l'ouvre ; glissée, elle change l'ordre des titres ; survolée
+   par un accompagnement qu'on tire, elle s'allume — le relâcher le range
+   sous ce titre. « Tous » n'est ni triable ni une cible. */
+type Ligne = {
+  cle: string
+  label: string
+  n: number
+  tone: { bg: string; fg: string }
+}
+
+function LigneTitre({
+  ligne,
+  actif,
+  onOpen,
+  triable = false,
+  glisseEnCours = false,
+}: {
+  ligne: Ligne
+  actif: boolean
+  onOpen: () => void
+  /** Titre réel : triable et cible de dépôt. Faux pour « Tous » et
+      « Présentés seuls » (ce dernier reste une cible). */
+  triable?: boolean
+  glisseEnCours?: boolean
+}) {
+  const estTous = ligne.cle === 'tous'
+  const sortable = useSortable({ id: `${NAV}${ligne.cle}`, disabled: !triable })
+  /* « Présentés seuls » : pas de place à défendre, mais on peut y déposer. */
+  const depot = useDroppable({
+    /* Un identifiant par ligne : deux enregistrements au même nom se
+       remplaceraient l'un l'autre dans dnd-kit. */
+    id: ligne.cle === 'seuls' ? `${NAV}${SANS_FAMILLE}` : `${NAV}depot-${ligne.cle}`,
+    disabled: ligne.cle !== 'seuls',
+  })
+  const ref = triable ? sortable.setNodeRef : ligne.cle === 'seuls' ? depot.setNodeRef : undefined
+  const survole = !estTous && glisseEnCours && (triable ? sortable.isOver : depot.isOver)
+
+  return (
+    <li
+      ref={ref}
+      style={
+        triable
+          ? { transform: CSS.Translate.toString(sortable.transform), transition: sortable.transition }
+          : undefined
+      }
+      className={cn('relative', triable && sortable.isDragging && 'opacity-35')}
+    >
+      <button
+        type="button"
+        /* À la souris et au doigt, toute la ligne se glisse (au-delà de
+           6 px : un clic reste un clic). Au clavier, Entrée ouvre le
+           titre ; le déplacement passe par la poignée, à droite. */
+        onPointerDown={triable ? (sortable.listeners?.onPointerDown as React.PointerEventHandler | undefined) : undefined}
+        onClick={onOpen}
+        /* « Afficher… » : jamais le libellé seul — le titre lui-même, dans
+           la liste, est le bouton qui le renomme. */
+        aria-label={`Afficher « ${ligne.label} »`}
+        aria-roledescription={triable ? 'titre déplaçable' : undefined}
+        aria-current={actif ? 'true' : undefined}
+        className={cn(
+          'group flex h-[52px] w-full items-center gap-3 rounded-[14px] px-3 text-left text-[14px] font-medium transition-[background-color,color,box-shadow] duration-[250ms] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+          triable && 'cursor-grab touch-none active:cursor-grabbing',
+          actif
+            ? 'bg-white text-foreground shadow-[0_1px_2px_rgba(22,73,81,0.06)]'
+            : 'text-[#46606c] hover:bg-white/60 hover:text-foreground',
+          survole && 'bg-white shadow-[0_0_0_2px_var(--page-fg)]',
+        )}
+      >
+        <span
+          aria-hidden="true"
+          className="grid h-8 w-8 shrink-0 place-items-center rounded-[10px] transition-transform duration-[350ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:scale-[1.06]"
+          style={{ background: ligne.tone.bg, color: ligne.tone.fg }}
+        >
+          {estTous ? (
+            <Layers className="h-4 w-4" strokeWidth={1.8} />
+          ) : (
+            <HeartHandshake className="h-4 w-4" strokeWidth={1.8} />
+          )}
+        </span>
+        <span aria-hidden="true" className="min-w-0 flex-1 truncate">{ligne.label}</span>
+        <span aria-hidden="true" className={cn('text-[12px] tabular-nums text-[#8aa4a8]', triable && 'mr-6')}>{ligne.n}</span>
+      </button>
+      {triable && (
+        <button
+          type="button"
+          {...sortable.attributes}
+          {...sortable.listeners}
+          aria-label={`Déplacer le titre ${ligne.label}`}
+          className="absolute right-2 top-1/2 grid h-7 w-6 -translate-y-1/2 cursor-grab touch-none place-items-center rounded-[8px] text-[#8aa4a8] transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:cursor-grabbing"
+        >
+          <GripVertical className="h-4 w-4" />
+        </button>
+      )}
+    </li>
   )
 }

@@ -13,6 +13,18 @@ import {
 import { toast } from 'sonner'
 
 import { SANS_FAMILLE } from '../ServiceGroup'
+
+/**
+ * Les titres de la colonne de gauche portent l'identifiant de leur
+ * famille préfixé (`nav:…`) : dnd-kit refuse deux éléments au même
+ * identifiant, et le bloc de droite porte déjà le nom nu. Pour le plan,
+ * c'est la même famille : on retire le préfixe avant toute décision.
+ */
+export const NAV = 'nav:'
+const brut = (id: string | number) => {
+  const s = String(id)
+  return s.startsWith(NAV) ? s.slice(NAV.length) : s
+}
 import { arrangeServices, reorderServiceGroups } from '@/server/actions/content'
 import type { ServiceGroup, ServiceWithMedia } from '@/server/db/schema'
 
@@ -106,8 +118,8 @@ export function useServiceArrangement({
   }
 
   function handleDragStart({ active }: DragStartEvent) {
-    origine.current = conteneurDe(String(active.id))
-    setDragged(String(active.id))
+    origine.current = conteneurDe(brut(active.id))
+    setDragged(brut(active.id))
   }
 
   function handleDragCancel() {
@@ -119,11 +131,11 @@ export function useServiceArrangement({
     setDragged(null)
 
     /* ── Déplacement d'une famille entière ─────────────────────────── */
-    if (estFamille(String(active.id))) {
+    if (estFamille(brut(active.id))) {
       origine.current = null
       if (!over) return
-      const cible = conteneurDe(String(over.id))
-      const from = groups.findIndex((g) => g.id === active.id)
+      const cible = conteneurDe(brut(over.id))
+      const from = groups.findIndex((g) => g.id === brut(active.id))
       const to = groups.findIndex((g) => g.id === cible)
       if (from < 0 || to < 0 || from === to) return
 
@@ -143,10 +155,10 @@ export function useServiceArrangement({
     }
 
     origine.current = null
-    if (!over || active.id === over.id) return
+    if (!over || brut(active.id) === brut(over.id)) return
 
-    const actifId = String(active.id)
-    const surId = String(over.id)
+    const actifId = brut(active.id)
+    const surId = brut(over.id)
     const cible = conteneurDe(surId)
     const depart = conteneurDe(actifId)
 
