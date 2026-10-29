@@ -170,10 +170,11 @@ export function Lignes({
 }
 
 /* ══════════════════════════════════════════════════════════════════════
-   LE SEUIL — l'ouverture. Une arche, au centre, sur le nom d'Anne écrit
-   très grand derrière elle. On fait défiler : l'arche s'élargit jusqu'à
-   remplir l'écran — on passe la porte du cabinet — et la phrase d'accueil
-   apparaît dedans.
+   LE SEUIL — l'ouverture. Au premier écran, le nom d'Anne, centré, au
+   PREMIER PLAN ; juste dessous, une fenêtre sur le cabinet. On fait
+   défiler : le nom s'élève et s'efface, la fenêtre monte au centre et
+   s'élargit jusqu'à remplir l'écran — on entre dans la pièce — et la
+   phrase d'accueil apparaît dedans.
    ══════════════════════════════════════════════════════════════════════ */
 
 export function Seuil({
@@ -197,50 +198,73 @@ export function Seuil({
   rdv: string
   horaires: OpeningHour[]
   services: { titre: string }[]
-  /** Une phrase de présentation, à gauche de la fenêtre. */
+  /** Une phrase de présentation, sous le nom. */
   intro: string
 }) {
   const ref = useAvancement<HTMLElement>('colle', true)
-  /* « Ouvert aujourd'hui » se calcule chez le visiteur (son jour, son
-     heure) : après l'hydratation, jamais au rendu serveur. */
+  /* « Ouvert aujourd'hui » se calcule chez le visiteur (son jour) : après
+     l'hydratation, jamais au rendu serveur. */
   const [jour, setJour] = useState<string | null>(null)
   useEffect(() => {
     const j = JOURS[(new Date().getDay() + 6) % 7]!
     const h = horaires.find((x) => x.day.toLowerCase().startsWith(j.slice(0, 3)))?.hours
     setJour(h && !/ferm/i.test(h) ? h : '')
   }, [horaires])
-  /* Ce qui accompagne le premier écran et s'efface quand on entre. */
-  const sEfface = { opacity: 'calc(1 - var(--e) * 2.6)' }
-  /* Sur téléphone, la fenêtre est plus petite : le nom reste lisible
-     au-dessus et au-dessous. */
-  const base = 'min(420px, 56vw)'
-  const haut = 'min(580px, 50svh, 62vw * 1.35)'
+
+  /* Ce qui habille le premier écran s'efface dès qu'on entre. */
+  const sFondu = { opacity: 'clamp(0, calc(1 - var(--e) * 7), 1)' }
+  const sEfface = { ...sFondu, transform: 'translateY(calc(var(--e) * -24px))' }
+  /* La fenêtre : sous le nom au départ, plein écran à l'arrivée. */
+  const larg = 'min(460px, 64vw)'
+  const haut = 'min(400px, 38svh)'
   return (
-    <section ref={ref} id="haut" className="relative h-[230vh] [--e:0] [--p:0]">
+    <section ref={ref} id="haut" className="relative h-[240vh] [--e:0] [--p:0]">
       <div className="sticky top-0 h-[100svh] overflow-hidden">
-        {/* Le nom, très grand, DERRIÈRE l'arche. */}
-        <h1 className="pointer-events-none absolute inset-0 z-0 flex flex-col justify-between px-[5vw] pb-[10svh] pt-[12svh] text-[clamp(56px,11vw,184px)] md:pb-[13svh] md:pt-[16svh] leading-[0.92] text-[var(--ad-nuit)]">
-          <span
-            className="block overflow-hidden"
-            style={{ transform: 'translateX(calc(var(--e) * -18vw))', opacity: 'calc(1 - var(--e) * 1.4)' }}
-          >
-            <span className="block motion-safe:animate-[ad-sortir_1.3s_var(--ad-ease)_0.15s_backwards]">{prenom}</span>
+        {/* Un halo très doux, derrière tout. */}
+        <div
+          aria-hidden="true"
+          className="absolute left-1/2 top-[30%] h-[70svh] w-[90vw] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(54,163,155,0.14),rgba(47,111,147,0.08)_55%,transparent)] blur-2xl"
+          style={sFondu}
+        />
+
+        {/* Le métier, au-dessus du nom. */}
+        <div className="absolute inset-x-0 top-[13svh] z-30 flex justify-center md:top-[14svh]" style={sEfface}>
+          <span className="inline-flex items-center gap-2 rounded-full bg-white px-3.5 py-1.5 text-[13px] font-semibold text-[var(--ad-pierre)] shadow-[0_1px_2px_rgba(20,35,46,0.06),0_6px_18px_-8px_rgba(20,35,46,0.18)] motion-safe:animate-[ad-monter_1.1s_var(--ad-ease)_0.1s_backwards]">
+            <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-[var(--ad-or)]" />
+            {metier} · {ville}
           </span>
-          <span
-            className="block self-end overflow-hidden text-right"
-            style={{ transform: 'translateX(calc(var(--e) * 18vw))', opacity: 'calc(1 - var(--e) * 1.4)' }}
-          >
-            <em className="block text-[var(--ad-nuit)] motion-safe:animate-[ad-sortir_1.3s_var(--ad-ease)_0.3s_backwards]">
-              {nom}
-            </em>
+        </div>
+
+        {/* Le nom : centré, AU PREMIER PLAN, jusqu'à ce qu'on fasse défiler. */}
+        <h1
+          className="pointer-events-none absolute inset-x-0 top-[19svh] z-30 px-5 text-center text-[clamp(52px,9.4vw,156px)] leading-[0.95] text-[var(--ad-nuit)] md:top-[20svh]"
+          style={{
+            transform: 'translateY(calc(var(--e) * -16svh)) scale(calc(1 - var(--e) * 0.25))',
+            opacity: 'clamp(0, calc(1 - var(--e) * 2.2), 1)',
+          }}
+        >
+          <span className="block overflow-hidden pb-[0.06em] md:inline-block">
+            <span className="block motion-safe:animate-[ad-sortir_1.2s_var(--ad-ease)_0.15s_backwards]">{prenom}</span>
+          </span>{' '}
+          <span className="block overflow-hidden pb-[0.06em] md:inline-block">
+            <em className="block motion-safe:animate-[ad-sortir_1.2s_var(--ad-ease)_0.28s_backwards]">{nom}</em>
           </span>
         </h1>
 
-        {/* L'arche, qui s'ouvre jusqu'à tout l'écran. */}
+        {/* Sous le nom : la présentation, et les deux actions. */}
         <div
-          className="absolute left-1/2 top-1/2 z-10 overflow-hidden bg-[var(--ad-sable-fonce)] shadow-[0_40px_120px_-40px_rgba(46,66,79,0.45)] motion-safe:animate-[ad-monter_1.4s_var(--ad-ease)_backwards]"
+          className="absolute inset-x-0 top-[calc(19svh+clamp(120px,21vw,330px))] z-30 hidden flex-col items-center px-6 text-center md:top-[calc(20svh+clamp(60px,10.5vw,170px))] md:flex"
+          style={sEfface}
+        >
+          <p className="max-w-[54ch] text-[16px] leading-[1.6] text-[var(--ad-pierre)] motion-safe:animate-[ad-monter_1.2s_var(--ad-ease)_0.45s_backwards]">{intro}</p>
+        </div>
+
+        {/* La fenêtre sur le cabinet : sous le nom, puis plein écran. */}
+        <div
+          className="absolute left-1/2 z-10 overflow-hidden bg-[var(--ad-sable-fonce)] shadow-[0_50px_120px_-50px_rgba(20,35,46,0.55)] motion-safe:animate-[ad-monter_1.4s_var(--ad-ease)_0.35s_backwards]"
           style={{
-            width: `calc(${base} + (100vw - ${base}) * var(--e))`,
+            top: 'calc(66% - 16% * var(--e))',
+            width: `calc(${larg} + (100vw - ${larg}) * var(--e))`,
             height: `calc(${haut} + (100svh - ${haut}) * var(--e))`,
             transform: 'translate(-50%, -50%)',
             borderRadius: 'calc((1 - var(--e)) * 32px)',
@@ -254,7 +278,7 @@ export function Seuil({
               priority
               sizes="100vw"
               className="object-cover"
-              style={{ transform: 'scale(calc(1.18 - var(--e) * 0.18))' }}
+              style={{ transform: 'scale(calc(1.15 - var(--e) * 0.15))' }}
             />
           )}
           <div aria-hidden="true" className="absolute inset-0 bg-[var(--ad-nuit)]" style={{ opacity: 'calc(var(--e) * 0.5)' }} />
@@ -266,12 +290,10 @@ export function Seuil({
               transform: 'translateY(calc((1 - var(--e)) * 40px))',
             }}
           >
-            <p className="max-w-[18ch] text-balance font-[family-name:var(--ad-titre)] font-semibold tracking-[-0.03em] text-[clamp(36px,5.5vw,84px)] leading-[1.02]">
-              {accroche}
-            </p>
+            <p className="max-w-[18ch] text-balance text-[clamp(34px,5.2vw,80px)] font-semibold leading-[1.04] tracking-[-0.035em]">{accroche}</p>
             <a
               href={rdv}
-              className="group mt-10 inline-flex items-center gap-3 rounded-full bg-white/95 py-2 pl-6 pr-2 text-[15px] font-medium text-[var(--ad-nuit)] backdrop-blur transition-[background-color] duration-300 hover:bg-white"
+              className="group mt-10 inline-flex items-center gap-3 rounded-full bg-white py-2 pl-6 pr-2 text-[15px] font-semibold text-[var(--ad-nuit)]"
             >
               Prendre rendez-vous
               <span className="grid h-9 w-9 place-items-center rounded-full bg-[var(--ad-nuit)] text-white transition-transform duration-500 ease-[var(--ad-ease)] group-hover:rotate-45">
@@ -281,33 +303,11 @@ export function Seuil({
           </div>
         </div>
 
-        {/* À gauche de la fenêtre : qui, et l'action principale. */}
-        <div
-          className="absolute left-[5vw] top-1/2 z-20 hidden w-[min(300px,calc(50vw-260px))] -translate-y-[10%] lg:block"
-          style={sEfface}
-        >
-          <p className="text-[15px] leading-[1.6] text-[var(--ad-pierre)] motion-safe:animate-[ad-monter_1.2s_var(--ad-ease)_0.5s_backwards]">{intro}</p>
-          <div className="mt-6 flex flex-wrap gap-2 motion-safe:animate-[ad-monter_1.2s_var(--ad-ease)_0.62s_backwards]">
-            <a
-              href={rdv}
-              className="group inline-flex items-center gap-2.5 rounded-full bg-[var(--ad-nuit)] py-1.5 pl-5 pr-1.5 text-[14px] font-semibold text-white"
-            >
-              Prendre rendez-vous
-              <span className="grid h-8 w-8 place-items-center rounded-full bg-white/15 transition-transform duration-500 ease-[var(--ad-ease)] group-hover:rotate-45">
-                <ArrowUpRight className="h-3.5 w-3.5" />
-              </span>
-            </a>
-            <a href="#accompagnements" className="inline-flex items-center rounded-full border border-[var(--ad-sable-fonce)] bg-white px-5 text-[14px] font-semibold text-[var(--ad-nuit)] transition-colors hover:border-[var(--ad-nuit)]">
-              Découvrir
-            </a>
-          </div>
-        </div>
-
-        {/* À droite : deux cartes de verre qui flottent. */}
-        <div className="pointer-events-none absolute right-[6vw] top-[26%] z-20 hidden flex-col items-end gap-4 lg:flex" style={sEfface}>
-          {jour !== null && (
-            <div className="motion-safe:animate-[ad-monter_1.2s_var(--ad-ease)_0.7s_backwards]">
-              <div className="flex items-center gap-3 rounded-[18px] border border-white/70 bg-white/70 px-4 py-3 shadow-[0_20px_50px_-24px_rgba(20,35,46,0.35)] backdrop-blur-xl motion-safe:animate-[ad-flotter_6s_ease-in-out_infinite]">
+        {/* De part et d'autre de la fenêtre : deux cartes de verre qui flottent. */}
+        <div className="pointer-events-none absolute inset-x-0 top-[66%] z-20 hidden -translate-y-1/2 justify-between px-[6vw] lg:flex" style={sFondu}>
+          <div className="w-[230px] motion-safe:animate-[ad-monter_1.2s_var(--ad-ease)_0.7s_backwards]">
+            {jour !== null && (
+              <div className="flex items-center gap-3 rounded-[18px] border border-white/70 bg-white/80 px-4 py-3 shadow-[0_20px_50px_-24px_rgba(20,35,46,0.35)] backdrop-blur-xl motion-safe:animate-[ad-flotter_6s_ease-in-out_infinite]">
                 <span className="relative grid h-3 w-3 place-items-center">
                   {jour && <span className="absolute inset-0 rounded-full bg-[#4caf8b] motion-safe:animate-[ad-pouls_1.8s_ease-out_infinite]" />}
                   <span className={cn('relative h-2 w-2 rounded-full', jour ? 'bg-[#4caf8b]' : 'bg-[var(--ad-gris)]')} />
@@ -317,10 +317,10 @@ export function Seuil({
                   <span className="block text-[12px] text-[var(--ad-gris)]">{jour || 'Écrivez-moi, je vous réponds'}</span>
                 </span>
               </div>
-            </div>
-          )}
-          <div className="mr-[4vw] motion-safe:animate-[ad-monter_1.2s_var(--ad-ease)_0.85s_backwards]">
-            <div className="w-[240px] rounded-[20px] border border-white/70 bg-white/70 p-4 shadow-[0_20px_50px_-24px_rgba(20,35,46,0.35)] backdrop-blur-xl motion-safe:animate-[ad-flotter_7s_ease-in-out_1.2s_infinite]">
+            )}
+          </div>
+          <div className="w-[250px] motion-safe:animate-[ad-monter_1.2s_var(--ad-ease)_0.85s_backwards]">
+            <div className="rounded-[20px] border border-white/70 bg-white/80 p-4 shadow-[0_20px_50px_-24px_rgba(20,35,46,0.35)] backdrop-blur-xl motion-safe:animate-[ad-flotter_7s_ease-in-out_1.2s_infinite]">
               <p className="text-[12px] font-semibold text-[var(--ad-gris)]">{services.length} accompagnements</p>
               <ul className="mt-2.5 flex flex-wrap gap-1.5">
                 {services.slice(0, 4).map((x) => (
@@ -333,17 +333,28 @@ export function Seuil({
           </div>
         </div>
 
-        {/* Les marges : métier et ville à gauche, l'invitation à défiler. */}
-        <div
-          className="absolute inset-x-[5vw] bottom-6 z-20 flex items-end justify-between text-[12px] uppercase tracking-[0.2em] text-[var(--ad-gris)]"
-          style={{ opacity: 'calc(1 - var(--e) * 3)' }}
-        >
-          <span className="motion-safe:animate-[ad-monter_1.2s_var(--ad-ease)_0.6s_backwards]">
-            {metier} · {ville}
-          </span>
-          <span className="flex items-center gap-3 motion-safe:animate-[ad-monter_1.2s_var(--ad-ease)_0.75s_backwards]">
-            Entrer
-            <span className="relative block h-10 w-px overflow-hidden bg-[var(--ad-sable-fonce)]">
+        {/* En bas : les deux actions, et l'invitation à entrer. */}
+        <div className="absolute inset-x-0 bottom-6 z-30 flex flex-col items-center gap-5 px-6" style={sEfface}>
+          <div className="flex flex-wrap justify-center gap-2 motion-safe:animate-[ad-monter_1.2s_var(--ad-ease)_0.6s_backwards]">
+            <a
+              href={rdv}
+              className="pointer-events-auto group inline-flex items-center gap-2.5 rounded-full bg-[var(--ad-nuit)] py-1.5 pl-5 pr-1.5 text-[14px] font-semibold text-white shadow-[0_14px_30px_-14px_rgba(20,35,46,0.6)]"
+            >
+              Prendre rendez-vous
+              <span className="grid h-8 w-8 place-items-center rounded-full bg-white/15 transition-transform duration-500 ease-[var(--ad-ease)] group-hover:rotate-45">
+                <ArrowUpRight className="h-3.5 w-3.5" />
+              </span>
+            </a>
+            <a
+              href="#accompagnements"
+              className="pointer-events-auto inline-flex items-center rounded-full border border-[var(--ad-sable-fonce)] bg-white px-5 text-[14px] font-semibold text-[var(--ad-nuit)] transition-colors hover:border-[var(--ad-nuit)]"
+            >
+              Découvrir
+            </a>
+          </div>
+          <span className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ad-gris)] max-md:hidden">
+            Défiler pour entrer
+            <span className="relative block h-8 w-px overflow-hidden bg-[var(--ad-sable-fonce)]">
               <span className="absolute inset-x-0 top-0 h-1/2 bg-[var(--ad-or)] motion-safe:animate-[ad-descendre_2.2s_var(--ad-ease-lent)_infinite]" />
             </span>
           </span>
