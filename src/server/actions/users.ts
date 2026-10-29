@@ -31,7 +31,9 @@ import {
  * écritures.
  */
 
-export type { InvitationOuverte, UtilisateurListe } from '@/server/queries/users'
+/* Pas de ré-export de types ici : un fichier « use server » ne peut
+   exporter que des fonctions asynchrones (Turbopack le refuse net). Les
+   types se lisent dans `server/queries/users.ts`. */
 
 const DUREE_INVITATION_MS = 7 * 24 * 60 * 60 * 1000
 

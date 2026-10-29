@@ -1,5 +1,4 @@
 import { AdminContent } from '@/components/admin/AdminContent'
-import { PageHeader } from '@/components/admin/PageHeader'
 import { UsersManager } from '@/components/admin/UsersManager'
 import { listUsers } from '@/server/queries/users'
 
@@ -11,10 +10,6 @@ export default async function UtilisateursPage() {
 
   return (
     <AdminContent width="wide">
-      <PageHeader
-        title="Utilisateurs"
-        description="Les personnes qui peuvent se connecter à cette administration."
-      />
       <UsersManager initial={utilisateurs} />
     </AdminContent>
   )

@@ -20,7 +20,12 @@ export const dynamic = 'force-dynamic'
  * rendu du site, et chaque modification est enregistrée automatiquement
  * en brouillon ; « Publier » la met en ligne.
  */
-export default async function HomeBuilderPage() {
+export default async function HomeBuilderPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ section?: string | string[] }>
+}) {
+  const { section } = await searchParams
   const [page, media, services, faqItems, settings, saved] =
     await Promise.all([
       getHomePageForAdmin(),
@@ -53,6 +58,13 @@ export default async function HomeBuilderPage() {
       initialSections={page.sections}
       data={{ services, faqItems, settings, media }}
       saved={saved}
+      /* `?section=…` : depuis « Votre page » sur l'accueil, l'éditeur
+         s'ouvre sur la section cliquée. Une valeur inconnue est ignorée. */
+      initialSelectedId={
+        typeof section === 'string' && page.sections.some((s) => s.id === section)
+          ? section
+          : null
+      }
     />
   )
 }

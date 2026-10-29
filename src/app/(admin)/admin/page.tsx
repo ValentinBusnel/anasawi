@@ -211,7 +211,7 @@ export default async function DashboardPage() {
                 return (
                   <li key={section.id}>
                     <Link
-                      href="/admin/accueil"
+                      href={`/admin/accueil?section=${section.id}`}
                       className={cn(
                         'group flex items-center gap-3.5 rounded-[14px] px-2 py-2.5 transition-colors duration-[250ms] hover:bg-[#f7f8f8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                         !section.isActive && 'opacity-50',

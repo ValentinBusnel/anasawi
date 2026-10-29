@@ -52,7 +52,10 @@ export function TemplateEditor({
   initialSections,
   data,
   saved,
+  initialSelectedId = null,
 }: {
+  /** Section ouverte d'emblée — le lien « Votre page » de l'accueil. */
+  initialSelectedId?: string | null
   pageId: string
   pageTitle: string
   /** Instantané servi au public — sert à l'indicateur d'état. */
@@ -75,7 +78,7 @@ export function TemplateEditor({
 
   const [viewport, setViewport] = useState<Breakpoint>('desktop')
   const [mode, setMode] = useState<'edit' | 'preview'>('edit')
-  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [selectedId, setSelectedId] = useState<string | null>(initialSelectedId)
   const [libraryOpen, setLibraryOpen] = useState(false)
   /** Section dont la suppression attend confirmation (ligne du rail). */
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
@@ -165,6 +168,12 @@ export function TemplateEditor({
     selectedId,
     sections,
   })
+
+  /* Ouvert sur une section précise : le canvas la centre dès qu'il est prêt. */
+  useEffect(() => {
+    if (initialSelectedId) stage.scrollToRef.current = initialSelectedId
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- une fois, à l'ouverture
+  }, [])
 
   const {
     freshId,

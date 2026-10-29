@@ -6,6 +6,8 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { ConfirmDelete } from './ConfirmDelete'
+import { PASTELS } from './editor/pastels'
+import { PageHeader } from './PageHeader'
 import { FieldError } from './form/FieldError'
 import { useActionForm } from './hooks/useActionForm'
 import { Button } from '@/components/ui/button'
@@ -24,8 +26,8 @@ import {
   createUser,
   deleteUser,
   renewInvitation,
-  type UtilisateurListe,
 } from '@/server/actions/users'
+import type { UtilisateurListe } from '@/server/queries/users'
 
 /**
  * Écran « Utilisateurs ».
@@ -76,37 +78,50 @@ export function UsersManager({ initial }: { initial: UtilisateurListe[] }) {
 
   return (
     <>
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-[14px] text-muted-foreground">
-          Chaque personne reçoit un lien pour choisir son mot de passe. Vous ne
-          le connaîtrez jamais.
-        </p>
-        <Button onClick={() => setDraft(VIDE)}>
-          <Plus />
-          Inviter une personne
-        </Button>
-      </div>
+      <PageHeader
+        overline="Accès à l’administration"
+        title="Utilisateurs"
+        description={`${initial.length} ${initial.length > 1 ? 'personnes peuvent' : 'personne peut'} se connecter · chacune choisit son mot de passe`}
+        action={
+          <Button size="sm" onClick={() => setDraft(VIDE)}>
+            <Plus />
+            Inviter une personne
+          </Button>
+        }
+      />
 
       {initial.length === 0 ? (
         <div className="rounded-[24px] bg-block px-6 py-16 text-center">
-          <p className="text-[13px] text-muted-foreground">Aucun utilisateur pour l’instant.</p>
+          <p className="text-[14px] text-muted-foreground">Aucun utilisateur pour l’instant.</p>
           <Button className="mt-4" onClick={() => setDraft(VIDE)}>
             <UserPlus />
             Inviter une personne
           </Button>
         </div>
       ) : (
-        <ul className="list-block">
-          {initial.map((u) => (
-            <li key={u.id} className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3.5 sm:px-5">
+        <div className="bloc-ecran flex flex-col rounded-[24px] bg-block p-2">
+          <div className="flex min-h-0 flex-1 flex-col rounded-[20px] bg-white">
+            <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-[#eef1f2] px-5 py-4 sm:px-6">
+              <h2 className="text-[16px] font-semibold text-foreground">
+                Les personnes
+                <span className="ml-2 text-[13px] font-medium text-[#8aa4a8]">{initial.length}</span>
+              </h2>
+              <p className="text-[13px] text-[#8aa4a8]">
+                Vous ne connaîtrez jamais leur mot de passe
+              </p>
+            </div>
+        <ul className="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto overscroll-contain p-2 [scrollbar-width:thin] sm:p-3">
+          {initial.map((u, i) => (
+            <li key={u.id} className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-[14px] px-3 py-3 transition-colors duration-[250ms] hover:bg-[#f7f8f8]">
               <span
                 aria-hidden="true"
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-ivory-warm text-[13px] font-medium text-ink-soft"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[15px] font-semibold"
+                style={{ background: PASTELS[(i + 8) % PASTELS.length]!.bg, color: PASTELS[(i + 8) % PASTELS.length]!.fg }}
               >
                 {u.name.trim().charAt(0).toUpperCase() || '?'}
               </span>
               <div className="min-w-0 flex-1 basis-[200px]">
-                <p className="truncate text-[13.5px] text-foreground">
+                <p className="truncate text-[14px] font-medium text-foreground">
                   {u.name}
                   {u.moi && <span className="ml-2 text-[13px] text-muted-foreground">(vous)</span>}
                 </p>
@@ -172,6 +187,8 @@ export function UsersManager({ initial }: { initial: UtilisateurListe[] }) {
             </li>
           ))}
         </ul>
+          </div>
+        </div>
       )}
 
       {/* ── Inviter ───────────────────────────────────────────────── */}

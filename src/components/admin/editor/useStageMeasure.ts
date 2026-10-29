@@ -181,7 +181,10 @@ export function useStageMeasure({
     if (!el) return
     scrollToRef.current = null
     requestAnimationFrame(() => scrollStageTo(id))
-  }, [sections, scrollStageTo, stage])
+    /* `frameVersion` : une section demandée avant que le cadre soit prêt
+       (ouverture de l'éditeur sur `?section=…`) est centrée dès qu'il
+       l'est. */
+  }, [sections, scrollStageTo, stage, frameVersion])
 
   /* ── Survol du canvas ────────────────────────────────────────────── */
 
