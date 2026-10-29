@@ -79,6 +79,13 @@ export function EditorStage({
       `beforeId` (fin de page si nul). */
   onInsertAt: (beforeId: string | null) => void
 }) {
+  /* Le rang de la section (de sa racine) dans la page : il donne son
+     pastel, le même que dans la liste et le formulaire. */
+  const rangDe = (id: string) => {
+    const racine = byId.get(id)?.parentId ?? id
+    return Math.max(0, roots.findIndex((r) => r.id === racine))
+  }
+
   return (
     <div
       ref={paneRef}
@@ -165,20 +172,20 @@ export function EditorStage({
               <div
                 key={`survol-${r.id}`}
                 className="pv-hover inset-x-0"
-                style={haloStyle(r, byId.get(r.id)?.type, scale)}
+                style={haloStyle(r, byId.get(r.id)?.type, rangDe(r.id), scale)}
               />
             ))}
         {editing && selectionRect && selectedId && (
           <>
             <div
               className="pv-hover inset-x-0"
-              style={haloStyle(selectionRect, byId.get(selectedId)?.type, scale)}
+              style={haloStyle(selectionRect, byId.get(selectedId)?.type, rangDe(selectedId), scale)}
             />
             {/* Une clé par sélection : l'onde se rejoue à chaque choix. */}
             <div
               key={`onde-${selectedId}`}
               className="pv-spot inset-x-0"
-              style={haloStyle(selectionRect, byId.get(selectedId)?.type, scale)}
+              style={haloStyle(selectionRect, byId.get(selectedId)?.type, rangDe(selectedId), scale)}
             />
           </>
         )}
@@ -262,9 +269,10 @@ export function EditorStage({
 function haloStyle(
   rect: { top: number; height: number },
   type: string | undefined,
+  rang: number,
   scale: number,
 ): React.CSSProperties {
-  const tone = toneOf(type ?? '')
+  const tone = toneOf(type ?? '', rang)
   return {
     top: rect.top * scale,
     height: rect.height * scale,

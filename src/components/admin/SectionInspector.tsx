@@ -167,7 +167,8 @@ export function SectionInspector({
 }: SectionInspectorProps) {
   const router = useRouter()
   const block = getBlock(section.type)
-  const tone = toneOf(section.type)
+  /* Le pastel suit la place de la section (de sa racine) dans la page. */
+  const tone = toneOf(section.type, position?.index ?? 0)
   const ToneIcon = tone.icon
 
   const [payload, setPayload] = useState<Record<string, unknown>>(

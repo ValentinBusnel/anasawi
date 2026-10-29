@@ -278,7 +278,7 @@ export function SectionRail({
             const nom = labelOf(section)
             const premiere = index === 0
             const derniere = index === roots.length - 1
-            const tone = toneOf(section.type)
+            const tone = toneOf(section.type, index)
             const Icone = tone.icon
 
             return (
