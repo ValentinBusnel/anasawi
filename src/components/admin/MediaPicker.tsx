@@ -344,8 +344,10 @@ export const UploadField = forwardRef<
     onFileChange?: (file: File | null) => void
     /** Version basse, pour un dialogue. */
     compact?: boolean
+    /** Le dossier où ranger le fichier envoyé (nul : non classé). */
+    folderId?: string | null
   }
->(function UploadField({ onUploaded, kind = 'image', onFileChange, compact = false }, ref) {
+>(function UploadField({ onUploaded, kind = 'image', onFileChange, compact = false, folderId = null }, ref) {
   const [file, setFile] = useState<File | null>(null)
   const [alt, setAlt] = useState('')
   const [pending, start] = useTransition()
@@ -484,6 +486,7 @@ export const UploadField = forwardRef<
           blurDataUrl: prepared.blurDataUrl,
           mimeType: prepared.mimeType,
           size: prepared.data.size,
+          folderId,
         })
 
         if (!result.ok) {

@@ -103,10 +103,27 @@ export type Invitation = typeof invitations.$inferSelect
    blurDataUrl généré côté client au moment de l'upload.
    ════════════════════════════════════════════════════════════════════ */
 
+/** Dossiers de la médiathèque — un seul niveau, rangés à la main. */
+export const mediaFolders = pgTable(
+  'media_folders',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    name: text('name').notNull(),
+    sortOrder: integer('sort_order').notNull().default(0),
+    ...timestamps,
+  },
+  (t) => [index('media_folders_order_idx').on(t.sortOrder)],
+)
+
 export const media = pgTable(
   'media',
   {
     id: uuid('id').primaryKey().defaultRandom(),
+    /** Dossier de rangement (nul : « Non classés »). Supprimer un dossier
+        ne supprime pas ses fichiers : ils redeviennent non classés. */
+    folderId: uuid('folder_id').references(() => mediaFolders.id, {
+      onDelete: 'set null',
+    }),
     url: text('url').notNull(),
     pathname: text('pathname').notNull(),
     filename: text('filename').notNull(),
@@ -119,7 +136,10 @@ export const media = pgTable(
     size: integer('size').notNull().default(0),
     ...timestamps,
   },
-  (t) => [index('media_created_idx').on(t.createdAt)],
+  (t) => [
+    index('media_created_idx').on(t.createdAt),
+    index('media_folder_idx').on(t.folderId),
+  ],
 )
 
 /* ════════════════════════════════════════════════════════════════════
@@ -451,6 +471,7 @@ export const servicesRelations = relations(services, ({ one }) => ({
 
 export type User = typeof users.$inferSelect
 export type Media = typeof media.$inferSelect
+export type MediaFolder = typeof mediaFolders.$inferSelect
 export type NewMedia = typeof media.$inferInsert
 /**
  * « Mes sections » — une section personnalisée enregistrée comme modèle

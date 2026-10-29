@@ -17,7 +17,10 @@ export function PageHeader({
   description,
   action,
   back,
+  overline,
 }: {
+  /** Surtitre discret au-dessus du titre (remplace la grande icône). */
+  overline?: string
   title: string
   description?: string
   action?: React.ReactNode
@@ -35,7 +38,11 @@ export function PageHeader({
         </Link>
       )}
 
-      <SpaceIcon className="mb-3.5" />
+      {overline ? (
+        <p className="mb-1.5 text-[14px] font-medium leading-[17px] text-[#8aa4a8]">{overline}</p>
+      ) : (
+        <SpaceIcon className="mb-3.5" />
+      )}
       <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
         <div className="min-w-0">
           <h1 className="text-[30px] font-semibold leading-[1.2] tracking-[-0.02em] text-foreground sm:text-[36px] sm:leading-[43px]">

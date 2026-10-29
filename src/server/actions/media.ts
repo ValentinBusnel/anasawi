@@ -44,6 +44,8 @@ const registerSchema = z
       .nullable(),
     mimeType: z.enum(ALLOWED_MIME_TYPES),
     size: z.number().int().nonnegative(),
+    /** Le dossier ouvert au moment de l'envoi (nul : non classé). */
+    folderId: z.string().uuid().nullable().optional(),
   })
   /* L'URL est DÉDUITE de la clé, jamais libre : le client ne peut pas
      enregistrer une ligne qui pointe ailleurs que vers `/api/media/…`. */

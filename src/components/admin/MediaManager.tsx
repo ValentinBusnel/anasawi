@@ -1,14 +1,28 @@
 'use client'
 
-import { Clapperboard, ImagePlus } from 'lucide-react'
+import {
+  Clapperboard,
+  Folder,
+  FolderPlus,
+  ImagePlus,
+  Inbox,
+  Layers,
+  Pencil,
+  Trash2,
+  Upload,
+} from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useRef, useState, useTransition } from 'react'
+import { useMemo, useRef, useState, useTransition } from 'react'
 import { toast } from 'sonner'
 
 import { ConfirmDelete } from './ConfirmDelete'
+import { PASTELS } from './editor/pastels'
 import { type MediaKind, UploadField, type UploadFieldHandle } from './MediaPicker'
-import { MediaMeta, MediaThumb } from './MediaThumb'
-import { Button } from '@/components/ui/button'
+import { formatTaille, MediaMeta, MediaThumb } from './MediaThumb'
+import { PageHeader } from './PageHeader'
+import { ActionMenu } from '@/components/ui/action-menu'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { Choice } from '@/components/ui/choice'
 import {
   Dialog,
   DialogContent,
@@ -21,9 +35,27 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { isVideoMimeType } from '@/lib/media-kind'
 import { cn } from '@/lib/utils'
-import { updateMedia } from '@/server/actions/media'
-import { deleteMedia } from '@/server/actions/media'
-import type { Media } from '@/server/db/schema'
+import { deleteMedia, updateMedia } from '@/server/actions/media'
+import {
+  createMediaFolder,
+  deleteMediaFolder,
+  moveMediaToFolder,
+  renameMediaFolder,
+} from '@/server/actions/media-folders'
+import type { Media, MediaFolder } from '@/server/db/schema'
+
+/**
+ * La médiathèque — l'écran « Fichiers » de l'espace Qeeps.
+ *
+ * À gauche, les dossiers : « Tous les fichiers », chaque dossier avec sa
+ * pastille de couleur et son compte, « Non classés », et « Nouveau
+ * dossier ». À droite, le dossier ouvert : ses fichiers en vignettes, et
+ * en bas la zone d'ajout — un fichier envoyé arrive dans le dossier ouvert.
+ *
+ * Ranger : glisser une vignette sur un dossier, ou choisir le dossier
+ * dans la fenêtre « Modifier ». Supprimer un dossier ne supprime aucun
+ * fichier : ils redeviennent non classés.
+ */
 
 /** Les deux genres qu'on peut ajouter — libellés attendus par les tests. */
 const GENRES: readonly { valeur: MediaKind; libelle: string }[] = [
@@ -31,44 +63,89 @@ const GENRES: readonly { valeur: MediaKind; libelle: string }[] = [
   { valeur: 'video', libelle: 'Une vidéo' },
 ]
 
-export function MediaManager({ items: initial }: { items: Media[] }) {
+/** « Tous les fichiers », « Non classés », ou l'identifiant d'un dossier. */
+type Vue = 'tous' | 'non-classes' | string
+
+const DRAG_TYPE = 'application/x-anasawi-media'
+
+const pluriel = (n: number, un: string, plusieurs: string) =>
+  `${n} ${n > 1 ? plusieurs : un}`
+
+export function MediaManager({
+  items: initial,
+  folders: initialFolders,
+}: {
+  items: Media[]
+  folders: MediaFolder[]
+}) {
   const router = useRouter()
   const [items, setItems] = useState(initial)
+  const [folders, setFolders] = useState(initialFolders)
+  const [vue, setVue] = useState<Vue>('tous')
   const [editing, setEditing] = useState<Media | null>(null)
   const [alt, setAlt] = useState('')
   const [caption, setCaption] = useState('')
+  const [dossierEdite, setDossierEdite] = useState<string>('aucun')
   const [pending, start] = useTransition()
-  /** Ce qu'on ajoute : une image, ou une vidéo. */
   const [genre, setGenre] = useState<MediaKind>('image')
-  /** Un fichier est choisi et attend sa description : l'ajout est en cours. */
-  const [ajoutEnCours, setAjoutEnCours] = useState(false)
+  const [creation, setCreation] = useState<string | null>(null)
+  const [renommage, setRenommage] = useState<string | null>(null)
+  const [survolDossier, setSurvolDossier] = useState<Vue | null>(null)
   const upload = useRef<UploadFieldHandle>(null)
-  const boutonsGenre = useRef<(HTMLButtonElement | null)[]>([])
-  const nom = genre === 'video' ? 'vidéo' : 'image'
+  const zoneAjout = useRef<HTMLDivElement>(null)
+
+  const dossierCourant = folders.find((f) => f.id === vue) ?? null
+  const folderIdCourant = dossierCourant?.id ?? null
+
+  const compte = useMemo(() => {
+    const parDossier = new Map<string | null, number>()
+    for (const m of items) parDossier.set(m.folderId, (parDossier.get(m.folderId) ?? 0) + 1)
+    return parDossier
+  }, [items])
+
+  const visibles =
+    vue === 'tous'
+      ? items
+      : vue === 'non-classes'
+        ? items.filter((m) => !m.folderId)
+        : items.filter((m) => m.folderId === vue)
+
+  const titre =
+    vue === 'tous' ? 'Tous les fichiers' : vue === 'non-classes' ? 'Non classés' : (dossierCourant?.name ?? '')
+
+  const pastelDe = (folderId: string) => {
+    const i = folders.findIndex((f) => f.id === folderId)
+    return PASTELS[(Math.max(0, i) + 1) % PASTELS.length]!
+  }
+
+  /* ── Fichiers ─────────────────────────────────────────────────────── */
 
   function openEditor(media: Media) {
     setEditing(media)
     setAlt(media.alt)
     setCaption(media.caption ?? '')
+    setDossierEdite(media.folderId ?? 'aucun')
   }
 
   function save() {
     if (!editing) return
-
+    const cible = dossierEdite === 'aucun' ? null : dossierEdite
     start(async () => {
-      const result = await updateMedia(editing.id, {
-        alt,
-        caption: caption || null,
-      })
-
+      const result = await updateMedia(editing.id, { alt, caption: caption || null })
       if (!result.ok) {
         toast.error(result.error)
         return
       }
-
+      if (cible !== editing.folderId) {
+        const range = await moveMediaToFolder(editing.id, cible)
+        if (!range.ok) {
+          toast.error(range.error)
+          return
+        }
+      }
       setItems((prev) =>
         prev.map((m) =>
-          m.id === editing.id ? { ...m, alt, caption: caption || null } : m,
+          m.id === editing.id ? { ...m, alt, caption: caption || null, folderId: cible } : m,
         ),
       )
       toast.success('Modifications enregistrées.')
@@ -77,149 +154,375 @@ export function MediaManager({ items: initial }: { items: Media[] }) {
     })
   }
 
-  /* Flèches gauche/droite entre les deux genres, comme des onglets. */
-  function surToucheGenre(e: React.KeyboardEvent, index: number) {
-    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight' && e.key !== 'Home' && e.key !== 'End') return
-    e.preventDefault()
-    const suivant =
-      e.key === 'Home'
-        ? 0
-        : e.key === 'End'
-          ? GENRES.length - 1
-          : (index + (e.key === 'ArrowRight' ? 1 : -1) + GENRES.length) % GENRES.length
-    const cible = GENRES[suivant]
-    if (!cible) return
-    setGenre(cible.valeur)
-    setAjoutEnCours(false)
-    boutonsGenre.current[suivant]?.focus()
+  function ranger(mediaId: string, cible: string | null) {
+    const avant = items
+    const media = items.find((m) => m.id === mediaId)
+    if (!media || media.folderId === cible) return
+    setItems((prev) => prev.map((m) => (m.id === mediaId ? { ...m, folderId: cible } : m)))
+    start(async () => {
+      const result = await moveMediaToFolder(mediaId, cible)
+      if (!result.ok) {
+        setItems(avant)
+        toast.error(result.error)
+        return
+      }
+      const nom = cible ? folders.find((f) => f.id === cible)?.name : 'Non classés'
+      toast.success(`Rangé dans « ${nom} ».`)
+    })
   }
+
+  /* ── Dossiers ─────────────────────────────────────────────────────── */
+
+  function creerDossier(nomBrut: string) {
+    const nom = nomBrut.trim()
+    setCreation(null)
+    if (!nom) return
+    start(async () => {
+      const result = await createMediaFolder(nom)
+      if (!result.ok) {
+        toast.error(result.error)
+        return
+      }
+      setFolders((prev) => [...prev, result.data])
+      setVue(result.data.id)
+      toast.success(`Dossier « ${nom} » créé.`)
+    })
+  }
+
+  function renommerDossier(id: string, nomBrut: string) {
+    const nom = nomBrut.trim()
+    setRenommage(null)
+    const dossier = folders.find((f) => f.id === id)
+    if (!nom || !dossier || nom === dossier.name) return
+    setFolders((prev) => prev.map((f) => (f.id === id ? { ...f, name: nom } : f)))
+    start(async () => {
+      const result = await renameMediaFolder(id, nom)
+      if (!result.ok) {
+        setFolders((prev) => prev.map((f) => (f.id === id ? dossier : f)))
+        toast.error(result.error)
+        return
+      }
+      toast.success('Dossier renommé.')
+    })
+  }
+
+  async function supprimerDossier(id: string) {
+    const result = await deleteMediaFolder(id)
+    if (result.ok) {
+      setFolders((prev) => prev.filter((f) => f.id !== id))
+      setItems((prev) => prev.map((m) => (m.folderId === id ? { ...m, folderId: null } : m)))
+      setVue('tous')
+    }
+    return result
+  }
+
+  /* ── Glisser une vignette sur un dossier ──────────────────────────── */
+
+  const cibleDeDepot = (v: Vue) => ({
+    onDragOver: (e: React.DragEvent) => {
+      if (!e.dataTransfer.types.includes(DRAG_TYPE)) return
+      e.preventDefault()
+      e.dataTransfer.dropEffect = 'move'
+      setSurvolDossier(v)
+    },
+    onDragLeave: () => setSurvolDossier((s) => (s === v ? null : s)),
+    onDrop: (e: React.DragEvent) => {
+      const id = e.dataTransfer.getData(DRAG_TYPE)
+      setSurvolDossier(null)
+      if (!id) return
+      e.preventDefault()
+      ranger(id, v === 'non-classes' || v === 'tous' ? null : v)
+    },
+  })
+
+  /* ── Rendu ────────────────────────────────────────────────────────── */
+
+  const ligneDossier = (
+    v: Vue,
+    libelle: string,
+    n: number,
+    pastille: React.ReactNode,
+  ) => {
+    const actif = vue === v
+    const survole = survolDossier === v
+    return (
+      <li key={v}>
+        <button
+          type="button"
+          onClick={() => setVue(v)}
+          aria-current={actif ? 'true' : undefined}
+          {...(v !== 'tous' ? cibleDeDepot(v) : {})}
+          className={cn(
+            'group flex h-[52px] w-full items-center gap-3 rounded-[14px] px-3 text-left text-[14px] font-medium transition-[background-color,color,box-shadow] duration-[250ms] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+            actif ? 'bg-white text-foreground shadow-[0_1px_2px_rgba(22,73,81,0.06)]' : 'text-[#46606c] hover:bg-white/60 hover:text-foreground',
+            survole && 'bg-white shadow-[0_0_0_2px_var(--page-fg)]',
+          )}
+        >
+          {pastille}
+          <span className="min-w-0 flex-1 truncate">{libelle}</span>
+          <span className="text-[12px] tabular-nums text-[#8aa4a8]">{n}</span>
+        </button>
+      </li>
+    )
+  }
+
+  const tuile = (icone: React.ReactNode, bg: string, fg: string) => (
+    <span
+      aria-hidden="true"
+      className="grid h-8 w-8 shrink-0 place-items-center rounded-[10px] transition-transform duration-[350ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:scale-[1.06]"
+      style={{ background: bg, color: fg }}
+    >
+      {icone}
+    </span>
+  )
+
+  const nonClasses = compte.get(null) ?? 0
 
   return (
     <>
-      {/* Ajouter : on choisit d'abord le genre, puis le fichier. */}
-      <section aria-labelledby="medias-ajouter" className="rounded-[24px] bg-block p-6">
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-          <h2 id="medias-ajouter" className="flex items-center gap-2.5 text-[16px] font-semibold text-foreground">
-            <span aria-hidden="true" className="h-2 w-2 rounded-full bg-[var(--page-fg)] opacity-70" />
-            Ajouter
-          </h2>
-          <div
-            role="group"
-            aria-label="Que voulez-vous ajouter ?"
-            className="flex gap-0.5 rounded-[12px] bg-white p-1 shadow-field"
+      <PageHeader
+        overline="Images et vidéos"
+        title="Médias"
+        description={`${pluriel(items.length, 'fichier', 'fichiers')} · ${pluriel(folders.length, 'dossier', 'dossiers')}`}
+        action={
+          <button
+            type="button"
+            className={buttonVariants({ variant: 'outline', size: 'sm' })}
+            onClick={() => {
+              zoneAjout.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+              upload.current?.choisir()
+            }}
           >
-            {GENRES.map(({ valeur, libelle }, index) => (
-              <button
-                key={valeur}
-                ref={(el) => {
-                  boutonsGenre.current[index] = el
-                }}
-                type="button"
-                aria-pressed={genre === valeur}
-                onClick={() => {
-                  setGenre(valeur)
-                  setAjoutEnCours(false)
-                }}
-                onKeyDown={(e) => surToucheGenre(e, index)}
-                className={cn(
-                  'inline-flex h-8 items-center gap-1.5 rounded-[9px] px-3 text-[13px] font-medium transition-[background-color,color] duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                  genre === valeur
-                    ? 'bg-[var(--page-bg)] text-[var(--page-fg)]'
-                    : 'text-muted-foreground hover:text-foreground',
-                )}
-              >
-                {valeur === 'video' ? (
-                  <Clapperboard className="h-4 w-4" aria-hidden="true" />
-                ) : (
-                  <ImagePlus className="h-4 w-4" aria-hidden="true" />
-                )}
-                {libelle}
-              </button>
-            ))}
-          </div>
-        </div>
+            <Upload strokeWidth={1.8} />
+            Envoyer des fichiers
+          </button>
+        }
+      />
 
-        <UploadField
-          key={genre}
-          ref={upload}
-          kind={genre}
-          onFileChange={(file) => setAjoutEnCours(file !== null)}
-          onUploaded={(media) => setItems((prev) => [media, ...prev])}
-        />
-      </section>
+      <div className="grid gap-2 rounded-[24px] bg-block p-2 lg:grid-cols-[260px_minmax(0,1fr)]">
+        {/* ── Les dossiers ─────────────────────────────────────────── */}
+        <nav aria-label="Dossiers" className="p-1 lg:p-2">
+          <ul className="flex flex-col gap-0.5">
+            {ligneDossier(
+              'tous',
+              'Tous les fichiers',
+              items.length,
+              tuile(<Layers className="h-4 w-4" strokeWidth={1.8} />, PASTELS[0]!.bg, PASTELS[0]!.fg),
+            )}
+          </ul>
 
-      {items.length === 0 ? (
-        <div className="rounded-[24px] bg-block px-6 py-16 text-center">
-          <p className="text-[13px] text-ink-soft">Aucune {nom} pour l’instant.</p>
-          {/* Pendant qu'un fichier attend sa description, le bouton se tait :
-              l'ajout est déjà en cours, juste au-dessus. */}
-          {!ajoutEnCours && (
-            <Button type="button" className="mt-4" onClick={() => upload.current?.choisir()}>
-              {genre === 'video' ? <Clapperboard aria-hidden="true" /> : <ImagePlus aria-hidden="true" />}
-              Ajouter une {nom}
-            </Button>
-          )}
-        </div>
-      ) : (
-        <ul
-          aria-label="Vos médias"
-          className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4"
-        >
-          {items.map((media) => {
-            const estVideo = isVideoMimeType(media.mimeType)
-            return (
-              <li
-                key={media.id}
-                className="flex flex-col overflow-hidden rounded-[16px] bg-block p-1.5 transition-shadow duration-300 hover:shadow-sm"
-                title={media.alt}
-              >
-                <div className="relative aspect-4/3 overflow-hidden rounded-[11px] bg-muted">
-                  <MediaThumb media={media} sizes="(max-width: 640px) 50vw, 240px" />
-                  {estVideo && (
-                    <span className="absolute left-2 top-2 rounded-full bg-white/90 px-2 py-0.5 text-[12px] font-medium text-foreground">
-                      Vidéo
-                    </span>
-                  )}
-                </div>
-
-                <div className="min-w-0 px-1.5 pt-2.5">
-                  <p className="truncate text-[14px] font-medium text-foreground">{media.alt}</p>
-                  <MediaMeta media={media} className="mt-0.5" />
-                </div>
-
-                {/* Actions toujours visibles — au doigt, au clavier, sans survol. */}
-                <div className="mt-auto flex items-center gap-1.5 px-0.5 pb-0.5 pt-3">
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    size="sm"
-                    className="h-9 flex-1"
-                    onClick={() => openEditor(media)}
-                  >
-                    Modifier
-                  </Button>
-                  <ConfirmDelete
-                    label={media.alt}
-                    description={`Si cette ${estVideo ? 'vidéo' : 'image'} est utilisée sur le site, elle n’y apparaîtra plus.`}
-                    onConfirm={async () => {
-                      const result = await deleteMedia(media.id)
-                      if (result.ok) {
-                        setItems((prev) => prev.filter((m) => m.id !== media.id))
-                      }
-                      return result
+          <p className="px-3 pb-1.5 pt-5 text-[13px] font-medium text-[#8aa4a8]">Dossiers</p>
+          <ul className="flex flex-col gap-0.5">
+            {folders.map((f) =>
+              renommage === f.id ? (
+                <li key={f.id} className="px-1 py-1">
+                  <Input
+                    autoFocus
+                    aria-label={`Nouveau nom de « ${f.name} »`}
+                    defaultValue={f.name}
+                    onBlur={(e) => renommerDossier(f.id, e.currentTarget.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') renommerDossier(f.id, e.currentTarget.value)
+                      if (e.key === 'Escape') setRenommage(null)
+                    }}
+                  />
+                </li>
+              ) : (
+                ligneDossier(
+                  f.id,
+                  f.name,
+                  compte.get(f.id) ?? 0,
+                  tuile(<Folder className="h-4 w-4" strokeWidth={1.8} />, pastelDe(f.id).bg, pastelDe(f.id).fg),
+                )
+              ),
+            )}
+            {(nonClasses > 0 || vue === 'non-classes') &&
+              ligneDossier(
+                'non-classes',
+                'Non classés',
+                nonClasses,
+                tuile(<Inbox className="h-4 w-4" strokeWidth={1.8} />, '#e9eced', '#6b8186'),
+              )}
+            <li className="pt-1">
+              {creation !== null ? (
+                <div className="px-1 py-1">
+                  <Input
+                    autoFocus
+                    aria-label="Nom du nouveau dossier"
+                    placeholder="Nom du dossier"
+                    value={creation}
+                    onChange={(e) => setCreation(e.target.value)}
+                    onBlur={() => creerDossier(creation)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') creerDossier(creation)
+                      if (e.key === 'Escape') setCreation(null)
                     }}
                   />
                 </div>
-              </li>
-            )
-          })}
-        </ul>
-      )}
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setCreation('')}
+                  className="group/add flex items-center gap-[7px] rounded-[8px] px-3 py-2 text-[13.5px] font-medium text-[#176c79] transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <FolderPlus className="h-4 w-4 transition-transform duration-300 group-hover/add:-rotate-6 group-hover/add:scale-110" strokeWidth={1.8} />
+                  Nouveau dossier
+                </button>
+              )}
+            </li>
+          </ul>
+        </nav>
 
-      <Dialog
-        open={editing !== null}
-        onOpenChange={(open) => !open && setEditing(null)}
-      >
+        {/* ── Le dossier ouvert ─────────────────────────────────────── */}
+        <section
+          aria-label={titre}
+          className="flex min-w-0 flex-col rounded-[20px] bg-white p-5 sm:p-6"
+        >
+          <div className="mb-5 flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h2 key={vue} className="truncate text-[16px] font-semibold text-foreground animate-[adm-fade_0.3s_ease_both]">
+                {titre}
+              </h2>
+              <p className="mt-0.5 text-[13px] text-[#8aa4a8]">
+                {pluriel(visibles.length, 'fichier', 'fichiers')}
+              </p>
+            </div>
+            {dossierCourant && (
+              <div className="flex shrink-0 items-center gap-1">
+                <ActionMenu
+                  label={`Actions du dossier « ${dossierCourant.name} »`}
+                  items={[
+                    {
+                      label: 'Renommer',
+                      icon: <Pencil />,
+                      onSelect: () => setRenommage(dossierCourant.id),
+                    },
+                  ]}
+                />
+                <ConfirmDelete
+                  label={dossierCourant.name}
+                  description="Les fichiers du dossier ne sont pas supprimés : ils redeviennent non classés."
+                  succes="Dossier supprimé."
+                  onConfirm={() => supprimerDossier(dossierCourant.id)}
+                  trigger={
+                    <Button variant="ghost" size="icon-sm" aria-label={`Supprimer le dossier ${dossierCourant.name}`}>
+                      <Trash2 className="text-destructive" />
+                    </Button>
+                  }
+                />
+              </div>
+            )}
+          </div>
+
+          {visibles.length === 0 ? (
+            <div className="flex flex-col items-center gap-1.5 rounded-[16px] bg-block px-6 py-14 text-center">
+              <span className="mb-2 grid h-12 w-12 place-items-center rounded-[14px] bg-white text-[#8aa4a8]">
+                <Folder className="h-5 w-5" strokeWidth={1.8} />
+              </span>
+              <p className="text-[16px] font-semibold text-foreground">Ce dossier est vide</p>
+              <p className="max-w-[40ch] text-[14px] text-muted-foreground">
+                Glissez-y des fichiers depuis « Tous les fichiers », ou envoyez-en
+                de nouveaux ci-dessous.
+              </p>
+            </div>
+          ) : (
+            <ul aria-label="Vos médias" className="grid grid-cols-2 gap-x-4 gap-y-5 sm:grid-cols-3 xl:grid-cols-4">
+              {visibles.map((media) => {
+                const estVideo = isVideoMimeType(media.mimeType)
+                return (
+                  <li
+                    key={media.id}
+                    title={media.alt}
+                    draggable
+                    onDragStart={(e) => {
+                      e.dataTransfer.setData(DRAG_TYPE, media.id)
+                      e.dataTransfer.effectAllowed = 'move'
+                    }}
+                    className="group relative flex min-w-0 cursor-grab flex-col animate-[adm-pop_0.35s_cubic-bezier(0.22,1,0.36,1)] active:cursor-grabbing"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => openEditor(media)}
+                      aria-label={`Modifier ${media.alt}`}
+                      className="relative block aspect-4/3 overflow-hidden rounded-[12px] bg-block transition-shadow duration-300 hover:shadow-[0_10px_30px_rgba(22,73,81,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    >
+                      <MediaThumb media={media} sizes="(max-width: 640px) 50vw, 220px" />
+                      {estVideo && (
+                        <span className="absolute bottom-2 left-2 grid h-6 w-6 place-items-center rounded-full bg-white/90 text-foreground">
+                          <Clapperboard className="h-3 w-3" strokeWidth={2} />
+                        </span>
+                      )}
+                    </button>
+
+                    <div className="mt-2 flex min-w-0 items-start gap-1">
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-[14px] font-medium text-foreground">{media.alt}</p>
+                        <p className="text-[12px] text-[#8aa4a8]">
+                          {[estVideo ? 'Vidéo' : 'Image', formatTaille(media.size)].filter(Boolean).join(' · ')}
+                        </p>
+                      </div>
+                      {/* Visible au survol, au clavier et au doigt. */}
+                      <div className="flex shrink-0 opacity-0 transition-opacity duration-200 focus-within:opacity-100 group-hover:opacity-100 [@media(hover:none)]:opacity-100">
+                        <ConfirmDelete
+                          label={media.alt}
+                          description={`Si cette ${estVideo ? 'vidéo' : 'image'} est utilisée sur le site, elle n’y apparaîtra plus.`}
+                          onConfirm={async () => {
+                            const result = await deleteMedia(media.id)
+                            if (result.ok) setItems((prev) => prev.filter((m) => m.id !== media.id))
+                            return result
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </li>
+                )
+              })}
+            </ul>
+          )}
+
+          {/* ── Ajouter, dans le dossier ouvert ─────────────────────── */}
+          <div ref={zoneAjout} className="mt-6 border-t border-[#eef1f2] pt-5">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+              <p className="text-[14px] font-semibold text-foreground">
+                Ajouter{dossierCourant ? ` dans « ${dossierCourant.name} »` : ''}
+              </p>
+              <div role="group" aria-label="Que voulez-vous ajouter ?" className="flex gap-0.5 rounded-[12px] bg-block p-1">
+                {GENRES.map(({ valeur, libelle }) => (
+                  <button
+                    key={valeur}
+                    type="button"
+                    aria-pressed={genre === valeur}
+                    onClick={() => setGenre(valeur)}
+                    className={cn(
+                      'inline-flex h-8 items-center gap-1.5 rounded-[9px] px-3 text-[13px] font-medium transition-[background-color,color,box-shadow] duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                      genre === valeur
+                        ? 'bg-white text-foreground shadow-[0_1px_2px_rgba(22,73,81,0.08)]'
+                        : 'text-muted-foreground hover:text-foreground',
+                    )}
+                  >
+                    {valeur === 'video' ? (
+                      <Clapperboard className="h-4 w-4" aria-hidden="true" />
+                    ) : (
+                      <ImagePlus className="h-4 w-4" aria-hidden="true" />
+                    )}
+                    {libelle}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <UploadField
+              key={genre}
+              ref={upload}
+              kind={genre}
+              compact
+              folderId={folderIdCourant}
+              onUploaded={(media) => setItems((prev) => [media, ...prev])}
+            />
+          </div>
+        </section>
+      </div>
+
+      <Dialog open={editing !== null} onOpenChange={(open) => !open && setEditing(null)}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
@@ -231,8 +534,8 @@ export function MediaManager({ items: initial }: { items: Media[] }) {
           </DialogHeader>
 
           {editing && (
-            <div className="flex items-center gap-3 rounded-[8px] border border-border bg-muted/40 p-2.5">
-              <span className="relative block h-[56px] w-[74px] shrink-0 overflow-hidden rounded-[8px] bg-muted">
+            <div className="flex items-center gap-3 rounded-[16px] bg-block p-2.5">
+              <span className="relative block h-[56px] w-[74px] shrink-0 overflow-hidden rounded-[10px] bg-muted">
                 <MediaThumb media={editing} sizes="74px" />
               </span>
               <MediaMeta media={editing} />
@@ -274,14 +577,21 @@ export function MediaManager({ items: initial }: { items: Media[] }) {
                 Facultatif. Un texte affiché sous le média, quand la section le prévoit.
               </p>
             </div>
+
+            <Choice
+              id="m-dossier"
+              label="Dossier"
+              value={dossierEdite}
+              onChange={setDossierEdite}
+              options={[
+                { value: 'aucun', label: 'Non classé' },
+                ...folders.map((f) => ({ value: f.id, label: f.name })),
+              ]}
+            />
           </div>
 
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setEditing(null)}
-              disabled={pending}
-            >
+            <Button variant="outline" onClick={() => setEditing(null)} disabled={pending}>
               Annuler
             </Button>
             <Button onClick={save} disabled={pending || !alt.trim()}>

@@ -8,6 +8,7 @@ import {
   contactMessages,
   faqItems,
   media,
+  mediaFolders,
   pages,
   savedSections,
   sections,
@@ -17,6 +18,7 @@ import {
   settings,
   type FaqItem,
   type Media,
+  type MediaFolder,
   type Page,
   type SavedSection,
   type ContactMessage,
@@ -214,6 +216,10 @@ export async function getAllFaq(): Promise<FaqItem[]> {
 
 export async function getAllMedia(): Promise<Media[]> {
   return db.select().from(media).orderBy(desc(media.createdAt))
+}
+
+export async function getMediaFolders(): Promise<MediaFolder[]> {
+  return db.select().from(mediaFolders).orderBy(asc(mediaFolders.sortOrder), asc(mediaFolders.createdAt))
 }
 
 export async function getMediaByIds(ids: string[]): Promise<Media[]> {

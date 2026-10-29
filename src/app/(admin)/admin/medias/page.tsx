@@ -1,20 +1,17 @@
 import { AdminContent } from '@/components/admin/AdminContent'
 import { MediaManager } from '@/components/admin/MediaManager'
-import { PageHeader } from '@/components/admin/PageHeader'
-import { getAllMedia } from '@/server/queries'
+import { getAllMedia, getMediaFolders } from '@/server/queries'
 
 export const dynamic = 'force-dynamic'
 
 export default async function MediaAdminPage() {
-  const items = await getAllMedia()
+  const [items, folders] = await Promise.all([getAllMedia(), getMediaFolders()])
 
+  /* L'en-tête (compteurs, « Envoyer des fichiers ») vit dans le
+     gestionnaire : il suit les ajouts et les rangements sans recharger. */
   return (
     <AdminContent width="wide">
-      <PageHeader
-        title="Médias"
-        description="Vos images et vos vidéos, prêtes à être utilisées sur le site."
-      />
-      <MediaManager items={items} />
+      <MediaManager items={items} folders={folders} />
     </AdminContent>
   )
 }

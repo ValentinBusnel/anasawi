@@ -398,6 +398,7 @@ function cadreGris(index: number, ratio: 'paysage' | 'portrait'): Media {
      donc invisible dans l'aperçu. */
   return {
     id: `00000000-0000-4000-8000-00000000000${index}`,
+    folderId: null,
     url: `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`,
     pathname: '',
     filename: 'cadre.svg',
