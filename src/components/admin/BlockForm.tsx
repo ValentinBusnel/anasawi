@@ -58,7 +58,7 @@ export function BlockForm({
     onChange({ ...value, [name]: next })
 
   return (
-    <div className="grid grid-cols-1 gap-3">
+    <div className="grid grid-cols-1 gap-3.5">
       {fields.map((field) => {
         const erreur = errors?.[field.name]?.[0]
         return (
@@ -70,7 +70,7 @@ export function BlockForm({
               library={library}
             />
             {erreur && (
-              <p role="alert" className="mt-1.5 text-[12px] leading-snug text-red-700">
+              <p role="alert" className="mt-1.5 text-[12px] leading-snug text-destructive">
                 {erreur}
               </p>
             )}
@@ -279,7 +279,7 @@ function Wrapper({
       </Label>
       {children}
       {field.help && (
-        <p className="mt-1.5 text-[0.7rem] leading-[1.5] text-muted-foreground">
+        <p className="mt-1.5 text-[12px] leading-[17px] text-muted-foreground">
           {field.help}
         </p>
       )}
@@ -394,39 +394,39 @@ function ListField({
 
   return (
     <div>
-      <div className="mb-2 flex items-center justify-between">
-        <Label className="text-[13px] font-medium text-foreground/80">
+      <div className="mb-[7px] flex items-center justify-between gap-3">
+        <Label className="text-[12.5px] font-medium leading-4 text-[#6b8186]">
           {field.label}
         </Label>
-        <Button
+        {/* L'ajout de l'espace Qeeps : un lien, dont le + pivote. */}
+        <button
           type="button"
-          variant="outline"
-          size="sm"
           onClick={() => onChange([...value, blank()])}
+          className="group/add inline-flex shrink-0 items-center gap-[7px] rounded-[8px] px-0.5 py-1.5 text-[13.5px] font-medium text-[#176c79] transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
-          <Plus />
+          <Plus className="h-3.5 w-3.5 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/add:rotate-90" strokeWidth={2} />
           {field.addLabel ?? 'Ajouter'}
-        </Button>
+        </button>
       </div>
 
       {field.help && (
-        <p className="mb-3 text-xs text-muted-foreground">{field.help}</p>
+        <p className="mb-3 text-[12px] leading-[17px] text-muted-foreground">{field.help}</p>
       )}
 
       {value.length === 0 ? (
-        <p className="rounded-[8px] border border-dashed border-line-strong px-3 py-5 text-center text-[0.72rem] text-muted-foreground">
+        <p className="rounded-[16px] border-[1.5px] border-dashed border-[#cfd9db] px-3 py-5 text-center text-[13px] text-muted-foreground">
           Aucun élément.
         </p>
       ) : singleTextItem ? (
         /* Liste à champ unique (ex. les lignes d'un titre) : une seule
            rangée compacte par élément — numéro, champ, flèches, croix. */
-        <ul className="space-y-1.5">
+        <ul className="space-y-2">
           {value.map((item, index) => {
             const sub = itemFields[0]
             if (!sub) return null
             return (
               <li key={index} className="flex items-center gap-1.5">
-                <span className="w-3.5 shrink-0 text-right text-[12px] tabular-nums text-muted-foreground">
+                <span className="w-4 shrink-0 text-right text-[12px] font-semibold tabular-nums text-[#8aa4a8]">
                   {index + 1}
                 </span>
                 <input
@@ -441,7 +441,7 @@ function ListField({
                     copy[index] = { ...item, [sub.name]: e.target.value }
                     onChange(copy)
                   }}
-                  className="h-9 min-w-0 flex-1 rounded-[9px] border border-input bg-card px-2.5 text-[13.5px] shadow-xs outline-none transition-[border-color,box-shadow] focus:border-ring focus:ring-[3px] focus:ring-ring/25"
+                  className="h-[42px] min-w-0 flex-1 rounded-[10px] border-0 bg-white px-3.5 text-[14px] text-foreground shadow-field outline-none transition-shadow duration-200 placeholder:text-[#b0bec1] hover:shadow-[var(--admin-field-shadow),0_0_0_1px_#dfe5e7] focus:shadow-[0_0_0_1.5px_#176c79,0_4px_14px_rgba(22,73,81,0.08)]"
                 />
                 <RowControls
                   index={index}
@@ -458,10 +458,12 @@ function ListField({
           {value.map((item, index) => (
             <li
               key={index}
-              className="rounded-[8px] border border-border bg-card p-2.5"
+              /* Une rangée blanche du répéteur Qeeps ; ses champs prennent
+                 le liseré (fond blanc). */
+              className="field-on-white rounded-[16px] bg-white p-3.5 animate-[adm-pop_0.35s_cubic-bezier(0.22,1,0.36,1)]"
             >
-              <div className="mb-2 flex items-center justify-between">
-                <span className="text-[12px] tabular-nums text-muted-foreground">
+              <div className="mb-2.5 flex items-center justify-between">
+                <span className="text-[12px] font-semibold tabular-nums text-[#8aa4a8]">
                   {index + 1}
                 </span>
                 <RowControls

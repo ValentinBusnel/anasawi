@@ -26,6 +26,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { MotionProvider } from '@/components/motion/MotionProvider'
+import { ICONE_PAR_CATEGORIE, PASTELS } from './editor/sectionTone'
 import { AnimProvider } from '@/components/site/anim'
 import {
   SectionsView,
@@ -129,8 +130,10 @@ export function TemplateLibrary({
       aria-label={`Ajouter la section « ${option.label} »`}
       onClick={() => void pick(() => onPick(option.type, option.label), option.type)}
       className={cn(
-        'group relative rounded-[14px] border border-border bg-card p-2 text-left shadow-xs transition-[border-color,box-shadow] duration-150',
-        'hover:border-primary/40 hover:shadow-pop focus-visible:border-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/30',
+        /* Les cartes de l'espace Qeeps : blanches sur le gris, arrondies à
+           20 px, elles se soulèvent d'un rien au survol. */
+        'group relative rounded-[20px] bg-white p-2 text-left shadow-[0_1px_2px_rgba(22,73,81,0.06)] transition-[box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]',
+        'hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgba(22,73,81,0.1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
         busy === option.type && 'opacity-60',
       )}
     >
@@ -161,7 +164,7 @@ export function TemplateLibrary({
     <div
       key={model.id}
       className={cn(
-        'group relative rounded-[14px] border border-border bg-card p-2 shadow-xs transition-[border-color,box-shadow] duration-150 hover:border-primary/40 hover:shadow-pop',
+        'group relative rounded-[20px] bg-white p-2 shadow-[0_1px_2px_rgba(22,73,81,0.06)] transition-[box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgba(22,73,81,0.1)]',
         busy === model.id && 'opacity-60',
       )}
     >
@@ -190,7 +193,7 @@ export function TemplateLibrary({
         <div
           role="alertdialog"
           aria-label="Confirmer la suppression du modèle"
-          className="absolute inset-x-2 top-2 flex items-center gap-1.5 rounded-md bg-white/95 px-2 py-1.5 text-[0.72rem] text-foreground shadow-sm"
+          className="absolute inset-x-2 top-2 flex items-center gap-1.5 rounded-md bg-white/95 px-2 py-1.5 text-[12px] text-foreground shadow-sm"
         >
           <span className="mr-auto">Supprimer ce modèle ?</span>
           <button
@@ -202,14 +205,14 @@ export function TemplateLibrary({
                  lui-même le résultat (succès ou erreur). */
               void onDeleteSaved(model.id)
             }}
-            className="rounded-[5px] bg-red-600 px-2 py-[2px] text-[0.7rem] font-medium text-white hover:bg-red-700"
+            className="rounded-[5px] bg-red-600 px-2 py-[2px] text-[12px] font-medium text-white hover:bg-red-700"
           >
             Supprimer
           </button>
           <button
             type="button"
             onClick={() => setConfirmSavedId(null)}
-            className="rounded-[5px] border border-line-strong px-2 py-[2px] text-[0.7rem] text-ink-soft hover:text-foreground"
+            className="rounded-[5px] border border-line-strong px-2 py-[2px] text-[12px] text-ink-soft hover:text-foreground"
           >
             Annuler
           </button>
@@ -258,48 +261,62 @@ export function TemplateLibrary({
         <div className="flex min-h-0 flex-1">
           {/* Catégories */}
           {!searching && (
-            <nav className="w-56 shrink-0 space-y-px overflow-y-auto border-r border-border bg-sidebar p-3">
-              <p className="px-2.5 pb-1 pt-2 text-[12px] font-medium text-muted-foreground">
+            <nav className="w-64 shrink-0 space-y-0.5 overflow-y-auto border-r border-[#eef1f2] bg-white p-3">
+              <p className="px-2 pb-2 pt-1 text-[13px] font-medium text-[#8aa4a8]">
                 Une section pour…
               </p>
-              {templateLibrary.map((group) => (
+              {templateLibrary.map((group, i) => {
+                const pastel = PASTELS[i % PASTELS.length]!
+                const Icone = ICONE_PAR_CATEGORIE[group.category]
+                const actif = active === group.category
+                return (
                 <button
                   key={group.category}
                   type="button"
                   onClick={() => setActive(group.category)}
                   className={cn(
-                    'flex h-9 w-full items-center justify-between rounded-[9px] px-2.5 text-left text-[13.5px] transition-colors',
-                    active === group.category
-                      ? 'bg-card font-medium text-foreground shadow-xs ring-1 ring-border'
-                      : 'text-ink-soft hover:bg-black/[0.04] hover:text-foreground',
+                    'group flex h-10 w-full items-center gap-2.5 rounded-[10px] px-2 text-left text-[14px] font-medium transition-[background-color,color] duration-[250ms]',
+                    actif ? 'font-semibold text-foreground' : 'text-[#6b8186] hover:bg-[#f7f8f8] hover:text-foreground',
                   )}
+                  style={actif ? { background: `color-mix(in srgb, ${pastel.bg} 45%, white)` } : undefined}
                 >
-                  {group.category}
-                  <span className="text-[12px] tabular-nums text-muted-foreground">
+                  <span
+                    aria-hidden="true"
+                    className={cn(
+                      'grid h-[26px] w-[26px] shrink-0 place-items-center rounded-[8px] transition-[opacity,transform] duration-[350ms] ease-[cubic-bezier(0.34,1.56,0.64,1)]',
+                      actif ? 'scale-[1.06] opacity-100' : 'opacity-75 group-hover:opacity-100',
+                    )}
+                    style={{ background: pastel.bg, color: pastel.fg }}
+                  >
+                    <Icone className="h-[13px] w-[13px]" strokeWidth={2} />
+                  </span>
+                  <span className="flex-1 truncate">{group.category}</span>
+                  <span className="text-[12px] tabular-nums text-[#8aa4a8]">
                     {group.options.length}
                   </span>
                 </button>
-              ))}
+                )
+              })}
               {saved.length > 0 && (
                 <>
-                  <p className="px-2.5 pb-1 pt-3 text-[12px] font-medium text-muted-foreground">
+                  <p className="px-2 pb-2 pt-4 text-[13px] font-medium text-[#8aa4a8]">
                     Personnel
                   </p>
                   <button
                     type="button"
                     onClick={() => setActive(MINE)}
                     className={cn(
-                      'flex h-9 w-full items-center justify-between rounded-[9px] px-2.5 text-left text-[13.5px] transition-colors',
+                      'flex h-10 w-full items-center gap-2.5 rounded-[10px] px-2 text-left text-[14px] font-medium transition-[background-color,color] duration-[250ms]',
                       active === MINE
-                        ? 'bg-card font-medium text-foreground shadow-xs ring-1 ring-border'
-                        : 'text-ink-soft hover:bg-black/[0.04] hover:text-foreground',
+                        ? 'bg-block font-semibold text-foreground'
+                        : 'text-[#6b8186] hover:bg-[#f7f8f8] hover:text-foreground',
                     )}
                   >
-                    <span className="flex items-center gap-1.5">
-                      <Bookmark className="h-3 w-3" />
-                      Mes modèles
+                    <span aria-hidden="true" className="grid h-[26px] w-[26px] shrink-0 place-items-center rounded-[8px] bg-block text-foreground">
+                      <Bookmark className="h-[13px] w-[13px]" strokeWidth={2} />
                     </span>
-                    <span className="text-[12px] tabular-nums text-muted-foreground">
+                    <span className="flex-1">Mes modèles</span>
+                    <span className="text-[12px] tabular-nums text-[#8aa4a8]">
                       {saved.length}
                     </span>
                   </button>
@@ -309,17 +326,17 @@ export function TemplateLibrary({
           )}
 
           {/* Previews */}
-          <div className="min-h-0 flex-1 overflow-y-auto bg-background p-6">
+          <div className="min-h-0 flex-1 overflow-y-auto bg-[#f6f8f8] p-6">
             {searching && results ? (
               results.options.length + results.mine.length === 0 ? (
                 <div className="py-16 text-center">
-                  <p className="text-[0.82rem] text-muted-foreground">
+                  <p className="text-[14px] text-muted-foreground">
                     Aucun modèle ne correspond à « {query.trim()} ».
                   </p>
                   <button
                     type="button"
                     onClick={() => setQuery('')}
-                    className="mt-3 rounded-lg border border-line-strong px-3 py-1.5 text-[0.78rem] text-ink-soft transition-colors hover:border-blue-deep hover:text-blue-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-deep/50"
+                    className="mt-3 rounded-lg border border-line-strong px-3 py-1.5 text-[13px] text-ink-soft transition-colors hover:border-blue-deep hover:text-blue-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-deep/50"
                   >
                     Effacer la recherche
                   </button>
@@ -492,7 +509,7 @@ function TemplatePreview({
   return (
     <div
       ref={frameRef}
-      className="pointer-events-none relative overflow-hidden rounded-[10px] bg-white ring-1 ring-black/[0.05]"
+      className="pointer-events-none relative overflow-hidden rounded-[14px] bg-white ring-1 ring-black/[0.04]"
       style={{ height: box.height }}
       aria-hidden="true"
     >

@@ -34,7 +34,7 @@ export function ServiceRow({
       className={cn(
         /* `flex-wrap` : sur téléphone, les commandes passent sous le texte
            plutôt que de l'écraser. */
-        'flex flex-wrap items-center gap-x-3 gap-y-2 bg-white px-3 py-3 transition-colors duration-150 hover:bg-ivory/50 sm:px-4',
+        'flex flex-wrap items-center gap-x-3 gap-y-2 rounded-[16px] bg-white px-3 py-3 transition-shadow duration-200 hover:shadow-sm sm:px-4',
         /* C'est le calque qu'on suit : l'original marque la place. */
         isDragging && 'opacity-35',
         !service.isActive && 'opacity-60',
@@ -77,7 +77,7 @@ export function ServiceRow({
             </span>
           )}
         </p>
-        <p className="truncate text-xs text-muted-foreground">
+        <p className="truncate text-[13px] text-muted-foreground">
           {service.excerpt || 'Aucune description courte pour l’instant.'}
         </p>
       </div>
@@ -88,7 +88,7 @@ export function ServiceRow({
         <span className="mr-1 flex items-center gap-2">
           <span
             aria-hidden="true"
-            className="hidden text-xs text-muted-foreground sm:inline"
+            className="hidden text-[13px] text-muted-foreground sm:inline"
           >
             Visible
           </span>

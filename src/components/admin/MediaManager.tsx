@@ -97,15 +97,16 @@ export function MediaManager({ items: initial }: { items: Media[] }) {
   return (
     <>
       {/* Ajouter : on choisit d'abord le genre, puis le fichier. */}
-      <section aria-labelledby="medias-ajouter" className="rounded-[8px] border border-border bg-card p-4">
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-          <h2 id="medias-ajouter" className="text-[15px] font-medium text-foreground">
+      <section aria-labelledby="medias-ajouter" className="rounded-[24px] bg-block p-6">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+          <h2 id="medias-ajouter" className="flex items-center gap-2.5 text-[16px] font-semibold text-foreground">
+            <span aria-hidden="true" className="h-2 w-2 rounded-full bg-[var(--page-fg)] opacity-70" />
             Ajouter
           </h2>
           <div
             role="group"
             aria-label="Que voulez-vous ajouter ?"
-            className="flex overflow-hidden rounded-[8px] border border-line-strong"
+            className="flex gap-0.5 rounded-[12px] bg-white p-1 shadow-field"
           >
             {GENRES.map(({ valeur, libelle }, index) => (
               <button
@@ -121,11 +122,10 @@ export function MediaManager({ items: initial }: { items: Media[] }) {
                 }}
                 onKeyDown={(e) => surToucheGenre(e, index)}
                 className={cn(
-                  'inline-flex h-9 items-center gap-1.5 px-3.5 text-[13px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring/50',
-                  index > 0 && 'border-l border-line',
+                  'inline-flex h-8 items-center gap-1.5 rounded-[9px] px-3 text-[13px] font-medium transition-[background-color,color] duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                   genre === valeur
-                    ? 'bg-blue-mist font-medium text-blue-deep'
-                    : 'bg-card text-ink-soft hover:text-foreground',
+                    ? 'bg-[var(--page-bg)] text-[var(--page-fg)]'
+                    : 'text-muted-foreground hover:text-foreground',
                 )}
               >
                 {valeur === 'video' ? (
@@ -149,7 +149,7 @@ export function MediaManager({ items: initial }: { items: Media[] }) {
       </section>
 
       {items.length === 0 ? (
-        <div className="mt-6 rounded-[8px] border border-dashed border-line-strong bg-card px-4 py-12 text-center">
+        <div className="rounded-[24px] bg-block px-6 py-16 text-center">
           <p className="text-[13px] text-ink-soft">Aucune {nom} pour l’instant.</p>
           {/* Pendant qu'un fichier attend sa description, le bouton se tait :
               l'ajout est déjà en cours, juste au-dessus. */}
@@ -163,17 +163,17 @@ export function MediaManager({ items: initial }: { items: Media[] }) {
       ) : (
         <ul
           aria-label="Vos médias"
-          className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4"
+          className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4"
         >
           {items.map((media) => {
             const estVideo = isVideoMimeType(media.mimeType)
             return (
               <li
                 key={media.id}
-                className="flex flex-col overflow-hidden rounded-[8px] border border-border bg-card"
+                className="flex flex-col overflow-hidden rounded-[16px] bg-block p-1.5 transition-shadow duration-300 hover:shadow-sm"
                 title={media.alt}
               >
-                <div className="relative aspect-4/3 bg-muted">
+                <div className="relative aspect-4/3 overflow-hidden rounded-[11px] bg-muted">
                   <MediaThumb media={media} sizes="(max-width: 640px) 50vw, 240px" />
                   {estVideo && (
                     <span className="absolute left-2 top-2 rounded-full bg-white/90 px-2 py-0.5 text-[12px] font-medium text-foreground">
@@ -182,17 +182,18 @@ export function MediaManager({ items: initial }: { items: Media[] }) {
                   )}
                 </div>
 
-                <div className="min-w-0 px-2.5 pt-2">
-                  <p className="truncate text-[13px] text-foreground">{media.alt}</p>
+                <div className="min-w-0 px-1.5 pt-2.5">
+                  <p className="truncate text-[14px] font-medium text-foreground">{media.alt}</p>
                   <MediaMeta media={media} className="mt-0.5" />
                 </div>
 
                 {/* Actions toujours visibles — au doigt, au clavier, sans survol. */}
-                <div className="mt-auto flex items-center gap-1.5 p-2.5">
+                <div className="mt-auto flex items-center gap-1.5 px-0.5 pb-0.5 pt-3">
                   <Button
                     type="button"
-                    variant="outline"
-                    className="flex-1"
+                    variant="secondary"
+                    size="sm"
+                    className="h-9 flex-1"
                     onClick={() => openEditor(media)}
                   >
                     Modifier
@@ -253,7 +254,7 @@ export function MediaManager({ items: initial }: { items: Media[] }) {
                 required
                 aria-describedby="m-alt-aide"
               />
-              <p id="m-alt-aide" className="mt-1.5 text-[12px] leading-[1.5] text-stone">
+              <p id="m-alt-aide" className="mt-1.5 text-[12px] leading-[17px] text-muted-foreground">
                 Obligatoire. Ce qu’on voit, en une phrase : lue à voix haute par les
                 lecteurs d’écran, et utile à Google.
               </p>
@@ -269,7 +270,7 @@ export function MediaManager({ items: initial }: { items: Media[] }) {
                 onChange={(e) => setCaption(e.target.value)}
                 aria-describedby="m-caption-aide"
               />
-              <p id="m-caption-aide" className="mt-1.5 text-[12px] leading-[1.5] text-stone">
+              <p id="m-caption-aide" className="mt-1.5 text-[12px] leading-[17px] text-muted-foreground">
                 Facultatif. Un texte affiché sous le média, quand la section le prévoit.
               </p>
             </div>

@@ -69,8 +69,13 @@ export function Famille({
           : undefined
       }
       className={cn(
-        'overflow-hidden rounded-lg border bg-white transition-colors',
-        isOver ? 'border-blue-deep/60 bg-blue-mist/30' : 'border-border',
+        /* Un bloc gris de l'espace Qeeps : le titre, puis les lignes
+           blanches arrondies. Survolé pendant un glisser : il prend le
+           pastel de l'écran. */
+        'rounded-[24px] p-2 transition-[background-color,box-shadow] duration-300',
+        isOver
+          ? 'bg-[color-mix(in_srgb,var(--page-bg)_60%,white)] shadow-[0_0_0_2px_var(--page-fg)]'
+          : 'bg-block',
         /* C'est le calque qu'on suit : l'original marque la place. */
         group && sortable.isDragging && 'opacity-35',
       )}
@@ -84,7 +89,8 @@ export function Famille({
           onDelete={onDelete}
         />
       ) : (
-        <p className="border-b border-border bg-muted/40 px-4 py-2.5 text-[13px] font-semibold text-foreground">
+        <p className="flex items-center gap-2.5 px-4 pb-2.5 pt-3 text-[15px] font-semibold text-foreground">
+          <span aria-hidden="true" className="h-2 w-2 rounded-full bg-[#8aa4a8] opacity-70" />
           Sans titre — présentés seuls
         </p>
       )}
@@ -94,11 +100,11 @@ export function Famille({
         strategy={verticalListSortingStrategy}
       >
         {services.length === 0 ? (
-          <p className="px-4 py-6 text-center text-[12.5px] text-muted-foreground">
+          <p className="rounded-[16px] border border-dashed border-[#cfd9db] px-4 py-6 text-center text-[13px] text-muted-foreground">
             Aucun accompagnement sous ce titre. Glissez-en un ici.
           </p>
         ) : (
-          <ul className="divide-y divide-border">
+          <ul className="flex flex-col gap-1.5">
             {services.map((service) => (
               <ServiceRow
                 key={service.id}
@@ -147,7 +153,7 @@ function TitreFamille({
   }
 
   return (
-    <div className="flex items-center gap-2 border-b border-border bg-ivory/60 px-3 py-2 sm:px-4">
+    <div className="flex items-center gap-2 px-2 pb-1.5 pt-1.5 sm:px-3">
       {/* Poignée toujours visible : rien ne doit dépendre du survol, qui
           n'existe pas au doigt. */}
       {!editing && (
@@ -204,7 +210,7 @@ function TitreFamille({
             title="Cliquer pour renommer"
             className="flex h-9 min-w-0 flex-1 items-center gap-2 rounded-lg px-1 text-left transition-colors hover:bg-white/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
           >
-            <span className="truncate text-[13.5px] font-semibold text-foreground">
+            <span className="truncate text-[15px] font-semibold text-foreground">
               {label}
             </span>
             <Pencil className="h-3.5 w-3.5 shrink-0 text-muted-foreground/60" />

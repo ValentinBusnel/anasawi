@@ -145,13 +145,13 @@ export function FaqManager({ items: initial }: { items: FaqItem[] }) {
 
   return (
     <>
-      <Notice className="mb-5">
+      <Notice>
         Les modifications sont visibles sur le site dès que vous enregistrez.
       </Notice>
 
       {/* Sur téléphone, le texte et le bouton passent l'un sous l'autre. */}
-      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-[12.5px] leading-[1.5] text-muted-foreground">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-[14px] leading-[1.5] text-muted-foreground">
           Les questions visibles aident aussi Google à mieux présenter votre
           site.
         </p>
@@ -388,7 +388,7 @@ function FaqRow({
             </span>
           )}
         </p>
-        <p className="truncate text-xs text-muted-foreground">
+        <p className="truncate text-[13px] text-muted-foreground">
           {truncate(item.answer, 110)}
         </p>
       </div>
@@ -401,7 +401,7 @@ function FaqRow({
         <span className="mr-1 flex items-center gap-2">
           <span
             aria-hidden="true"
-            className="hidden text-xs text-muted-foreground sm:inline"
+            className="hidden text-[13px] text-muted-foreground sm:inline"
           >
             Visible
           </span>

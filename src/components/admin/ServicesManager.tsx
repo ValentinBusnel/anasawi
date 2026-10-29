@@ -68,7 +68,7 @@ const dropAnimation: DropAnimation = {
 /** Rappel commun aux écrans de contenus : ici, pas d'étape « publier ». */
 function NoteEnLigne() {
   return (
-    <Notice className="mb-5">
+    <Notice>
       Les modifications sont visibles sur le site dès que vous enregistrez.
     </Notice>
   )
@@ -272,7 +272,7 @@ export function ServicesManager({
 
       {/* Sur téléphone, les deux boutons passent l'un sous l'autre plutôt
           que de se comprimer ; l'action principale reste en dernier. */}
-      <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:justify-end">
+      <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
         <Button variant="outline" onClick={ajouterFamille} disabled={pending}>
           <Plus />
           Ajouter un titre

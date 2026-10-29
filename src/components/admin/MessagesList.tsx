@@ -73,14 +73,14 @@ export function MessagesList({ messages }: { messages: ContactMessage[] }) {
                   </span>
                   {!message.isRead && <Badge>Nouveau</Badge>}
                 </span>
-                <span className="mt-1 block truncate text-[12.5px] text-muted-foreground">
+                <span className="mt-1 block truncate text-[13px] text-muted-foreground">
                   {truncate(message.message, 110)}
                 </span>
               </span>
 
               <time
                 dateTime={message.createdAt.toISOString()}
-                className="shrink-0 text-[12.5px] text-muted-foreground"
+                className="shrink-0 text-[13px] text-muted-foreground"
               >
                 {formatDate(message.createdAt)}
               </time>
@@ -88,7 +88,7 @@ export function MessagesList({ messages }: { messages: ContactMessage[] }) {
 
             {open && (
               <div className="border-t border-border bg-ivory/40 px-5 py-4">
-                <p className="text-[12px] text-muted-foreground">
+                <p className="text-[13px] text-muted-foreground">
                   {message.email}
                 </p>
                 <p className="mt-2.5 whitespace-pre-wrap text-[13px] leading-relaxed">

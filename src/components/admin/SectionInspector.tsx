@@ -378,7 +378,7 @@ export function SectionInspector({
 
   if (!block) {
     return (
-      <p className="p-4 text-[0.8rem] text-destructive">
+      <p className="p-4 text-[14px] text-destructive">
         Type de section inconnu : « {section.type} ».
       </p>
     )
@@ -450,10 +450,10 @@ export function SectionInspector({
 
   return (
     <>
-      <div className="adm-page min-h-0 flex-1 overflow-y-auto px-5 pb-8 pt-7 sm:px-8">
+      <div className="adm-page flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-5 pb-8 pt-7 sm:px-8">
         {/* ── En-tête de la section, comme sur l'espace Qeeps : la grande
             icône teintée, le rang, le nom, le modèle d'où elle vient. ── */}
-        <div className="relative mb-4">
+        <div className="relative mb-2">
           <button
             type="button"
             onClick={onClose}
@@ -564,7 +564,7 @@ export function SectionInspector({
                   />
 
                   <div>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-2 gap-3.5">
                       <Choice
                         id="section-animation"
                         label="Animation d’apparition"
@@ -628,7 +628,7 @@ export function SectionInspector({
 
                   {/* Décor au trait — un motif calme posé sur la section. */}
                   <div>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-2 gap-3.5">
                       <Choice
                         id="section-decor"
                         label="Décor"

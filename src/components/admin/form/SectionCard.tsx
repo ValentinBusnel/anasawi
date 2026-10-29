@@ -35,7 +35,9 @@ export function SectionCard({
         )}
       >
         <div>
-          <h2 className="text-[16px] font-semibold leading-[22px] text-foreground">
+          <h2 className="flex items-center gap-2.5 text-[16px] font-semibold leading-[22px] text-foreground">
+            {/* La pastille au pastel de l'écran, comme les blocs de Qeeps. */}
+            <span aria-hidden="true" className="h-2 w-2 shrink-0 rounded-full bg-[var(--page-fg,#176c79)] opacity-70" />
             {title}
           </h2>
           {note && (

@@ -1,6 +1,8 @@
 import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
 
+import { SpaceIcon } from './SpaceIcon'
+
 /**
  * En-tête d'écran du CMS : un titre net (sans-serif, semi-gras), une
  * phrase qui dit à quoi sert l'écran, les actions alignées à droite. Le
@@ -22,7 +24,7 @@ export function PageHeader({
   back?: { href: string; label: string }
 }) {
   return (
-    <div className="mb-2">
+    <div>
       {back && (
         <Link
           href={back.href}
@@ -33,6 +35,7 @@ export function PageHeader({
         </Link>
       )}
 
+      <SpaceIcon className="mb-3.5" />
       <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
         <div className="min-w-0">
           <h1 className="text-[30px] font-semibold leading-[1.2] tracking-[-0.02em] text-foreground sm:text-[36px] sm:leading-[43px]">

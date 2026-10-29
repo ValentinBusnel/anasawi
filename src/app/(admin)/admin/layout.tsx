@@ -4,6 +4,7 @@ import { Suspense } from 'react'
 import { Toaster } from 'sonner'
 
 import { AdminTopBar } from '@/components/admin/AdminTopBar'
+import { TonedMain } from '@/components/admin/TonedMain'
 import { NavigationProgress } from '@/components/admin/NavigationProgress'
 import { PaletteProvider } from '@/components/admin/PaletteProvider'
 import { auth } from '@/lib/auth'
@@ -60,9 +61,7 @@ export default async function AdminLayout({
 
         {/* Repère « contenu principal » pour les lecteurs d'écran : la
             barre du haut est la navigation, ceci est l'écran. */}
-        <main className="flex min-w-0 flex-1 flex-col overflow-hidden max-lg:pb-[80px]">
-          {children}
-        </main>
+        <TonedMain>{children}</TonedMain>
 
         {/* Notifications sobres : une carte blanche, l'icône porte la
             couleur (succès, erreur) — pas de fond vert ou rouge plein. */}

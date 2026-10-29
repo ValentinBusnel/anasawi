@@ -76,8 +76,8 @@ export function UsersManager({ initial }: { initial: UtilisateurListe[] }) {
 
   return (
     <>
-      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-[12.5px] text-muted-foreground">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-[14px] text-muted-foreground">
           Chaque personne reçoit un lien pour choisir son mot de passe. Vous ne
           le connaîtrez jamais.
         </p>
@@ -108,11 +108,11 @@ export function UsersManager({ initial }: { initial: UtilisateurListe[] }) {
               <div className="min-w-0 flex-1 basis-[200px]">
                 <p className="truncate text-[13.5px] text-foreground">
                   {u.name}
-                  {u.moi && <span className="ml-2 text-[12px] text-muted-foreground">(vous)</span>}
+                  {u.moi && <span className="ml-2 text-[13px] text-muted-foreground">(vous)</span>}
                 </p>
-                <p className="truncate text-[12.5px] text-muted-foreground">{u.email}</p>
+                <p className="truncate text-[13px] text-muted-foreground">{u.email}</p>
               </div>
-              <div className="basis-[180px] text-[12.5px]">
+              <div className="basis-[180px] text-[13px]">
                 {u.actif ? (
                   <span className="inline-flex items-center gap-1.5 text-success-ink">
                     <Check className="h-3.5 w-3.5" strokeWidth={2} />

@@ -102,7 +102,7 @@ export function SeoEditor({
   const avance = avanceOuvert || Boolean(errorOf('canonical'))
 
   return (
-    <div className="space-y-[22px]">
+    <div className="space-y-4">
       {/* Aperçu du résultat Google — approximatif mais suffisant pour
           juger d'une troncature avant publication. Il suit la saisie. */}
       <Card
@@ -268,15 +268,16 @@ function Card({
 }) {
   return (
     <section className="rounded-[24px] bg-block p-6">
-      <h2 className="text-[15px] font-semibold tracking-[-0.01em] text-foreground">
+      <h2 className="flex items-center gap-2.5 text-[16px] font-semibold leading-[22px] text-foreground">
+        <span aria-hidden="true" className="h-2 w-2 shrink-0 rounded-full bg-[var(--page-fg,#176c79)] opacity-70" />
         {title}
       </h2>
       {note && (
-        <p className="mt-1.5 max-w-[62ch] text-[12px] leading-[1.6] text-muted-foreground">
+        <p className="mt-0.5 max-w-[62ch] text-[13px] leading-[19px] text-muted-foreground">
           {note}
         </p>
       )}
-      <div className="mt-4 space-y-5">{children}</div>
+      <div className="mt-5 space-y-3.5">{children}</div>
     </section>
   )
 }

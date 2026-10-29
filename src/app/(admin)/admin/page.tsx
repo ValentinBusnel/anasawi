@@ -12,11 +12,18 @@ import {
 import Link from 'next/link'
 
 import { AdminContent } from '@/components/admin/AdminContent'
+import { espaceParHref } from '@/components/admin/spaces'
 import { buttonVariants } from '@/components/ui/button'
 import { hasUnpublishedChanges } from '@/lib/publish'
 import { getDashboardCounts, getHomePageForAdmin, getSettings } from '@/server/queries'
 
 export const dynamic = 'force-dynamic'
+
+/* Le pastel de l'espace vers lequel mène une ligne. */
+function teinte(href: string): React.CSSProperties {
+  const tone = espaceParHref(href)?.tone ?? { bg: '#ddf7f7', fg: '#176c79' }
+  return { background: tone.bg, color: tone.fg }
+}
 
 const pluriel = (n: number, un: string, plusieurs: string) =>
   `${n} ${n > 1 ? plusieurs : un}`
@@ -204,7 +211,10 @@ export default async function DashboardPage() {
                     href={item.href}
                     className="group flex items-center gap-4 rounded-[16px] px-4 py-3.5 transition-shadow hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
-                    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[12px] bg-accent text-primary">
+                    <span
+                      className="grid h-10 w-10 shrink-0 place-items-center rounded-[12px]"
+                      style={teinte(item.href)}
+                    >
                       <Icone className="h-[18px] w-[18px]" strokeWidth={1.75} />
                     </span>
                     <span className="min-w-0 flex-1">
@@ -234,7 +244,12 @@ export default async function DashboardPage() {
                   href={item.href}
                   className="group flex items-center gap-4 rounded-[16px] px-4 py-3 transition-shadow hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[12px] bg-block text-muted-foreground transition-colors group-hover:text-primary"><Icone className="h-[18px] w-[18px]" strokeWidth={1.75} /></span>
+                  <span
+                    className="grid h-10 w-10 shrink-0 place-items-center rounded-[12px] transition-transform duration-[350ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:scale-[1.06]"
+                    style={teinte(item.href)}
+                  >
+                    <Icone className="h-[18px] w-[18px]" strokeWidth={1.75} />
+                  </span>
                   <span className="flex-1 text-[14px] font-medium text-foreground">{item.label}</span>
                   <span className="hidden text-[13px] text-muted-foreground sm:block">{item.detail}</span>
                   <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />

@@ -3,20 +3,14 @@
 import {
   ChevronDown,
   Eye,
-  HelpCircle,
-  Home,
-  Image as ImageIcon,
   LogOut,
-  Mail,
-  PenLine,
-  Settings,
-  Sparkles,
   Users,
 } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 
+import { ESPACES, espaceDe, estCourant } from './spaces'
 import { LogoMark } from '@/components/site/Logo'
 import { cn } from '@/lib/utils'
 import { signOutAction } from '@/server/actions/auth'
@@ -35,26 +29,7 @@ import { signOutAction } from '@/server/actions/auth'
  * lecteurs d'écran la trouvent sous ce nom.
  */
 
-type Espace = {
-  href: string
-  label: string
-  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>
-}
-
-const ESPACES: Espace[] = [
-  { href: '/admin', label: 'Accueil', icon: Home },
-  { href: '/admin/accueil', label: 'Mon site', icon: PenLine },
-  { href: '/admin/accompagnements', label: 'Accompagnements', icon: Sparkles },
-  { href: '/admin/faq', label: 'Questions', icon: HelpCircle },
-  { href: '/admin/medias', label: 'Médias', icon: ImageIcon },
-  { href: '/admin/messages', label: 'Messages', icon: Mail },
-  { href: '/admin/reglages', label: 'Réglages', icon: Settings },
-]
-
-function courant(href: string, pathname: string): boolean {
-  if (href === '/admin') return pathname === '/admin'
-  return pathname === href || pathname.startsWith(`${href}/`)
-}
+const ESPACES_BARRE = ESPACES.filter((e) => e.barre)
 
 const FOCUS =
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#176c79] focus-visible:ring-offset-2'
@@ -94,12 +69,17 @@ function Espaces({ nonLus }: { nonLus: number }) {
       {indicateur && (
         <span
           aria-hidden="true"
-          className="absolute bottom-1 top-1 rounded-[9px] bg-white shadow-[0_1px_2px_rgba(22,73,81,0.08),0_4px_12px_rgba(22,73,81,0.06)] transition-[left,width] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] max-lg:bottom-1.5 max-lg:top-1.5 max-lg:rounded-[12px] max-lg:bg-block max-lg:shadow-none"
-          style={{ left: indicateur.left, width: indicateur.width }}
+          className="absolute bottom-1 top-1 rounded-[9px] shadow-[0_1px_2px_rgba(22,73,81,0.08),0_4px_12px_rgba(22,73,81,0.06)] transition-[left,width,background-color] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] max-lg:bottom-1.5 max-lg:top-1.5 max-lg:rounded-[12px] max-lg:shadow-none"
+          /* Blanc, à peine teinté du pastel de l'espace courant. */
+          style={{
+            left: indicateur.left,
+            width: indicateur.width,
+            background: `color-mix(in srgb, ${espaceDe(pathname).tone.bg} 40%, white)`,
+          }}
         />
       )}
-      {ESPACES.map((espace) => {
-        const actif = courant(espace.href, pathname)
+      {ESPACES_BARRE.map((espace) => {
+        const actif = estCourant(espace.href, pathname)
         const Icone = espace.icon
         return (
           <li key={espace.href} className="relative z-[1] max-lg:flex-1">
@@ -115,10 +95,8 @@ function Espaces({ nonLus }: { nonLus: number }) {
               )}
             >
               <Icone
-                className={cn(
-                  'h-4 w-4 shrink-0 transition-colors max-lg:h-[19px] max-lg:w-[19px]',
-                  actif && 'text-[#176c79]',
-                )}
+                className="h-4 w-4 shrink-0 transition-colors duration-300 max-lg:h-[19px] max-lg:w-[19px]"
+                style={actif ? { color: espace.tone.fg } : undefined}
                 strokeWidth={1.8}
               />
               {/* Le nom : en entier sur ordinateur, sous l'icône sur

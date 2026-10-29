@@ -70,7 +70,7 @@ export function ApparenceTab({
         </div>
 
         <div className="sm:col-span-2">
-          <p id="reglage-respiration" className="mb-1.5 block text-[0.76rem] font-medium leading-none text-muted-foreground">
+          <p id="reglage-respiration" className="mb-[7px] block text-[12.5px] font-medium leading-4 text-muted-foreground">
             Respiration des sections
           </p>
           <div

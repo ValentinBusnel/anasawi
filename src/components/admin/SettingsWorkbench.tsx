@@ -345,13 +345,15 @@ export function SettingsWorkbench({
 
   return (
     <PaletteProvider palette={palette}>
-      <div className="min-h-0 flex-1 overflow-y-auto bg-ivory">
-        <div className="mx-auto max-w-[960px] px-5 py-8 sm:px-8 sm:py-11">
+      {/* La même colonne que les autres écrans (AdminContent) : mêmes
+          marges, même largeur, même entrée animée. */}
+      <div className="min-h-0 flex-1 overflow-y-auto bg-background">
+        <div className="adm-page mx-auto flex max-w-[880px] flex-col gap-6 px-4 pt-7 sm:px-6 sm:pt-10 lg:px-8 lg:pt-12">
           <PageHeader
             title="Réglages"
             description="Tout ce qui vaut pour le site entier : qui vous êtes, comment on vous joint, vos couleurs, votre menu et ce que Google affiche."
           />
-          <Notice className="-mt-3 mb-6">
+          <Notice>
             Les réglages sont visibles sur le site dès que vous enregistrez.
           </Notice>
 
@@ -360,7 +362,9 @@ export function SettingsWorkbench({
             role="tablist"
             aria-label="Réglages"
             onKeyDown={clavierOnglets}
-            className="mb-6 flex gap-1 overflow-x-auto border-b border-border"
+            /* En pilule, comme la barre du haut : l'onglet actif est une
+               surface blanche teintée du pastel de l'écran. */
+            className="no-scrollbar flex w-fit max-w-full gap-0.5 overflow-x-auto rounded-[12px] bg-block p-1"
           >
             {ONGLETS.map((o) => {
               const actif = onglet === o.id
@@ -379,10 +383,10 @@ export function SettingsWorkbench({
                   tabIndex={actif ? 0 : -1}
                   onClick={() => choisir(o.id)}
                   className={cn(
-                    '-mb-px whitespace-nowrap border-b-2 px-3 py-2.5 text-[13px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40',
+                    'h-9 whitespace-nowrap rounded-[9px] px-3.5 text-[14px] font-medium transition-[background-color,color,box-shadow] duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                     actif
-                      ? 'border-primary font-medium text-primary'
-                      : 'border-transparent text-ink-soft hover:text-foreground',
+                      ? 'bg-[color-mix(in_srgb,var(--page-bg)_40%,white)] text-foreground shadow-[0_1px_2px_rgba(22,73,81,0.08),0_4px_12px_rgba(22,73,81,0.06)]'
+                      : 'text-muted-foreground hover:text-foreground',
                   )}
                 >
                   {o.label}
@@ -520,7 +524,7 @@ function Panneau({
       id={`panneau-${id}`}
       aria-labelledby={`onglet-${id}`}
       hidden={!actif}
-      className="min-w-0 space-y-[22px]"
+      className="min-w-0 space-y-4"
     >
       {children}
     </div>
@@ -550,12 +554,16 @@ function BarreEnregistrement({
       : 'Enregistrer'
 
   return (
-    <div className="sticky bottom-0 z-10 -mx-5 mt-7 border-t border-border bg-ivory/90 px-5 py-3.5 backdrop-blur sm:-mx-8 sm:px-8">
+    <div
+      /* Une barre flottante, collée en bas de l'écran — la pastille
+         « Publier » de l'espace Qeeps, ici « Enregistrer ». */
+      className="sticky bottom-4 z-10 mb-6 rounded-[16px] bg-white/95 px-4 py-3 shadow-pop backdrop-blur-[14px] sm:px-5"
+    >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
         <span
           aria-live="polite"
           className={cn(
-            'flex items-center gap-1.5 text-[12.5px]',
+            'flex items-center gap-1.5 text-[13px]',
             dirty && !pending ? 'text-warning-ink' : 'text-muted-foreground',
           )}
         >

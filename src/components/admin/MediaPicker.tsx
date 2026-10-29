@@ -557,9 +557,14 @@ export const UploadField = forwardRef<
           }}
           onClick={() => inputRef.current?.click()}
           className={cn(
-            'flex cursor-pointer flex-col items-center justify-center gap-2.5 rounded-[8px] border border-dashed bg-card text-center transition-colors',
-            compact ? 'px-4 py-4' : 'px-4 py-8',
-            survol ? 'border-blue-deep bg-blue-mist' : 'border-line-strong hover:border-blue-deep',
+            /* La zone de dépôt de l'espace Qeeps : pointillés doux, fond
+               transparent sur le bloc gris, blanc au survol, cyan quand un
+               fichier arrive. */
+            'flex cursor-pointer flex-col items-center justify-center gap-2.5 rounded-[16px] border-[1.5px] border-dashed text-center transition-[background-color,border-color] duration-200',
+            compact ? 'px-4 py-4' : 'min-h-[150px] px-5 py-8',
+            survol
+              ? 'border-[#176c79] bg-accent'
+              : 'border-[#cfd9db] bg-transparent hover:border-[#176c79] hover:bg-white',
           )}
         >
           <Button
@@ -572,10 +577,10 @@ export const UploadField = forwardRef<
             {video ? <Clapperboard aria-hidden="true" /> : <ImagePlus aria-hidden="true" />}
             Ajouter une {nom}
           </Button>
-          <p className="text-[13px] text-ink-soft">
+          <p className="text-[14px] font-medium text-foreground">
             Glissez une {nom} ici ou cliquez pour choisir
           </p>
-          <p className="max-w-[46ch] text-[12px] leading-[1.5] text-stone">{aide}</p>
+          <p className="max-w-[46ch] text-[12px] leading-[17px] text-muted-foreground">{aide}</p>
         </div>
       ) : (
         <div className="rounded-[8px] border border-border bg-card p-3">

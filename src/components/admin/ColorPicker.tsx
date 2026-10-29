@@ -38,7 +38,7 @@ export function ColorPicker({
 
   return (
     <div>
-      <span className="mb-[5px] block text-xs text-ink-soft">
+      <span className="mb-[7px] block text-[12.5px] font-medium text-muted-foreground">
         {label}
       </span>
 

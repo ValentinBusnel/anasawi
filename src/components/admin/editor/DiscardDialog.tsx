@@ -34,7 +34,7 @@ export function DiscardDialog({
           <DialogTitle>
             Annuler les modifications non publiées ?
           </DialogTitle>
-          <DialogDescription className="text-[0.82rem] leading-relaxed">
+          <DialogDescription className="text-[14px] leading-relaxed">
             La page reviendra exactement à sa version en ligne. Tout ce qui
             a été modifié depuis la dernière publication sera perdu, et
             l’historique ⌘Z sera vidé.

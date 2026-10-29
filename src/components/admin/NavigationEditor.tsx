@@ -84,10 +84,10 @@ export function NavigationEditor({
   )
 
   return (
-    <div className="space-y-5">
-      <ol className="space-y-3">
+    <div className="space-y-4">
+      <ol className="flex flex-col gap-1.5 rounded-[24px] bg-block p-2">
         {items.length === 0 && (
-          <li className="rounded-xl border border-dashed border-border bg-white px-4 py-10 text-center text-[13px] text-muted-foreground">
+          <li className="rounded-[16px] border-[1.5px] border-dashed border-[#cfd9db] px-4 py-10 text-center text-[14px] text-muted-foreground">
             Votre menu est vide pour l’instant — ajoutez des sections
             ci-dessous.
           </li>
@@ -97,10 +97,12 @@ export function NavigationEditor({
           return (
             <li
               key={i}
-              className="rounded-[24px] bg-block p-6"
+              /* Une rangée blanche dans le bloc gris, comme les éléments
+                 répétés de l'espace Qeeps. */
+              className="rounded-[16px] bg-white p-4"
             >
               <div className="mb-3 flex items-center justify-between gap-3">
-                <p className="text-[13px] font-semibold text-foreground">
+                <p className="text-[14px] font-medium text-foreground">
                   {i + 1}. {nom}
                 </p>
                 <ActionMenu
@@ -172,7 +174,7 @@ export function NavigationEditor({
       {/* Ajouter : les sections de l'accueil pas encore dans le menu, et
           un lien libre. */}
       <div>
-        <p className="mb-2 text-[13px] font-semibold text-foreground">
+        <p className="mb-2.5 text-[16px] font-semibold text-foreground">
           Ajouter au menu
         </p>
         <div className="flex flex-wrap gap-2">
