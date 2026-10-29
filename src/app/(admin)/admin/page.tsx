@@ -176,9 +176,9 @@ export default async function DashboardPage() {
       </section>
 
       {/* ── Le cadre gris, deux colonnes ───────────────────────────── */}
-      <div className="grid items-start gap-2 rounded-[24px] bg-block p-2 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
+      <div className="grid gap-2 rounded-[24px] bg-block p-2 lg:h-[calc(100dvh-364px)] lg:min-h-[440px] lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
         {/* Votre page */}
-        <section aria-labelledby="votre-page" className="rounded-[20px] bg-white p-5 sm:p-6">
+        <section aria-labelledby="votre-page" className="min-h-0 min-w-0 overflow-y-auto overscroll-contain rounded-[20px] [scrollbar-width:thin] bg-white p-5 sm:p-6">
           <div className="mb-3 flex items-baseline justify-between gap-3 px-1">
             <h2 id="votre-page" className="text-[16px] font-semibold text-foreground">
               Votre page
@@ -241,7 +241,7 @@ export default async function DashboardPage() {
           )}
         </section>
 
-        <div className="grid gap-2">
+        <div className="flex min-h-0 min-w-0 flex-col gap-2 overflow-y-auto overscroll-contain rounded-[20px] [scrollbar-width:thin]">
           {/* Messages */}
           <section aria-label="Derniers messages" className="rounded-[20px] bg-white p-5 sm:p-6">
             <TeteCarte

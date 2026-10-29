@@ -299,9 +299,9 @@ export function MediaManager({
         }
       />
 
-      <div className="grid gap-2 rounded-[24px] bg-block p-2 lg:grid-cols-[260px_minmax(0,1fr)]">
+      <div className="grid gap-2 rounded-[24px] bg-block p-2 lg:h-[calc(100dvh-265px)] lg:min-h-[480px] lg:grid-cols-[260px_minmax(0,1fr)]">
         {/* ── Les dossiers ─────────────────────────────────────────── */}
-        <nav aria-label="Dossiers" className="p-1 lg:p-2">
+        <nav aria-label="Dossiers" className="min-h-0 overflow-y-auto overscroll-contain p-1 [scrollbar-width:thin] lg:p-2">
           <ul className="flex flex-col gap-0.5">
             {ligneDossier(
               'tous',
@@ -376,7 +376,7 @@ export function MediaManager({
         {/* ── Le dossier ouvert ─────────────────────────────────────── */}
         <section
           aria-label={titre}
-          className="flex min-w-0 flex-col rounded-[20px] bg-white p-5 sm:p-6"
+          className="flex min-h-0 min-w-0 flex-col overflow-y-auto overscroll-contain rounded-[20px] bg-white p-5 [scrollbar-width:thin] sm:p-6"
         >
           <div className="mb-5 flex items-start justify-between gap-3">
             <div className="min-w-0">

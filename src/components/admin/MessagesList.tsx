@@ -100,8 +100,8 @@ export function MessagesList({ messages }: { messages: ContactMessage[] }) {
           </p>
         </div>
       ) : (
-        <div className="relative grid gap-2 rounded-[24px] bg-block p-2 lg:h-[clamp(520px,calc(100dvh-230px),780px)] lg:grid-cols-[340px_minmax(0,1fr)]">
-          <ul aria-label="Messages reçus" className="flex min-h-0 flex-col gap-0.5 overflow-y-auto p-1 lg:p-2">
+        <div className="relative grid gap-2 rounded-[24px] bg-block p-2 lg:h-[calc(100dvh-265px)] lg:min-h-[440px] lg:grid-cols-[340px_minmax(0,1fr)]">
+          <ul aria-label="Messages reçus" className="flex min-h-0 min-w-0 flex-col gap-0.5 overflow-y-auto overscroll-contain p-1 [scrollbar-width:thin] lg:p-2">
             {items.map((message) => {
               const open = openId === message.id
 
@@ -154,7 +154,7 @@ export function MessagesList({ messages }: { messages: ContactMessage[] }) {
                   {open && (
                     <article
                       aria-label={`Message de ${message.name}`}
-                      className="mt-1 flex flex-col rounded-[20px] bg-white p-5 animate-[adm-fade_0.3s_ease_both] lg:absolute lg:inset-y-2 lg:left-[350px] lg:right-2 lg:mt-0 lg:overflow-y-auto lg:p-8"
+                      className="mt-1 flex flex-col rounded-[20px] bg-white p-5 animate-[adm-fade_0.3s_ease_both] lg:absolute lg:inset-y-2 lg:left-[350px] lg:right-2 lg:mt-0 lg:overflow-y-auto lg:overscroll-contain lg:p-8"
                     >
                       <header className="flex items-start gap-3.5 border-b border-[#eef1f2] pb-5">
                         <Initiale nom={message.name} nonLu={false} />
@@ -174,7 +174,7 @@ export function MessagesList({ messages }: { messages: ContactMessage[] }) {
                         {message.message}
                       </p>
 
-                      <div className="mt-auto flex flex-wrap items-center gap-2 pt-8">
+                      <div className="mt-8 flex flex-wrap items-center gap-2 border-t border-[#eef1f2] pt-5">
                         <Button size="sm" asChild>
                           <a href={`mailto:${message.email}`}>
                             <Reply />
