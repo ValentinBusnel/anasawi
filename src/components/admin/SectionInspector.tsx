@@ -503,7 +503,6 @@ export function SectionInspector({
         {contentFields.length > 0 && (
           <Group
             tone={tone.fg}
-            flash
             title="Contenu"
             open={open.content}
             onToggle={() => toggle('content')}
