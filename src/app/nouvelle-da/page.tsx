@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-import { PageAccueil } from '@/components/qeeps/pages'
+import { PageAnasawi } from '@/components/anasawi/pages'
 
 export const dynamic = 'force-dynamic'
 
@@ -9,5 +9,5 @@ export const metadata: Metadata = {
 }
 
 export default function NouvelleDaPage() {
-  return <PageAccueil base="/nouvelle-da" />
+  return <PageAnasawi base="/nouvelle-da" />
 }

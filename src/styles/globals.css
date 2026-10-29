@@ -500,10 +500,6 @@
   :root:has(.qeeps-da) body {
     background: var(--a-bg-racine, #f7f7f7);
   }
-  :root:has(.anasawi-da),
-  :root:has(.anasawi-da) body {
-    --a-bg-racine: #fbf8f2;
-  }
 
   /* Focus visible dédié — jamais outline:none */
   :focus-visible {
@@ -718,104 +714,6 @@
   --q-ease-appear: cubic-bezier(0.02, 0.45, 0.56, 1);
 }
 
-/* ══════════════════════════════════════════════════════════════════════
-   /nouvelle-da — la DA PROPRE d'Anasawi, dans la même mise en page
-   moderne. Ce qui change, et pourquoi :
-   - l'ivoire (#fbf8f2) et le sable de la charte au lieu des gris froids ;
-   - une encre « nuit » (#2e424f) et le bleu profond (#46728a) d'Anasawi,
-     plus un sable doré (#b8935a) en contrepoint, au lieu du pétrole ;
-   - les titres en Cormorant Garamond, légers, avec un mot en italique —
-     la voix d'Anne, posée — et le texte en Karla ;
-   - des boutons en pilule et des étiquettes arrondies : rien d'anguleux ;
-   - l'ARCHE de la charte sur les photos (portrait, cabinet) ;
-   - des ombres chaudes (brun très léger) au lieu du noir.
-   ══════════════════════════════════════════════════════════════════════ */
-.anasawi-da {
-  --a-ink: #2e424f;
-  --a-accent: #46728a;
-  --a-muted: #7d7a72;
-  --a-soft: #5f635e;
-  --a-bg: #fbf8f2;
-  --a-nav: #fbf8f2;
-  --a-block: #f4eee3;
-  --a-block-2: #eae2d2;
-  --a-line: #e7dfd0;
-  --a-line-soft: #efe8db;
-  --a-tint: #eaf1f4;
-  --a-ombre: 66, 52, 30;
-  --a-glow: rgba(184, 147, 90, 0.2);
-  --a-p0-bg: #eaf1f4; --a-p0-fg: #46728a;
-  --a-p1-bg: #f1e6d3; --a-p1-fg: #8c6a35;
-  --a-p2-bg: #e5ece1; --a-p2-fg: #55704f;
-  --a-p3-bg: #f3e1db; --a-p3-fg: #9a5a48;
-  --a-p4-bg: #e9e5ef; --a-p4-fg: #66597f;
-  --a-p5-bg: #e6eef0; --a-p5-fg: #3e6a73;
-  --a-r-btn: 999px;
-  --a-r-tag: 999px;
-  --a-r-champ: 14px;
-  --a-r-carte: 18px;
-  --a-r-bloc: 32px;
-
-  --q-shadow-btn: 0 1px 2px rgba(66, 52, 30, 0.06), 0 6px 16px -6px rgba(66, 52, 30, 0.18);
-  --q-shadow-card: 0 2px 4px rgba(66, 52, 30, 0.03), 0 18px 40px -12px rgba(66, 52, 30, 0.14), 0 60px 90px -40px rgba(66, 52, 30, 0.16);
-  --q-shadow-quote: 0 1px 2px rgba(66, 52, 30, 0.08), 0 10px 24px -10px rgba(66, 52, 30, 0.16);
-  --q-shadow-hero: 0 -40px 80px -50px rgba(66, 52, 30, 0.35);
-
-  font-family: var(--font-karla), ui-sans-serif, system-ui, sans-serif;
-}
-
-/* La voix d'Anne : des titres en Cormorant, légers, un peu plus grands
-   (à corps égal, Cormorant paraît plus petit que Poppins). */
-.anasawi-da :is(h1, h2, h3),
-.anasawi-da .a-titre {
-  font-family: var(--font-cormorant), Georgia, serif !important;
-  font-weight: 400 !important;
-  letter-spacing: -0.01em !important;
-  font-size-adjust: 0.5;
-  line-height: 1.08 !important;
-}
-.anasawi-da :is(h1, h2) em,
-.anasawi-da .a-italique {
-  font-style: italic;
-  color: var(--a-accent);
-}
-.anasawi-da .a-logo {
-  font-family: var(--font-cormorant), Georgia, serif;
-  font-weight: 500;
-  font-style: italic;
-  font-size-adjust: 0.5;
-  letter-spacing: 0;
-}
-.anasawi-da .a-logo > span {
-  color: #b8935a;
-}
-/* Les surtitres en petites capitales espacées, couleur sable doré. */
-.anasawi-da .a-surtitre {
-  font-size: 12px !important;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: #a07f4c !important;
-}
-/* Dans la DA Qeeps, `em` ne penche pas ; chez Anasawi, le mot en
-   italique garde sa couleur même dans un titre en dégradé. */
-.qeeps-da em {
-  font-style: normal;
-}
-.anasawi-da em {
-  font-style: italic;
-}
-.anasawi-da .q-degrade em {
-  -webkit-text-fill-color: var(--a-accent);
-}
-
-/* L'arche de la charte. */
-.anasawi-da .a-arche {
-  border-radius: 999px 999px 18px 18px !important;
-}
-.anasawi-da .a-arche-large {
-  border-radius: 220px 220px 14px 14px / 160px 160px 14px 14px !important;
-}
-
 /* Le titre en dégradé pétrole (« Développeur Full Stack » de la candidature). */
 @utility q-degrade {
   background-image: linear-gradient(661deg, var(--a-ink, #164951) 0%, var(--a-accent, #176c79) 100%);
@@ -850,5 +748,156 @@
 @keyframes q-defile-v {
   to {
     transform: translateY(-50%);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   /nouvelle-da — LES COMPOSANTS PROPRES D'ANASAWI (`components/anasawi`)
+   Plus rien de Qeeps : l'ivoire, le sable, l'encre nuit, Cormorant et
+   Karla, l'arche — et des mouvements lents, qui respirent.
+   ══════════════════════════════════════════════════════════════════════ */
+:root:has(.ad),
+:root:has(.ad) body {
+  background: #fbf8f2;
+}
+.ad {
+  --ad-ivoire: #fbf8f2;
+  --ad-sable: #f4eee3;
+  --ad-sable-fonce: #eae2d2;
+  --ad-nuit: #2e424f;
+  --ad-bleu: #46728a;
+  --ad-brume: #eaf1f4;
+  --ad-or: #b8935a;
+  --ad-pierre: #5f635e;
+  --ad-gris: #7d7a72;
+  --ad-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ad-ease-lent: cubic-bezier(0.65, 0, 0.35, 1);
+  font-family: var(--font-karla), ui-sans-serif, system-ui, sans-serif;
+  color: var(--ad-nuit);
+}
+.ad :is(h1, h2, h3, h4) {
+  font-family: var(--font-cormorant), Georgia, serif;
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: -0.015em;
+}
+.ad em {
+  font-style: italic;
+  color: var(--ad-bleu);
+}
+
+/* Une ligne qui sort de son masque. */
+@keyframes ad-sortir {
+  from {
+    transform: translateY(105%);
+  }
+}
+/* Monter et apparaître. */
+@keyframes ad-monter {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+    filter: blur(6px);
+  }
+}
+/* Le souffle : 4 s pour inspirer, 4 s pour expirer. */
+@keyframes ad-souffle {
+  0%,
+  100% {
+    transform: scale(0.62);
+  }
+  50% {
+    transform: scale(1);
+  }
+}
+@keyframes ad-inspirez {
+  0%,
+  45% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  50%,
+  95% {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes ad-expirez {
+  0%,
+  45% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  50%,
+  95% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes ad-tourner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes ad-points {
+  0%,
+  80%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.35;
+  }
+  40% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+@keyframes ad-pouls {
+  from {
+    transform: scale(0.6);
+    opacity: 0.6;
+  }
+  to {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+@keyframes ad-envol {
+  to {
+    transform: translateY(-60px) rotate(-4deg) scale(0.86);
+    opacity: 0;
+  }
+}
+@keyframes ad-tracer {
+  from {
+    stroke-dashoffset: var(--ad-longueur, 400);
+  }
+}
+@keyframes ad-defiler {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ad *,
+  .ad *::before,
+  .ad *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+@keyframes ad-descendre {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(200%);
   }
 }
