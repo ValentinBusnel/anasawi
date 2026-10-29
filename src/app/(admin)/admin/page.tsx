@@ -11,10 +11,10 @@ import { cn, formatDate, truncate } from '@/lib/utils'
 import type { Section } from '@/server/db/schema'
 import {
   getAllServices,
-  getDashboardCounts,
   getHomePageForAdmin,
   getMessages,
   getSettings,
+  getUnreadCount,
 } from '@/server/queries'
 
 export const dynamic = 'force-dynamic'
@@ -82,13 +82,16 @@ function TeteCarte({
  * messages, et les accompagnements.
  */
 export default async function DashboardPage() {
-  const [home, settings, messages, services] = await Promise.all([
+  /* Tout en parallèle, en un seul aller-retour : le compte des sections
+     se lit sur la page elle-même, celui des accompagnements sur la liste. */
+  const [home, settings, messages, services, nonLus] = await Promise.all([
     getHomePageForAdmin(),
     getSettings(),
     getMessages(4),
     getAllServices(),
+    getUnreadCount(),
   ])
-  const stats = await getDashboardCounts(home?.id ?? null)
+  const stats = { nonLus, services: services.length }
 
   const prenom = settings.practitionerName?.split(' ')[0]
   const racines = (home?.sections ?? [])

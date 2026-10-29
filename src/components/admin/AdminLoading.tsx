@@ -25,7 +25,9 @@ export function AdminLoading({
         role="status"
         aria-label="Chargement"
         aria-busy="true"
-        className="flex justify-center gap-1.5 py-20"
+        /* Les points n'apparaissent qu'au-delà de 250 ms : une navigation
+           rapide passe directement à l'écran, sans clignotement. */
+        className="flex justify-center gap-1.5 py-20 motion-safe:animate-[adm-fade_0.2s_ease_0.25s_backwards]"
       >
         {[0, 0.15, 0.3].map((delai) => (
           <span

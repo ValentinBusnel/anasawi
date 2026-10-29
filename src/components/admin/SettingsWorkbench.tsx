@@ -1,6 +1,6 @@
 'use client'
 
-import { Check } from 'lucide-react'
+import { Check, IdCard, Menu, Palette, Search } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -11,7 +11,8 @@ import {
   type NavigationEditorProps,
   type NavigationItem,
 } from './NavigationEditor'
-import { Notice } from './Notice'
+import { AdminContent } from './AdminContent'
+import { PASTELS } from './editor/pastels'
 import { PageHeader } from './PageHeader'
 import { PaletteProvider } from './PaletteProvider'
 import {
@@ -28,7 +29,7 @@ import type { Identity } from '@/lib/identity'
 import {
   DEFAULT_PALETTE,
   paletteFromIdentity,
-  type Palette,
+  type Palette as PaletteCouleurs,
   type PaletteRole,
 } from '@/lib/palette'
 import { cn } from '@/lib/utils'
@@ -61,10 +62,38 @@ import type { Media, Settings, OpeningHour, SocialLink } from '@/server/db/schem
  */
 
 const ONGLETS = [
-  { id: 'coordonnees', label: 'Coordonnées' },
-  { id: 'apparence', label: 'Apparence' },
-  { id: 'menu', label: 'Menu du site' },
-  { id: 'referencement', label: 'Référencement' },
+  {
+    id: 'coordonnees',
+    label: 'Coordonnées',
+    resume: 'Identité, contact, horaires',
+    description: 'Qui vous êtes, comment on vous joint, quand vous recevez.',
+    icone: IdCard,
+    tone: PASTELS[0]!,
+  },
+  {
+    id: 'apparence',
+    label: 'Apparence',
+    resume: 'Couleurs et formes',
+    description: 'Les couleurs du site, l’arrondi des boutons, la respiration.',
+    icone: Palette,
+    tone: PASTELS[2]!,
+  },
+  {
+    id: 'menu',
+    label: 'Menu du site',
+    resume: 'Les liens du haut de page',
+    description: 'Les entrées du menu, dans l’ordre où elles s’affichent.',
+    icone: Menu,
+    tone: PASTELS[1]!,
+  },
+  {
+    id: 'referencement',
+    label: 'Référencement',
+    resume: 'Ce que Google affiche',
+    description: 'Le titre, la description et l’image montrés par Google et au partage.',
+    icone: Search,
+    tone: PASTELS[5]!,
+  },
 ] as const
 type Onglet = (typeof ONGLETS)[number]['id']
 
@@ -129,8 +158,8 @@ export function SettingsWorkbench({
   const clavierOnglets = (event: React.KeyboardEvent) => {
     const index = ONGLETS.findIndex((o) => o.id === onglet)
     let suivant: number | null = null
-    if (event.key === 'ArrowRight') suivant = (index + 1) % ONGLETS.length
-    else if (event.key === 'ArrowLeft')
+    if (event.key === 'ArrowRight' || event.key === 'ArrowDown') suivant = (index + 1) % ONGLETS.length
+    else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp')
       suivant = (index - 1 + ONGLETS.length) % ONGLETS.length
     else if (event.key === 'Home') suivant = 0
     else if (event.key === 'End') suivant = ONGLETS.length - 1
@@ -177,7 +206,7 @@ export function SettingsWorkbench({
   /* L'identité est réduite à sa forme actuelle dès l'ouverture : les
      anciennes clés de couleurs sont repliées dans la palette, et le premier
      enregistrement les efface pour de bon. */
-  const [palette, setPalette] = useState<Palette>(() =>
+  const [palette, setPalette] = useState<PaletteCouleurs>(() =>
     paletteFromIdentity(initialIdentity),
   )
   const [buttonRadius, setButtonRadius] = useState(
@@ -343,32 +372,38 @@ export function SettingsWorkbench({
     return () => window.removeEventListener('beforeunload', garde)
   }, [dirtyQuelquePart])
 
+  const courant = ONGLETS.find((o) => o.id === onglet)!
+  const IconeCourante = courant.icone
+  const defilement = useRef<HTMLDivElement>(null)
+  /* Changer d'onglet ramène en haut du panneau : on ne reprend pas au
+     milieu d'un autre formulaire. */
+  useEffect(() => {
+    defilement.current?.scrollTo({ top: 0 })
+  }, [onglet])
+
   return (
     <PaletteProvider palette={palette}>
-      {/* La même colonne que les autres écrans (AdminContent) : mêmes
-          marges, même largeur, même entrée animée. */}
-      <div className="min-h-0 flex-1 overflow-y-auto bg-background">
-        <div className="adm-page mx-auto flex max-w-[880px] flex-col gap-6 px-4 pt-7 sm:px-6 sm:pt-10 lg:px-8 lg:pt-12">
-          <PageHeader
-            title="Réglages"
-            description="Tout ce qui vaut pour le site entier : qui vous êtes, comment on vous joint, vos couleurs, votre menu et ce que Google affiche."
-          />
-          <Notice>
-            Les réglages sont visibles sur le site dès que vous enregistrez.
-          </Notice>
+      <AdminContent width="wide">
+        <PageHeader
+          overline="Votre site"
+          title="Réglages"
+          description="Ce qui vaut pour le site entier — visible dès que vous enregistrez."
+        />
 
-          {/* Onglets */}
+        {/* Le cadre gris, comme Médias et Messages : les rubriques à
+            gauche, la rubrique ouverte à droite, qui défile seule. */}
+        <div className="bloc-ecran grid gap-2 rounded-[24px] bg-block p-2 lg:grid-cols-[260px_minmax(0,1fr)]">
           <div
             role="tablist"
             aria-label="Réglages"
+            aria-orientation="vertical"
             onKeyDown={clavierOnglets}
-            /* En pilule, comme la barre du haut : l'onglet actif est une
-               surface blanche teintée du pastel de l'écran. */
-            className="no-scrollbar flex w-fit max-w-full gap-0.5 overflow-x-auto rounded-[12px] bg-block p-1"
+            className="grid gap-0.5 p-1 max-lg:grid-cols-2 lg:content-start lg:p-2"
           >
             {ONGLETS.map((o) => {
               const actif = onglet === o.id
-              const modifie = dirtyDe[groupeDe(o.id)] && !actif
+              const modifie = dirtyDe[groupeDe(o.id)]
+              const Icone = o.icone
               return (
                 <button
                   key={o.id}
@@ -383,124 +418,159 @@ export function SettingsWorkbench({
                   tabIndex={actif ? 0 : -1}
                   onClick={() => choisir(o.id)}
                   className={cn(
-                    'h-9 whitespace-nowrap rounded-[9px] px-3.5 text-[14px] font-medium transition-[background-color,color,box-shadow] duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                    actif
-                      ? 'bg-[color-mix(in_srgb,var(--page-bg)_40%,white)] text-foreground shadow-[0_1px_2px_rgba(22,73,81,0.08),0_4px_12px_rgba(22,73,81,0.06)]'
-                      : 'text-muted-foreground hover:text-foreground',
+                    'group flex items-center gap-3 rounded-[14px] px-3 py-2.5 text-left transition-[background-color,box-shadow] duration-[250ms] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                    actif ? 'bg-white shadow-[0_1px_2px_rgba(22,73,81,0.06)]' : 'hover:bg-white/60',
                   )}
                 >
-                  {o.label}
-                  {/* Point ambre : « il y a du non-enregistré là-bas ». Décoratif
-                      pour le lecteur d'écran (le nom de l'onglet ne change pas) ;
-                      la barre du bas porte l'information en toutes lettres. */}
-                  {modifie ? (
+                  <span
+                    aria-hidden="true"
+                    className="grid h-9 w-9 shrink-0 place-items-center rounded-[11px] transition-transform duration-[350ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:scale-[1.06]"
+                    style={{ background: o.tone.bg, color: o.tone.fg }}
+                  >
+                    <Icone className="h-[17px] w-[17px]" strokeWidth={1.8} />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span
+                      className={cn(
+                        'block truncate text-[14px]',
+                        actif ? 'font-semibold text-foreground' : 'font-medium text-[#46606c]',
+                      )}
+                    >
+                      {o.label}
+                    </span>
+                    <span className="block truncate text-[12px] text-[#8aa4a8] max-sm:hidden">{o.resume}</span>
+                  </span>
+                  {/* « Il y a du non-enregistré là » — décoratif ; la barre
+                      d'enregistrement le dit en toutes lettres. */}
+                  {modifie && (
                     <span
                       aria-hidden="true"
                       title="Modifications non enregistrées"
-                      className="ml-1.5 inline-block h-1.5 w-1.5 rounded-full bg-warning align-middle"
+                      className="h-2 w-2 shrink-0 rounded-full bg-[#176c79]"
                     />
-                  ) : null}
+                  )}
                 </button>
               )
             })}
           </div>
 
-          {/* Les quatre panneaux restent montés : ce qu'on y tape survit
-              au changement d'onglet. Seul l'actif est visible. */}
-          <Panneau id="coordonnees" actif={onglet === 'coordonnees'}>
-            <CoordonneesTab
-              form={form}
-              onField={set}
-              errorOf={errorOf}
-              hours={hours}
-              onHours={(next) => {
-                setDirtyForm(true)
-                setHours(next)
-              }}
-              socials={socials}
-              onSocials={(next) => {
-                setDirtyForm(true)
-                setSocials(next)
-              }}
-              logoMediaId={logoMediaId}
-              onLogo={(id) => {
-                setDirtyForm(true)
-                setLogoMediaId(id)
-              }}
-              library={library}
-            />
-          </Panneau>
+          <section className="flex min-h-0 min-w-0 flex-col overflow-hidden rounded-[20px] bg-white">
+            <header className="flex items-center gap-3.5 border-b border-[#eef1f2] px-5 py-4 sm:px-7">
+              <span
+                aria-hidden="true"
+                className="grid h-10 w-10 shrink-0 place-items-center rounded-[12px]"
+                style={{ background: courant.tone.bg, color: courant.tone.fg }}
+              >
+                <IconeCourante className="h-[18px] w-[18px]" strokeWidth={1.8} />
+              </span>
+              <div key={onglet} className="min-w-0 animate-[adm-fade_0.25s_ease_both]">
+                <h2 className="text-[17px] font-semibold text-foreground">{courant.label}</h2>
+                <p className="truncate text-[13px] text-muted-foreground">{courant.description}</p>
+              </div>
+            </header>
 
-          <Panneau id="apparence" actif={onglet === 'apparence'}>
-            <ApparenceTab
-              palette={palette}
-              buttonRadius={buttonRadius}
-              spacing={spacing}
-              onRole={setRole}
-              onReset={() => {
-                setDirtyForm(true)
-                setPalette({ ...DEFAULT_PALETTE })
-              }}
-              onRadius={(px) => {
-                setDirtyForm(true)
-                setButtonRadius(px)
-              }}
-              onSpacing={(value) => {
-                setDirtyForm(true)
-                setSpacing(value)
-              }}
-            />
-          </Panneau>
+            {/* Les quatre panneaux restent montés : ce qu'on y tape survit
+                au changement d'onglet. Seul l'actif est visible. */}
+            <div
+              ref={defilement}
+              className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-5 [scrollbar-width:thin] sm:px-7 sm:py-6"
+            >
+              <Panneau id="coordonnees" actif={onglet === 'coordonnees'}>
+                <CoordonneesTab
+                  form={form}
+                  onField={set}
+                  errorOf={errorOf}
+                  hours={hours}
+                  onHours={(next) => {
+                    setDirtyForm(true)
+                    setHours(next)
+                  }}
+                  socials={socials}
+                  onSocials={(next) => {
+                    setDirtyForm(true)
+                    setSocials(next)
+                  }}
+                  logoMediaId={logoMediaId}
+                  onLogo={(id) => {
+                    setDirtyForm(true)
+                    setLogoMediaId(id)
+                  }}
+                  library={library}
+                />
+              </Panneau>
 
-          <Panneau id="menu" actif={onglet === 'menu'}>
-            <NavigationEditor
-              items={menuItems}
-              suggestions={menu.suggestions}
-              fieldErrors={menuErrors}
-              onChange={(next) => {
-                setDirtyMenu(true)
-                /* Les erreurs sont indexées par position : toute
-                   modification les rend caduques. */
-                setMenuErrors({})
-                setMenuItems(next)
-              }}
-            />
-          </Panneau>
+              <Panneau id="apparence" actif={onglet === 'apparence'}>
+                <ApparenceTab
+                  palette={palette}
+                  buttonRadius={buttonRadius}
+                  spacing={spacing}
+                  onRole={setRole}
+                  onReset={() => {
+                    setDirtyForm(true)
+                    setPalette({ ...DEFAULT_PALETTE })
+                  }}
+                  onRadius={(px) => {
+                    setDirtyForm(true)
+                    setButtonRadius(px)
+                  }}
+                  onSpacing={(value) => {
+                    setDirtyForm(true)
+                    setSpacing(value)
+                  }}
+                />
+              </Panneau>
 
-          <Panneau id="referencement" actif={onglet === 'referencement'}>
-            {referencement ? (
-              <SeoEditor
-                page={referencement.page}
-                library={referencement.library}
-                siteName={referencement.siteName}
-                value={seo}
-                fieldErrors={seoErrors}
-                onChange={(next) => {
-                  setDirtySeo(true)
-                  setSeo(next)
-                }}
+              <Panneau id="menu" actif={onglet === 'menu'}>
+                <NavigationEditor
+                  items={menuItems}
+                  suggestions={menu.suggestions}
+                  fieldErrors={menuErrors}
+                  onChange={(next) => {
+                    setDirtyMenu(true)
+                    /* Les erreurs sont indexées par position : toute
+                       modification les rend caduques. */
+                    setMenuErrors({})
+                    setMenuItems(next)
+                  }}
+                />
+              </Panneau>
+
+              <Panneau id="referencement" actif={onglet === 'referencement'}>
+                {referencement ? (
+                  <SeoEditor
+                    page={referencement.page}
+                    library={referencement.library}
+                    siteName={referencement.siteName}
+                    value={seo}
+                    fieldErrors={seoErrors}
+                    onChange={(next) => {
+                      setDirtySeo(true)
+                      setSeo(next)
+                    }}
+                  />
+                ) : (
+                  <p className="text-[13px] text-muted-foreground">
+                    Le référencement se règle une fois la page d’accueil créée.
+                  </p>
+                )}
+              </Panneau>
+            </div>
+
+            {/* LA barre d'enregistrement : une seule, au pied du panneau,
+                toujours au même endroit. */}
+            {(groupe !== 'referencement' || referencement) && (
+              <BarreEnregistrement
+                dirty={barre.dirty}
+                pending={barre.etat.pending}
+                saved={barre.etat.saved}
+                error={barre.etat.error}
+                bloque={barre.bloque}
+                onSave={barre.onSave}
               />
-            ) : (
-              <p className="text-[13px] text-muted-foreground">
-                Le référencement se règle une fois la page d’accueil créée.
-              </p>
             )}
-          </Panneau>
-
-          {/* LA barre d'enregistrement : une seule, collée au bas de la
-              zone qui défile, qui dit toujours où l'on en est. */}
-          {(groupe !== 'referencement' || referencement) && (
-            <BarreEnregistrement
-              dirty={barre.dirty}
-              pending={barre.etat.pending}
-              saved={barre.etat.saved}
-              error={barre.etat.error}
-              bloque={barre.bloque}
-              onSave={barre.onSave}
-            />
-          )}
+          </section>
         </div>
-      </div>
+      </AdminContent>
     </PaletteProvider>
   )
 }
@@ -524,7 +594,7 @@ function Panneau({
       id={`panneau-${id}`}
       aria-labelledby={`onglet-${id}`}
       hidden={!actif}
-      className="min-w-0 space-y-4"
+      className="min-w-0 space-y-3"
     >
       {children}
     </div>
@@ -554,29 +624,25 @@ function BarreEnregistrement({
       : 'Enregistrer'
 
   return (
-    <div
-      /* Une barre flottante, collée en bas de l'écran — la pastille
-         « Publier » de l'espace Qeeps, ici « Enregistrer ». */
-      className="sticky bottom-4 z-10 mb-6 rounded-[16px] bg-white/95 px-4 py-3 shadow-pop backdrop-blur-[14px] sm:px-5"
-    >
+    <div className="border-t border-[#eef1f2] bg-white px-5 py-3 sm:px-7">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
         <span
           aria-live="polite"
           className={cn(
             'flex items-center gap-1.5 text-[13px]',
-            dirty && !pending ? 'text-warning-ink' : 'text-muted-foreground',
+            dirty && !pending ? 'font-medium text-[#176c79]' : 'text-muted-foreground',
           )}
         >
           {pending ? (
             'Enregistrement en cours…'
           ) : dirty ? (
             <>
-              <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-warning" />
+              <span aria-hidden="true" className="h-2 w-2 rounded-full bg-[#176c79]" />
               {bloque ?? 'Modifications non enregistrées'}
             </>
           ) : (
             <>
-              <Check className="h-[14px] w-[14px] text-primary" aria-hidden="true" />
+              <Check className="h-[14px] w-[14px] text-success" aria-hidden="true" />
               Tout est enregistré
             </>
           )}

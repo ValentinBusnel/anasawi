@@ -37,7 +37,11 @@ const FOCUS =
 /* ── Les espaces, en pilule ─────────────────────────────────────────── */
 
 function Espaces({ nonLus }: { nonLus: number }) {
-  const pathname = usePathname() ?? '/admin'
+  const adresse = usePathname() ?? '/admin'
+  /* L'onglet cliqué s'allume TOUT DE SUITE, sans attendre l'écran : la
+     pilule glisse dès le clic, la page suit. */
+  const [cible, setCible] = useState<{ depuis: string; vers: string } | null>(null)
+  const pathname = cible && cible.depuis === adresse ? cible.vers : adresse
   const liste = useRef<HTMLUListElement>(null)
   const [indicateur, setIndicateur] = useState<{ left: number; width: number } | null>(null)
 
@@ -85,6 +89,10 @@ function Espaces({ nonLus }: { nonLus: number }) {
           <li key={espace.href} className="relative z-[1] max-lg:flex-1">
             <Link
               href={espace.href}
+              onClick={(e) => {
+                if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return
+                if (!estCourant(espace.href, adresse)) setCible({ depuis: adresse, vers: espace.href })
+              }}
               aria-current={actif ? 'page' : undefined}
               aria-label={espace.label}
               className={cn(

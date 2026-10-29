@@ -27,7 +27,7 @@ export function SectionCard({
   return (
     <section
       id={id}
-      className="scroll-mt-6 rounded-[24px] bg-block p-6"
+      className="scroll-mt-6 rounded-[20px] bg-block p-5 sm:p-6"
     >
       <div
         className={cn(

@@ -41,7 +41,9 @@ export const ESPACES: Espace[] = [
   { href: '/admin/faq', label: 'Questions', icon: HelpCircle, tone: P[4]!, barre: true },
   { href: '/admin/medias', label: 'Médias', icon: ImageIcon, tone: P[6]!, barre: true },
   { href: '/admin/messages', label: 'Messages', icon: Mail, tone: P[5]!, barre: true },
-  { href: '/admin/reglages', label: 'Réglages', icon: Settings, tone: P[9]!, barre: true },
+  /* Réglages : une ardoise neutre, pas un pastel — c'est la salle des
+     machines, elle n'a pas à attirer l'œil (le jaune beurre détonnait). */
+  { href: '/admin/reglages', label: 'Réglages', icon: Settings, tone: { bg: '#e3eaee', fg: '#46606c' }, barre: true },
   { href: '/admin/utilisateurs', label: 'Utilisateurs', icon: Users, tone: P[8]!, barre: false },
 ]
 
