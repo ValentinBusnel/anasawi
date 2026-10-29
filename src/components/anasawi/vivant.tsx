@@ -199,7 +199,7 @@ export function Seuil({
     <section ref={ref} id="haut" className="relative h-[230vh] [--e:0] [--p:0]">
       <div className="sticky top-0 h-[100svh] overflow-hidden">
         {/* Le nom, très grand, DERRIÈRE l'arche. */}
-        <h1 className="pointer-events-none absolute inset-0 z-0 flex flex-col justify-between px-[5vw] pb-[13svh] pt-[16svh] text-[clamp(64px,13vw,220px)] leading-[0.9] text-[var(--ad-nuit)]">
+        <h1 className="pointer-events-none absolute inset-0 z-0 flex flex-col justify-between px-[5vw] pb-[13svh] pt-[16svh] text-[clamp(56px,11vw,184px)] leading-[0.92] text-[var(--ad-nuit)]">
           <span
             className="block overflow-hidden"
             style={{ transform: 'translateX(calc(var(--e) * -18vw))', opacity: 'calc(1 - var(--e) * 1.4)' }}
@@ -210,7 +210,7 @@ export function Seuil({
             className="block self-end overflow-hidden text-right"
             style={{ transform: 'translateX(calc(var(--e) * 18vw))', opacity: 'calc(1 - var(--e) * 1.4)' }}
           >
-            <em className="block not-italic text-[var(--ad-nuit)] motion-safe:animate-[ad-sortir_1.3s_var(--ad-ease)_0.3s_backwards] [font-style:italic]">
+            <em className="block text-[var(--ad-nuit)] motion-safe:animate-[ad-sortir_1.3s_var(--ad-ease)_0.3s_backwards]">
               {nom}
             </em>
           </span>
@@ -223,7 +223,7 @@ export function Seuil({
             width: `calc(${base} + (100vw - ${base}) * var(--e))`,
             height: `calc(${haut} + (100svh - ${haut}) * var(--e))`,
             transform: 'translate(-50%, -50%)',
-            borderRadius: 'calc((1 - var(--e)) * 999px) calc((1 - var(--e)) * 999px) calc((1 - var(--e)) * 24px) calc((1 - var(--e)) * 24px)',
+            borderRadius: 'calc((1 - var(--e)) * 32px)',
           }}
         >
           {photo && (
@@ -246,7 +246,7 @@ export function Seuil({
               transform: 'translateY(calc((1 - var(--e)) * 40px))',
             }}
           >
-            <p className="max-w-[18ch] text-balance font-[family-name:var(--font-cormorant)] text-[clamp(36px,5.5vw,84px)] leading-[1.02]">
+            <p className="max-w-[18ch] text-balance font-[family-name:var(--ad-titre)] font-semibold tracking-[-0.03em] text-[clamp(36px,5.5vw,84px)] leading-[1.02]">
               {accroche}
             </p>
             <a
@@ -352,7 +352,7 @@ export function Chemin({ etapes }: { etapes: { titre: string; texte: string }[] 
             {/* Le jalon, sur le trait. */}
             <span
               aria-hidden="true"
-              className="absolute left-[18px] top-1/2 grid h-11 w-11 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-[var(--ad-sable-fonce)] bg-[var(--ad-ivoire)] font-[family-name:var(--font-cormorant)] text-[20px] text-[var(--ad-gris)] md:left-1/2"
+              className="absolute left-[18px] top-1/2 grid h-11 w-11 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-[var(--ad-sable-fonce)] bg-[var(--ad-ivoire)] font-[family-name:var(--ad-titre)] font-semibold tracking-[-0.03em] text-[20px] text-[var(--ad-gris)] md:left-1/2"
             >
               <span
                 className="absolute inset-0 rounded-full bg-[var(--ad-nuit)]"
@@ -385,7 +385,7 @@ export function Chemin({ etapes }: { etapes: { titre: string; texte: string }[] 
    resserrent, et sa fiche apparaît.
    ══════════════════════════════════════════════════════════════════════ */
 
-const TEINTES = ['#eaf1f4', '#f1e6d3', '#e5ece1', '#f3e1db', '#e9e5ef', '#e6eef0']
+const TEINTES = ['#e3eef5', '#ddf1ee', '#e7e8f6', '#e9eef3', '#dfedf7', '#e4f3ea']
 
 export function Arches({ services, rdv }: { services: ServiceWithMedia[]; rdv: string }) {
   const [ouverte, setOuverte] = useState(0)
@@ -398,7 +398,7 @@ export function Arches({ services, rdv }: { services: ServiceWithMedia[]; rdv: s
             key={s.id}
             onMouseEnter={() => setOuverte(i)}
             className={cn(
-              'group relative overflow-hidden rounded-t-[999px] rounded-b-[28px] transition-[flex-grow,height] duration-[900ms] ease-[var(--ad-ease)]',
+              'group relative overflow-hidden rounded-[28px] transition-[flex-grow,height] duration-[900ms] ease-[var(--ad-ease)]',
               actif ? 'h-[460px] md:h-auto md:flex-[3.4]' : 'h-[120px] md:h-auto md:flex-1',
             )}
             style={{ background: TEINTES[i % TEINTES.length] }}
@@ -439,8 +439,8 @@ export function Arches({ services, rdv }: { services: ServiceWithMedia[]; rdv: s
                 s.media ? 'text-white' : 'text-[var(--ad-nuit)]',
               )}
             >
-              <span className="font-[family-name:var(--font-cormorant)] text-[18px] italic opacity-70">{String(i + 1).padStart(2, '0')}</span>
-              <span className="font-[family-name:var(--font-cormorant)] text-[24px] leading-[1.05] md:[writing-mode:vertical-rl] md:rotate-180">{s.title}</span>
+              <span className="font-[family-name:var(--ad-titre)] font-semibold tracking-[-0.03em] text-[18px] opacity-70">{String(i + 1).padStart(2, '0')}</span>
+              <span className="font-[family-name:var(--ad-titre)] font-semibold tracking-[-0.03em] text-[24px] leading-[1.05] md:[writing-mode:vertical-rl] md:rotate-180">{s.title}</span>
             </div>
             {/* Ouverte : la fiche. */}
             <div
@@ -492,7 +492,7 @@ export function Promenade({ photos, titre }: { photos: Media[]; titre: React.Rea
     window.addEventListener('resize', mesure)
     return () => window.removeEventListener('resize', mesure)
   }, [ref])
-  const formes = ['rounded-t-[999px] rounded-b-[24px]', 'rounded-[24px]', 'rounded-[999px]', 'rounded-t-[24px] rounded-b-[999px]']
+  const formes = ['rounded-[28px]', 'rounded-[20px]', 'rounded-[36px]', 'rounded-[24px]']
   return (
     <section ref={ref} id="cabinet" className="relative [--p:0] md:h-[320vh]">
       <div className="py-20 md:sticky md:top-0 md:flex md:h-[100svh] md:flex-col md:justify-center md:overflow-hidden md:py-0">
@@ -527,7 +527,7 @@ export function Promenade({ photos, titre }: { photos: Media[]; titre: React.Rea
                   />
                 </div>
                 {p.caption && (
-                  <figcaption className="mt-3 font-[family-name:var(--font-cormorant)] text-[18px] italic text-[var(--ad-gris)]">{p.caption}</figcaption>
+                  <figcaption className="mt-3 text-[14px] font-medium text-[var(--ad-gris)]">{p.caption}</figcaption>
                 )}
               </figure>
             ))}
@@ -586,11 +586,11 @@ export function Conversation({ faq, prenom, portrait }: { faq: FaqItem[]; prenom
       <div className="relative min-h-[380px] rounded-[36px] bg-[var(--ad-sable)] p-6 sm:p-9" aria-live="polite">
         {q && (
           <div key={q.id} className="flex flex-col gap-5">
-            <p className="ml-auto max-w-[80%] rounded-[22px] rounded-br-[6px] bg-white px-5 py-3.5 text-[15px] leading-[1.5] text-[var(--ad-nuit)] shadow-[0_8px_24px_-12px_rgba(66,52,30,0.25)] motion-safe:animate-[ad-monter_0.6s_var(--ad-ease)_backwards]">
+            <p className="ml-auto max-w-[80%] rounded-[22px] rounded-br-[6px] bg-white px-5 py-3.5 text-[15px] leading-[1.5] text-[var(--ad-nuit)] shadow-[0_8px_24px_-12px_rgba(20,35,46,0.25)] motion-safe:animate-[ad-monter_0.6s_var(--ad-ease)_backwards]">
               {q.question}
             </p>
             <div className="flex items-end gap-3">
-              <span className="relative h-10 w-10 shrink-0 overflow-hidden rounded-t-full rounded-b-[10px] bg-[var(--ad-sable-fonce)]">
+              <span className="relative h-10 w-10 shrink-0 overflow-hidden rounded-[12px] bg-[var(--ad-sable-fonce)]">
                 {portrait && <Image src={portrait.url} alt="" fill sizes="40px" className="object-cover" />}
               </span>
               {ecrit ? (
@@ -652,7 +652,7 @@ export function Semaine({ horaires }: { horaires: OpeningHour[] }) {
                 actif ? 'bg-[var(--ad-nuit)] text-white' : ferme(h) ? 'bg-transparent text-[var(--ad-gris)]/60' : 'bg-[var(--ad-sable)] text-[var(--ad-nuit)]',
               )}
             >
-              <span className="font-[family-name:var(--font-cormorant)] text-[20px] capitalize leading-none">{j.slice(0, 2)}</span>
+              <span className="font-[family-name:var(--ad-titre)] font-semibold tracking-[-0.03em] text-[20px] capitalize leading-none">{j.slice(0, 2)}</span>
               <span className={cn('h-1 w-1 rounded-full', ferme(h) ? 'bg-current/30' : actif ? 'bg-[var(--ad-or)]' : 'bg-[var(--ad-bleu)]')} />
             </li>
           )
@@ -669,7 +669,7 @@ export function Semaine({ horaires }: { horaires: OpeningHour[] }) {
    ══════════════════════════════════════════════════════════════════════ */
 
 const LIGNE =
-  'w-full border-0 border-b border-[var(--ad-sable-fonce)] bg-transparent px-0 py-3 font-[family-name:var(--font-cormorant)] text-[22px] text-[var(--ad-nuit)] outline-none transition-[border-color] duration-300 placeholder:text-[var(--ad-gris)]/50 focus:border-[var(--ad-nuit)]'
+  'w-full border-0 border-b border-[var(--ad-sable-fonce)] bg-transparent px-0 py-3 font-[family-name:var(--ad-titre)] font-medium tracking-[-0.01em] text-[18px] text-[var(--ad-nuit)] outline-none transition-[border-color] duration-300 placeholder:text-[var(--ad-gris)]/50 focus:border-[var(--ad-nuit)]'
 
 export function Lettre({ prenom }: { prenom: string }) {
   const [etat, setEtat] = useState<'repos' | 'envoi' | 'envole' | 'ok'>('repos')
@@ -708,7 +708,7 @@ export function Lettre({ prenom }: { prenom: string }) {
 
   if (etat === 'ok') {
     return (
-      <div className="flex min-h-[520px] flex-col items-center justify-center rounded-[36px] bg-white p-10 text-center shadow-[0_30px_80px_-40px_rgba(66,52,30,0.35)]">
+      <div className="flex min-h-[520px] flex-col items-center justify-center rounded-[36px] bg-white p-10 text-center shadow-[0_30px_80px_-40px_rgba(20,35,46,0.35)]">
         <svg viewBox="0 0 120 84" className="h-24 w-32" aria-hidden="true">
           {['M6 10 h108 v64 h-108 z', 'M6 10 L60 50 L114 10', 'M6 74 L46 40', 'M114 74 L74 40'].map((d, i) => (
             <path
@@ -726,7 +726,7 @@ export function Lettre({ prenom }: { prenom: string }) {
             />
           ))}
         </svg>
-        <p className="mt-8 font-[family-name:var(--font-cormorant)] text-[40px] leading-none text-[var(--ad-nuit)]">
+        <p className="mt-8 font-[family-name:var(--ad-titre)] font-semibold tracking-[-0.03em] text-[40px] leading-none text-[var(--ad-nuit)]">
           Votre lettre est <em>partie</em>.
         </p>
         <p className="mt-4 max-w-[36ch] text-[15px] leading-[1.6] text-[var(--ad-pierre)]">
@@ -740,11 +740,11 @@ export function Lettre({ prenom }: { prenom: string }) {
     <form
       onSubmit={envoyer}
       className={cn(
-        'relative rounded-[36px] bg-white p-7 shadow-[0_30px_80px_-40px_rgba(66,52,30,0.35)] sm:p-12',
+        'relative rounded-[36px] bg-white p-7 shadow-[0_30px_80px_-40px_rgba(20,35,46,0.35)] sm:p-12',
         etat === 'envole' && 'motion-safe:animate-[ad-envol_0.75s_var(--ad-ease)_forwards]',
       )}
     >
-      <p className="font-[family-name:var(--font-cormorant)] text-[30px] italic text-[var(--ad-nuit)]">Chère {prenom},</p>
+      <p className="font-[family-name:var(--ad-titre)] font-semibold tracking-[-0.03em] text-[30px] text-[var(--ad-nuit)]">Chère {prenom},</p>
       <div className="mt-6 grid gap-x-8 gap-y-2 sm:grid-cols-2">
         <label className="block">
           <span className="sr-only">Votre nom</span>
@@ -787,7 +787,7 @@ export function Lettre({ prenom }: { prenom: string }) {
         </p>
       )}
       <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
-        <span className="font-[family-name:var(--font-cormorant)] text-[20px] italic text-[var(--ad-gris)]">— avec mes salutations</span>
+        <span className="text-[15px] font-medium text-[var(--ad-gris)]">— avec mes salutations</span>
         <button
           type="submit"
           disabled={etat !== 'repos'}
@@ -844,11 +844,11 @@ export function Fil({ liens, rdv }: { liens: { href: string; label: string }[]; 
         <div
           ref={ref}
           className={cn(
-            'pointer-events-auto relative flex items-center gap-2 overflow-hidden rounded-full border border-white/60 bg-[rgba(251,248,242,0.72)] shadow-[0_10px_40px_-20px_rgba(66,52,30,0.35)] backdrop-blur-xl transition-[padding,gap,box-shadow] duration-700 ease-[var(--ad-ease)] [--lu:0]',
+            'pointer-events-auto relative flex items-center gap-2 overflow-hidden rounded-full border border-white/60 bg-white/75 shadow-[0_10px_40px_-20px_rgba(20,35,46,0.3)] backdrop-blur-xl transition-[padding,gap,box-shadow] duration-700 ease-[var(--ad-ease)] [--lu:0]',
             serre ? 'py-1.5 pl-5 pr-1.5' : 'py-2.5 pl-6 pr-2.5',
           )}
         >
-          <a href="#haut" className="mr-3 font-[family-name:var(--font-cormorant)] text-[24px] italic leading-none text-[var(--ad-nuit)]">
+          <a href="#haut" className="mr-3 font-[family-name:var(--ad-titre)] font-semibold tracking-[-0.03em] text-[24px] leading-none text-[var(--ad-nuit)]">
             Anasawi<span className="text-[var(--ad-or)]">.</span>
           </a>
           <nav aria-label="Sections" className="flex items-center max-md:hidden">
@@ -893,7 +893,7 @@ export function Fil({ liens, rdv }: { liens: { href: string; label: string }[]; 
         aria-hidden={!ouvert}
       >
         <div className="flex items-center justify-between">
-          <span className="font-[family-name:var(--font-cormorant)] text-[26px] italic">
+          <span className="font-[family-name:var(--ad-titre)] font-semibold tracking-[-0.03em] text-[26px] ">
             Anasawi<span className="text-[var(--ad-or)]">.</span>
           </span>
           <button type="button" onClick={() => setOuvert(false)} aria-label="Fermer le menu" className="grid h-10 w-10 place-items-center rounded-full border border-[var(--ad-sable-fonce)]">
@@ -908,12 +908,12 @@ export function Fil({ liens, rdv }: { liens: { href: string; label: string }[]; 
               onClick={() => setOuvert(false)}
               tabIndex={ouvert ? 0 : -1}
               className={cn(
-                'font-[family-name:var(--font-cormorant)] text-[46px] leading-[1.15] text-[var(--ad-nuit)] transition-[opacity,transform] duration-700 ease-[var(--ad-ease)]',
+                'font-[family-name:var(--ad-titre)] font-semibold tracking-[-0.03em] text-[46px] leading-[1.15] text-[var(--ad-nuit)] transition-[opacity,transform] duration-700 ease-[var(--ad-ease)]',
                 ouvert ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0',
               )}
               style={{ transitionDelay: ouvert ? `${0.15 + i * 0.06}s` : '0s' }}
             >
-              <span className="mr-3 align-top text-[14px] italic text-[var(--ad-or)]">{String(i + 1).padStart(2, '0')}</span>
+              <span className="mr-3 align-top text-[14px] text-[var(--ad-or)]">{String(i + 1).padStart(2, '0')}</span>
               {l.label}
             </a>
           ))}

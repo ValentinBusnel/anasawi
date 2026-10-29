@@ -75,8 +75,8 @@ export async function ModelesAnasawi({ base }: { base: string }) {
         {COMPOSANTS.map(({ nom, idee, C }, i) => (
           <div key={nom}>
             <div className="mx-auto flex max-w-[1200px] items-baseline gap-4 border-t border-[var(--ad-sable-fonce)] px-[5vw] pt-6">
-              <span className="font-[family-name:var(--font-cormorant)] text-[20px] italic text-[var(--ad-or)]">{String(i + 1).padStart(2, '0')}</span>
-              <span className="font-[family-name:var(--font-cormorant)] text-[28px]">{nom}</span>
+              <span className="font-[family-name:var(--ad-titre)] font-semibold tracking-[-0.03em] text-[20px] text-[var(--ad-or)]">{String(i + 1).padStart(2, '0')}</span>
+              <span className="font-[family-name:var(--ad-titre)] font-semibold tracking-[-0.03em] text-[28px]">{nom}</span>
               <span className="text-[14px] text-[var(--ad-gris)]">{idee}</span>
             </div>
             <C c={c} />

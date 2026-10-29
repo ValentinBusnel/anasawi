@@ -31,8 +31,13 @@ const nomDe = (nom: string) => nom.split(' ').slice(1).join(' ') || nom
 /** Surtitre : un trait d'or et des petites capitales. */
 function Surtitre({ children, clair = false }: { children: React.ReactNode; clair?: boolean }) {
   return (
-    <p className={cn('mb-6 flex items-center gap-3 text-[12px] font-medium uppercase tracking-[0.22em]', clair ? 'text-white/70' : 'text-[var(--ad-gris)]')}>
-      <span aria-hidden="true" className="h-px w-8 bg-[var(--ad-or)]" />
+    <p
+      className={cn(
+        'mb-5 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[13px] font-semibold',
+        clair ? 'bg-white/10 text-white/80' : 'bg-white text-[var(--ad-pierre)] shadow-[0_1px_2px_rgba(20,35,46,0.06),0_4px_14px_-6px_rgba(20,35,46,0.12)]',
+      )}
+    >
+      <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-[var(--ad-or)]" />
       {children}
     </p>
   )
@@ -62,7 +67,7 @@ export function Respiration({ c }: P) {
       <div className="mx-auto grid max-w-[1200px] items-center gap-16 px-[5vw] md:grid-cols-2">
         <div>
           <Surtitre>Avant de commencer</Surtitre>
-          <h2 className="text-[48px] md:text-[72px]">
+          <h2 className="text-[38px] md:text-[56px]">
             <Lignes lignes={['Prenez le temps', <span key="r">d’une <em>respiration</em>.</span>]} />
           </h2>
           <Revele delai={0.3}>
@@ -74,7 +79,7 @@ export function Respiration({ c }: P) {
           <span className="absolute inset-0 rounded-full border border-[var(--ad-sable-fonce)]" />
           <span className="absolute inset-[14%] rounded-full border border-dashed border-[var(--ad-or)]/40 motion-safe:animate-[ad-tourner_60s_linear_infinite]" />
           <span className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_40%_35%,#ffffff_0%,var(--ad-brume)_45%,#d9e6ec_100%)] shadow-[0_40px_100px_-30px_rgba(70,114,138,0.45)] motion-safe:animate-[ad-souffle_8s_var(--ad-ease-lent)_infinite]" />
-          <span className="relative grid place-items-center font-[family-name:var(--font-cormorant)] text-[34px] italic text-[var(--ad-nuit)]">
+          <span className="relative grid place-items-center font-[family-name:var(--ad-titre)] font-semibold tracking-[-0.03em] text-[34px] text-[var(--ad-nuit)]">
             <span className="col-start-1 row-start-1 motion-safe:animate-[ad-inspirez_8s_linear_infinite]">Inspirez</span>
             <span className="col-start-1 row-start-1 opacity-0 motion-safe:animate-[ad-expirez_8s_linear_infinite]">Expirez</span>
           </span>
@@ -92,11 +97,11 @@ export function Rencontre({ c }: P) {
     <section id="a-propos" className="scroll-mt-24 py-28 md:py-40">
       <div className="mx-auto grid max-w-[1200px] items-center gap-16 px-[5vw] md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:gap-24">
         <Revele className="relative mx-auto w-full max-w-[440px]">
-          <div className="relative aspect-[3/4] overflow-hidden rounded-t-full rounded-b-[32px] bg-[var(--ad-sable-fonce)]">
+          <div className="relative aspect-[3/4] overflow-hidden rounded-[32px] bg-[var(--ad-sable-fonce)]">
             {c.portrait && <Image src={c.portrait.url} alt={c.portrait.alt} fill sizes="440px" className="object-cover" />}
           </div>
           {/* Le sceau : le métier écrit en cercle, qui tourne lentement. */}
-          <div aria-hidden="true" className="absolute -bottom-10 -right-6 grid h-36 w-36 place-items-center rounded-full bg-[var(--ad-ivoire)] shadow-[0_20px_50px_-20px_rgba(66,52,30,0.4)] md:-right-12">
+          <div aria-hidden="true" className="absolute -bottom-10 -right-6 grid h-36 w-36 place-items-center rounded-full bg-[var(--ad-ivoire)] shadow-[0_20px_50px_-20px_rgba(20,35,46,0.4)] md:-right-12">
             <svg viewBox="0 0 100 100" className="absolute inset-2 motion-safe:animate-[ad-tourner_28s_linear_infinite]">
               <defs>
                 <path id="ad-cercle" d="M50,50 m-38,0 a38,38 0 1,1 76,0 a38,38 0 1,1 -76,0" />
@@ -105,18 +110,18 @@ export function Rencontre({ c }: P) {
                 <textPath href="#ad-cercle">{anneau}</textPath>
               </text>
             </svg>
-            <span className="font-[family-name:var(--font-cormorant)] text-[34px] italic text-[var(--ad-or)]">A.</span>
+            <span className="font-[family-name:var(--ad-titre)] font-semibold tracking-[-0.03em] text-[34px] text-[var(--ad-or)]">A.</span>
           </div>
         </Revele>
         <div>
           <Surtitre>{c.apropos.surtitre}</Surtitre>
-          <h2 className="text-[46px] md:text-[64px]">
+          <h2 className="text-[36px] md:text-[54px]">
             <Lignes lignes={[prenomDe(c.nom), <em key="n">{nomDe(c.nom)}</em>]} />
           </h2>
-          <Encre texte={c.apropos.texte} className="mt-10 font-[family-name:var(--font-cormorant)] text-[26px] leading-[1.45] text-[var(--ad-nuit)] md:text-[30px]" />
+          <Encre texte={c.apropos.texte} className="mt-10 font-[family-name:var(--ad-titre)] text-[21px] font-medium leading-[1.55] tracking-[-0.015em] text-[var(--ad-nuit)] md:text-[24px]" />
           {c.apropos.citation && (
             <Revele delai={0.1}>
-              <p className="mt-8 border-l border-[var(--ad-or)] pl-5 text-[16px] italic leading-[1.7] text-[var(--ad-pierre)]">{c.apropos.citation}</p>
+              <p className="mt-8 border-l border-[var(--ad-or)] pl-5 text-[16px] leading-[1.7] text-[var(--ad-pierre)]">{c.apropos.citation}</p>
             </Revele>
           )}
         </div>
@@ -135,7 +140,7 @@ export function SectionChemin({ c }: P) {
           <div className="flex justify-center">
             <Surtitre>{c.methode.surtitre}</Surtitre>
           </div>
-          <h2 className="text-[46px] md:text-[68px]">
+          <h2 className="text-[36px] md:text-[54px]">
             <Lignes lignes={[c.methode.titre]} />
           </h2>
           {c.methode.intro && (
@@ -159,13 +164,13 @@ export function SectionArches({ c }: P) {
         <div className="mb-14 flex flex-wrap items-end justify-between gap-6">
           <div>
             <Surtitre>Accompagnements</Surtitre>
-            <h2 className="text-[46px] md:text-[68px]">
+            <h2 className="text-[36px] md:text-[54px]">
               <Lignes lignes={['Ce que je vous', <em key="p">propose</em>]} />
             </h2>
           </div>
           <Revele delai={0.2}>
             <p className="max-w-[34ch] text-[15px] leading-[1.7] text-[var(--ad-pierre)]">
-              {c.services.length} façons d’être accompagné. Survolez ou touchez une arche pour l’ouvrir.
+              {c.services.length} façons d’être accompagné. Survolez ou touchez une carte pour l’ouvrir.
             </p>
           </Revele>
         </div>
@@ -187,7 +192,7 @@ export function Phrase({ c }: P) {
       <div className="mx-auto max-w-[1200px] px-[5vw] text-center">
         <span aria-hidden="true" className="mx-auto mb-10 block h-16 w-px bg-gradient-to-b from-transparent to-[var(--ad-or)]" />
         <blockquote>
-          <p className="font-[family-name:var(--font-cormorant)] text-[clamp(40px,6.4vw,104px)] leading-[1.02] text-[var(--ad-nuit)]">
+          <p className="font-[family-name:var(--ad-titre)] font-semibold tracking-[-0.03em] text-[clamp(34px,5vw,80px)] leading-[1.05] text-[var(--ad-nuit)]">
             <Lignes lignes={[mots.slice(0, milieu).join(' '), <em key="b">{mots.slice(milieu).join(' ')}</em>]} />
           </p>
           <Revele delai={0.4}>
@@ -218,7 +223,7 @@ export function SectionConversation({ c }: P) {
     <section id="questions" className="scroll-mt-24 py-24 md:py-36">
       <div className="mx-auto max-w-[1200px] px-[5vw]">
         <Surtitre>Questions fréquentes</Surtitre>
-        <h2 className="mb-14 text-[46px] md:text-[68px]">
+        <h2 className="mb-14 text-[36px] md:text-[54px]">
           <Lignes lignes={['Ce qu’on me', <em key="d">demande</em>]} />
         </h2>
         <Revele>
@@ -242,7 +247,7 @@ export function RendezVous({ c }: P) {
       <div className="mx-auto grid max-w-[1200px] gap-16 px-[5vw] lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
         <div>
           <Surtitre>Rendez-vous</Surtitre>
-          <h2 className="text-[46px] md:text-[64px]">
+          <h2 className="text-[36px] md:text-[54px]">
             <Lignes lignes={['Écrivez-moi,', <em key="e">simplement</em>]} />
           </h2>
           <Revele delai={0.2} className="mt-12">
@@ -276,11 +281,11 @@ export function Horizon({ c, liens, base }: P & { liens: { href: string; label: 
   return (
     /* Le fond sable continue celui du rendez-vous derrière la courbe. */
     <div className="bg-[var(--ad-sable)]">
-    <footer className="relative overflow-hidden rounded-t-[50%_120px] bg-[var(--ad-nuit)] px-[5vw] pb-10 pt-28 text-white md:rounded-t-[50%_220px] md:pt-40">
+    <footer className="relative overflow-hidden rounded-t-[40px] bg-[var(--ad-nuit)] px-[5vw] pb-10 pt-28 text-white md:rounded-t-[56px] md:pt-40">
       <div aria-hidden="true" className="absolute -top-40 left-1/2 h-80 w-[60vw] -translate-x-1/2 rounded-full bg-[var(--ad-bleu)]/30 blur-3xl" />
       <div className="relative mx-auto max-w-[1200px]">
-        <p className="text-center font-[family-name:var(--font-cormorant)] text-[clamp(52px,10vw,160px)] leading-[0.95]">
-          <Lignes lignes={['Prenons', <span key="t" className="italic text-[var(--ad-or)]">le temps.</span>]} />
+        <p className="text-center font-[family-name:var(--ad-titre)] font-semibold tracking-[-0.03em] text-[clamp(48px,8.5vw,136px)] leading-[0.98]">
+          <Lignes lignes={['Prenons', <span key="t" className="text-[var(--ad-or)]">le temps.</span>]} />
         </p>
         <Revele delai={0.3} className="mt-12 flex justify-center">
           <a
@@ -294,7 +299,7 @@ export function Horizon({ c, liens, base }: P & { liens: { href: string; label: 
           </a>
         </Revele>
         <div className="mt-24 flex flex-wrap items-end justify-between gap-8 border-t border-white/15 pt-8 text-[14px] text-white/60">
-          <span className="font-[family-name:var(--font-cormorant)] text-[28px] italic text-white">
+          <span className="font-[family-name:var(--ad-titre)] font-semibold tracking-[-0.03em] text-[28px] text-white">
             Anasawi<span className="text-[var(--ad-or)]">.</span>
           </span>
           <nav aria-label="Pied de page" className="flex flex-wrap gap-x-6 gap-y-2">
