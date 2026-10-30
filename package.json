@@ -20,6 +20,7 @@
     "db:seed-home": "tsx src/server/db/seed-home.ts",
     "db:seed-site": "tsx src/server/db/seed-site.ts",
     "db:seed-cabinet": "tsx src/server/db/seed-cabinet.ts",
+    "sync:configurer": "tsx src/server/db/configurer-synchro.ts",
     "db:rename-brand": "tsx src/server/db/rename-brand.ts",
     "db:seed-accompagnements": "tsx src/server/db/seed-accompagnements.ts",
     "db:list-services": "tsx src/server/db/list-services.ts",
