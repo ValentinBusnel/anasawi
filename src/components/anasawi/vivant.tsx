@@ -1457,6 +1457,14 @@ export function Carte({ adresse, zoom = 15, className }: { adresse: string; zoom
   const ref = useRef<HTMLDivElement>(null)
   const [proche, setProche] = useState(false)
   const [active, setActive] = useState(false)
+  /* Change à chaque fin d'exploration : la carte est rechargée, recentrée
+     sur l'adresse — l'épingle du site retombe juste. */
+  const [vue, setVue] = useState(0)
+  const terminer = () => {
+    if (!active) return
+    setActive(false)
+    setVue((v) => v + 1)
+  }
   useEffect(() => {
     const el = ref.current
     if (!el) return
@@ -1473,16 +1481,19 @@ export function Carte({ adresse, zoom = 15, className }: { adresse: string; zoom
     return () => io.disconnect()
   }, [])
   return (
-    <div ref={ref} className={cn('relative overflow-hidden bg-[var(--ad-brume)]', className)} onMouseLeave={() => setActive(false)}>
+    <div ref={ref} className={cn('relative overflow-hidden bg-[var(--ad-brume)]', className)} onMouseLeave={terminer}>
       {proche && (
         <iframe
+          key={vue}
           title={`Plan d’accès : ${adresse}`}
           src={`https://www.google.com/maps?q=${encodeURIComponent(adresse)}&z=${zoom}&output=embed`}
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
           className={cn(
-            'absolute left-0 top-0 h-[calc(100%+60px)] w-[calc(var(--centre,50%)*2)] max-w-none -translate-y-[30px] border-0 transition-[filter] duration-700 [filter:grayscale(1)_contrast(1.05)_brightness(1.04)]',
-            active && '[filter:grayscale(0.25)_contrast(1)_brightness(1)]',
+            /* Plus haute que le cadre de 300 px, centrée : la fiche que
+               Google pose en haut à gauche et ses boutons du bas sortent
+               du cadre — il ne reste que la carte, centre inchangé. */
+            'absolute left-0 top-[-150px] h-[calc(100%+300px)] w-[calc(var(--centre,50%)*2)] max-w-none border-0 [filter:grayscale(1)_contrast(1.05)_brightness(1.04)]',
             !active && 'pointer-events-none',
           )}
         />
@@ -1490,10 +1501,7 @@ export function Carte({ adresse, zoom = 15, className }: { adresse: string; zoom
       {/* La teinte du site, posée sur le gris de la carte. */}
       <div
         aria-hidden="true"
-        className={cn(
-          'pointer-events-none absolute inset-0 bg-[linear-gradient(140deg,#2f6f93,#36a39b)] mix-blend-color transition-opacity duration-700',
-          active ? 'opacity-0' : 'opacity-60',
-        )}
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(140deg,#2f6f93,#36a39b)] opacity-60 mix-blend-color"
       />
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(246,247,249,0.55))]" />
       {/* L'épingle, au centre — là où la carte place l'adresse. */}
@@ -1503,13 +1511,13 @@ export function Carte({ adresse, zoom = 15, className }: { adresse: string; zoom
           <span className="h-3 w-3 rounded-full bg-[var(--ad-or)] [transform:rotate(-45deg)]" />
         </span>
       </span>
-      {!active && proche && (
+      {proche && (
         <button
           type="button"
-          onClick={() => setActive(true)}
+          onClick={() => (active ? terminer() : setActive(true))}
           className="absolute right-4 top-4 z-10 rounded-full bg-white/85 px-3.5 py-1.5 text-[12px] font-semibold text-[var(--ad-nuit)] shadow-[0_6px_18px_-10px_rgba(20,35,46,0.5)] backdrop-blur transition-colors hover:bg-white"
         >
-          Explorer la carte
+          {active ? 'Recentrer' : 'Explorer la carte'}
         </button>
       )}
     </div>
