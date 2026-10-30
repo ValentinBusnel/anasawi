@@ -1456,15 +1456,18 @@ export function Compteur({ valeur, duree = 1600 }: { valeur: number; duree?: num
 export function Carte({ adresse, zoom = 15, className }: { adresse: string; zoom?: number; className?: string }) {
   const ref = useRef<HTMLDivElement>(null)
   const [proche, setProche] = useState(false)
+  /* `active` : la carte reçoit la souris. `decalee` : on l'a déplacée,
+     l'épingle du site ne tombe plus sur l'adresse — on la cache jusqu'au
+     recentrage. Sortir de la carte ne recharge rien : la vue reste où on
+     l'a laissée, sans flash ni saut. */
   const [active, setActive] = useState(false)
-  /* Change à chaque fin d'exploration : la carte est rechargée, recentrée
-     sur l'adresse — l'épingle du site retombe juste. */
+  const [decalee, setDecalee] = useState(false)
+  /* Recentrer = recharger la carte. La nouvelle se charge, invisible,
+     par-dessus l'ancienne, et ne la remplace qu'une fois prête. */
   const [vue, setVue] = useState(0)
-  const terminer = () => {
-    if (!active) return
-    setActive(false)
-    setVue((v) => v + 1)
-  }
+  const [prochaine, setProchaine] = useState<number | null>(null)
+  const src = `https://www.google.com/maps?q=${encodeURIComponent(adresse)}&z=${zoom}&output=embed`
+
   useEffect(() => {
     const el = ref.current
     if (!el) return
@@ -1480,45 +1483,76 @@ export function Carte({ adresse, zoom = 15, className }: { adresse: string; zoom
     io.observe(el)
     return () => io.disconnect()
   }, [])
+
+  const explorer = () => {
+    setActive(true)
+    setDecalee(true)
+  }
+  const recentrer = () => {
+    setActive(false)
+    setProchaine(vue + 1)
+  }
+
+  /* Plus haute que le cadre de 300 px, centrée : la fiche que Google pose
+     en haut à gauche et ses boutons du bas sortent du cadre. */
+  const cadre =
+    'absolute left-0 top-[-150px] h-[calc(100%+300px)] w-[calc(var(--centre,50%)*2)] max-w-none border-0 [filter:grayscale(1)_contrast(1.05)_brightness(1.04)]'
+  const bouton =
+    'rounded-full bg-white/85 px-3.5 py-1.5 text-[12px] font-semibold text-[var(--ad-nuit)] shadow-[0_6px_18px_-10px_rgba(20,35,46,0.5)] backdrop-blur transition-colors hover:bg-white'
+
   return (
-    <div ref={ref} className={cn('relative overflow-hidden bg-[var(--ad-brume)]', className)} onMouseLeave={terminer}>
+    <div ref={ref} className={cn('relative isolate overflow-hidden bg-[var(--ad-brume)]', className)} onMouseLeave={() => setActive(false)}>
       {proche && (
+        <iframe key={vue} title={`Plan d’accès : ${adresse}`} src={src} loading="lazy" referrerPolicy="no-referrer-when-downgrade" className={cn(cadre, !active && 'pointer-events-none')} />
+      )}
+      {prochaine !== null && (
         <iframe
-          key={vue}
-          title={`Plan d’accès : ${adresse}`}
-          src={`https://www.google.com/maps?q=${encodeURIComponent(adresse)}&z=${zoom}&output=embed`}
-          loading="lazy"
+          key={prochaine}
+          aria-hidden="true"
+          tabIndex={-1}
+          title="Plan d’accès (rechargement)"
+          src={src}
           referrerPolicy="no-referrer-when-downgrade"
-          className={cn(
-            /* Plus haute que le cadre de 300 px, centrée : la fiche que
-               Google pose en haut à gauche et ses boutons du bas sortent
-               du cadre — il ne reste que la carte, centre inchangé. */
-            'absolute left-0 top-[-150px] h-[calc(100%+300px)] w-[calc(var(--centre,50%)*2)] max-w-none border-0 [filter:grayscale(1)_contrast(1.05)_brightness(1.04)]',
-            !active && 'pointer-events-none',
-          )}
+          onLoad={() => {
+            // Laisse Google dessiner ses tuiles avant d'échanger.
+            window.setTimeout(() => {
+              setVue(prochaine)
+              setProchaine(null)
+              setDecalee(false)
+            }, 600)
+          }}
+          className={cn(cadre, 'pointer-events-none opacity-0')}
         />
       )}
-      {/* La teinte du site, posée sur le gris de la carte. */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(140deg,#2f6f93,#36a39b)] opacity-60 mix-blend-color"
-      />
+      {/* La teinte du site, posée sur le gris de la carte — même en exploration. */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[linear-gradient(140deg,#2f6f93,#36a39b)] opacity-60 mix-blend-color" />
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(246,247,249,0.55))]" />
       {/* L'épingle, au centre — là où la carte place l'adresse. */}
-      <span aria-hidden="true" className={cn('pointer-events-none absolute left-[var(--centre,50%)] top-1/2 grid -translate-x-1/2 -translate-y-full place-items-center transition-opacity duration-500', active && 'opacity-0')}>
+      <span
+        aria-hidden="true"
+        className={cn(
+          'pointer-events-none absolute left-[var(--centre,50%)] top-1/2 grid -translate-x-1/2 -translate-y-full place-items-center transition-opacity duration-500',
+          decalee && 'opacity-0',
+        )}
+      >
         <span className="absolute top-full h-20 w-20 -translate-y-1/2 rounded-full bg-[var(--ad-or)]/35 motion-safe:animate-[ad-pouls_2.4s_ease-out_infinite]" />
         <span className="relative grid h-12 w-12 place-items-center rounded-full rounded-br-none bg-[var(--ad-nuit)] text-white shadow-[0_14px_30px_-10px_rgba(20,35,46,0.6)] [transform:rotate(45deg)]">
           <span className="h-3 w-3 rounded-full bg-[var(--ad-or)] [transform:rotate(-45deg)]" />
         </span>
       </span>
       {proche && (
-        <button
-          type="button"
-          onClick={() => (active ? terminer() : setActive(true))}
-          className="absolute right-4 top-4 z-10 rounded-full bg-white/85 px-3.5 py-1.5 text-[12px] font-semibold text-[var(--ad-nuit)] shadow-[0_6px_18px_-10px_rgba(20,35,46,0.5)] backdrop-blur transition-colors hover:bg-white"
-        >
-          {active ? 'Recentrer' : 'Explorer la carte'}
-        </button>
+        <div className="absolute right-4 top-4 z-10 flex gap-2">
+          {decalee && (
+            <button type="button" onClick={recentrer} disabled={prochaine !== null} className={bouton}>
+              {prochaine !== null ? 'Recentrage…' : 'Recentrer'}
+            </button>
+          )}
+          {!active && (
+            <button type="button" onClick={explorer} className={bouton}>
+              Explorer la carte
+            </button>
+          )}
+        </div>
       )}
     </div>
   )
