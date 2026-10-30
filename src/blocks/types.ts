@@ -80,6 +80,15 @@ type BlockMeta = {
   /** Le bloc est-il proposé pour la navigation ? */
   navigable?: boolean
   /**
+   * Version moderne : les valeurs RÉELLES de ses champs (textes du site,
+   * photos choisies…), écrites dans tout champ vide quand la section est
+   * créée ou ouverte dans l'éditeur — on modifie ce qui est affiché, pas
+   * un champ vide qui « suit » une autre source.
+   */
+  preremplir?: (c: Contenu) => Record<string, unknown>
+  /** Version moderne : la section remplace le pied de page par défaut. */
+  piedDePage?: boolean
+  /**
    * Le bloc gère lui-même sa largeur et ses marges verticales.
    * Le conteneur de section ne lui applique alors aucune respiration.
    */

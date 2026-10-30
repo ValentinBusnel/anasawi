@@ -4,6 +4,7 @@ import Link from 'next/link'
 
 import { Aimant, Arches, Carte, Chemin, Conversation, Conviction, Encre, Incline, Lettre, Lignes, Lueur, Parallaxe, Promenade, Revele, Rideau, Semaine, Seuil, Souffle } from './vivant'
 import type { Contenu } from '@/blocks/moderne/contenu'
+import { photosPromenade, TEXTES } from '@/blocks/moderne/textes'
 import { LogoMark } from '@/components/site/Logo'
 import { cn, toE164 } from '@/lib/utils'
 
@@ -26,9 +27,25 @@ import { cn, toE164 } from '@/lib/utils'
  */
 
 type P = { c: Contenu }
+type T<K extends keyof typeof TEXTES> = ReturnType<(typeof TEXTES)[K]>
 
 const prenomDe = (nom: string) => nom.split(' ')[0] ?? nom
 const nomDe = (nom: string) => nom.split(' ').slice(1).join(' ') || nom
+
+/** Un texte saisi avec ses accents (« *mot* ») : le mot clé en <em>. */
+export function accent(texte: string): React.ReactNode {
+  const morceaux = texte.split('*')
+  if (morceaux.length < 2) return texte
+  return morceaux.map((m, i) => (i % 2 ? <em key={i}>{m}</em> : m))
+}
+
+/** Un titre saisi : une ligne par retour à la ligne, accents compris. */
+export function enLignes(texte: string): React.ReactNode[] {
+  return texte
+    .split('\n')
+    .filter((l) => l.trim())
+    .map((l, i) => <span key={i}>{accent(l)}</span>)
+}
 
 /** Surtitre : un trait d'or et des petites capitales. */
 export function Surtitre({ children, clair = false }: { children: React.ReactNode; clair?: boolean }) {
@@ -47,43 +64,40 @@ export function Surtitre({ children, clair = false }: { children: React.ReactNod
 
 /* ── Seuil ──────────────────────────────────────────────────────────── */
 
-export function SectionSeuil({ c }: P) {
+export function SectionSeuil({ c, t = TEXTES.mSeuil(c) }: P & { t?: T<'mSeuil'> }) {
   return (
     <Seuil
-      prenom={prenomDe(c.nom)}
-      nom={nomDe(c.nom)}
+      prenom={prenomDe(t.nom)}
+      nom={nomDe(t.nom)}
       metier={c.metier}
       ville={c.ville}
-      accroche={c.accroche}
+      accroche={t.accroche}
       photo={c.ambiance ?? c.portrait}
       rdv={c.rdv}
       horaires={c.horaires}
-      services={c.services.map((s) => ({ titre: s.title }))}
-      intro={c.ouverture.intro || c.accroche}
+      intro={t.intro}
+      textes={t}
     />
   )
 }
 
 /* ── Respiration ────────────────────────────────────────────────────── */
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars -- même signature que les autres sections (vitrine)
-export function Respiration(_props: P) {
+export function Respiration({ t = TEXTES.mRespiration() }: Partial<P> & { t?: T<'mRespiration'> }) {
   return (
     <section className="relative overflow-hidden py-24 md:py-32">
       <div className="mx-auto grid max-w-[1200px] items-center gap-16 px-[5vw] md:grid-cols-2">
         <div>
-          <Surtitre>Avant de commencer</Surtitre>
+          {t.surtitre && <Surtitre>{t.surtitre}</Surtitre>}
           <h2 className="text-[38px] md:text-[56px]">
-            <Lignes lignes={['Prenez le temps', <span key="r">d’une <em>respiration</em>.</span>]} />
+            <Lignes lignes={enLignes(t.titre)} />
           </h2>
           <Revele delai={0.3}>
-            <p className="mt-8 max-w-[42ch] text-[17px] leading-[1.75] text-[var(--ad-pierre)]">
-              Un instant pour vous, avant la suite. Suivez le cercle : il gonfle, vous inspirez ; il se pose, vous expirez.
-            </p>
+            <p className="mt-8 max-w-[42ch] text-[17px] leading-[1.75] text-[var(--ad-pierre)]">{t.texte}</p>
           </Revele>
         </div>
         {/* Le cercle qui respire — et l'exercice guidé d'une minute. */}
-        <Souffle />
+        <Souffle bouton={t.bouton} />
       </div>
     </section>
   )
@@ -91,8 +105,8 @@ export function Respiration(_props: P) {
 
 /* ── Rencontre ──────────────────────────────────────────────────────── */
 
-export function Rencontre({ c }: P) {
-  const anneau = `${c.metier} · ${c.ville} · ${[...new Set(c.services.map((s) => s.method).filter(Boolean))].slice(0, 2).join(' · ')} · `
+export function Rencontre({ c, t = TEXTES.mRencontre(c) }: P & { t?: T<'mRencontre'> }) {
+  const anneau = t.anneau
   return (
     <section id="a-propos" className="scroll-mt-24 py-28 md:py-40">
       <div className="mx-auto grid max-w-[1200px] items-center gap-16 px-[5vw] md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:gap-24">
@@ -120,14 +134,14 @@ export function Rencontre({ c }: P) {
           </div>
         </Revele>
         <div>
-          <Surtitre>{c.apropos.surtitre}</Surtitre>
+          {t.surtitre && <Surtitre>{t.surtitre}</Surtitre>}
           <h2 className="text-[36px] md:text-[54px]">
-            <Lignes lignes={[prenomDe(c.nom), <em key="n">{nomDe(c.nom)}</em>]} />
+            <Lignes lignes={enLignes(t.titre)} />
           </h2>
-          <Encre texte={c.apropos.texte} className="mt-10 font-[family-name:var(--ad-titre)] text-[21px] font-medium leading-[1.55] tracking-[-0.015em] text-[var(--ad-nuit)] md:text-[24px]" />
-          {c.apropos.citation && (
+          <Encre texte={t.texte.replace(/\*/g, '')} className="mt-10 font-[family-name:var(--ad-titre)] text-[21px] font-medium leading-[1.55] tracking-[-0.015em] text-[var(--ad-nuit)] md:text-[24px]" />
+          {t.citation && (
             <Revele delai={0.1}>
-              <p className="mt-8 border-l border-[var(--ad-or)] pl-5 text-[16px] leading-[1.7] text-[var(--ad-pierre)]">{c.apropos.citation}</p>
+              <p className="mt-8 border-l border-[var(--ad-or)] pl-5 text-[16px] leading-[1.7] text-[var(--ad-pierre)]">{t.citation}</p>
             </Revele>
           )}
         </div>
@@ -138,24 +152,24 @@ export function Rencontre({ c }: P) {
 
 /* ── Chemin ─────────────────────────────────────────────────────────── */
 
-export function SectionChemin({ c }: P) {
+export function SectionChemin({ c, t = TEXTES.mChemin(c) }: P & { t?: T<'mChemin'> }) {
   return (
     <section id="methode" className="scroll-mt-24 py-24 md:py-36">
       <div className="mx-auto max-w-[1100px] px-[5vw]">
         <div className="mb-16 text-center md:mb-24">
           <div className="flex justify-center">
-            <Surtitre>{c.methode.surtitre}</Surtitre>
+            {t.surtitre && <Surtitre>{t.surtitre}</Surtitre>}
           </div>
           <h2 className="text-[36px] md:text-[54px]">
-            <Lignes lignes={[c.methode.titre]} />
+            <Lignes lignes={enLignes(t.titre)} />
           </h2>
-          {c.methode.intro && (
+          {t.intro && (
             <Revele delai={0.2}>
-              <p className="mx-auto mt-6 max-w-[52ch] text-[17px] leading-[1.7] text-[var(--ad-pierre)]">{c.methode.intro}</p>
+              <p className="mx-auto mt-6 max-w-[52ch] text-[17px] leading-[1.7] text-[var(--ad-pierre)]">{t.intro}</p>
             </Revele>
           )}
         </div>
-        <Chemin etapes={c.methode.etapes} />
+        <Chemin etapes={t.etapes.filter((e) => e.titre?.trim())} />
       </div>
     </section>
   )
@@ -163,25 +177,25 @@ export function SectionChemin({ c }: P) {
 
 /* ── Arches ─────────────────────────────────────────────────────────── */
 
-export function SectionArches({ c }: P) {
+export function SectionArches({ c, t = TEXTES.mArches(c) }: P & { t?: T<'mArches'> }) {
   return (
     <section id="accompagnements" className="scroll-mt-24 py-24 md:py-36">
       <div className="mx-auto max-w-[1320px] px-[5vw]">
         <div className="mb-14 flex flex-wrap items-end justify-between gap-6">
           <div>
-            <Surtitre>Accompagnements</Surtitre>
+            {t.surtitre && <Surtitre>{t.surtitre}</Surtitre>}
             <h2 className="text-[36px] md:text-[54px]">
-              <Lignes lignes={['Ce que je vous', <em key="p">propose</em>]} />
+              <Lignes lignes={enLignes(t.titre)} />
             </h2>
           </div>
-          <Revele delai={0.2}>
-            <p className="max-w-[34ch] text-[15px] leading-[1.7] text-[var(--ad-pierre)]">
-              {c.services.length} façons d’être accompagné. Survolez ou touchez une carte pour l’ouvrir.
-            </p>
-          </Revele>
+          {t.texte && (
+            <Revele delai={0.2}>
+              <p className="max-w-[34ch] text-[15px] leading-[1.7] text-[var(--ad-pierre)]">{t.texte}</p>
+            </Revele>
+          )}
         </div>
         <Revele>
-          <Arches services={c.services} rdv={c.rdv} />
+          <Arches services={c.services} rdv={c.rdv} bouton={t.bouton} />
         </Revele>
       </div>
     </section>
@@ -194,7 +208,7 @@ const JOURS_COURTS = ['lun', 'mar', 'mer', 'jeu', 'ven', 'sam', 'dim']
 
 /** Un « bento » : tout ce qu'on cherche avant d'appeler, en cartes
     vivantes — le plan qui bat, l'onde de la visio, les séances. */
-export function EnPratique({ c }: P) {
+export function EnPratique({ c, t = TEXTES.mEnPratique() }: P & { t?: T<'mEnPratique'> }) {
   const ouverts = c.horaires.filter((h) => !/ferm/i.test(h.hours))
   const indice = (j: string) => JOURS_COURTS.findIndex((d) => j.toLowerCase().startsWith(d))
   const tries = [...ouverts].sort((a, b) => indice(a.day) - indice(b.day))
@@ -204,9 +218,9 @@ export function EnPratique({ c }: P) {
   return (
     <section className="py-24 md:py-32">
       <div className="mx-auto max-w-[1200px] px-[5vw]">
-        <Surtitre>En pratique</Surtitre>
+        {t.surtitre && <Surtitre>{t.surtitre}</Surtitre>}
         <h2 className="mb-12 text-[36px] md:text-[54px]">
-          <Lignes lignes={['Tout ce qu’il faut', <em key="s">savoir</em>]} />
+          <Lignes lignes={enLignes(t.titre)} />
         </h2>
         <div className="grid gap-4 md:auto-rows-[220px] md:grid-cols-4">
           {/* Le plan : une vraie carte, teintée aux couleurs du site. */}
@@ -218,7 +232,7 @@ export function EnPratique({ c }: P) {
             )}
             <div className="pointer-events-none relative flex h-full min-h-[340px] flex-col justify-end p-5">
               <div className="pointer-events-auto rounded-[20px] bg-white/90 p-5 shadow-[0_14px_40px_-20px_rgba(46,66,79,0.4)] backdrop-blur">
-                <p className="text-[13px] font-semibold text-[var(--ad-gris)]">Le cabinet</p>
+                <p className="text-[13px] font-semibold text-[var(--ad-gris)]">{t.cabinet}</p>
                 <p className="mt-1 text-[18px] font-semibold tracking-[-0.02em]">{c.adresse ?? c.ville}</p>
                 {c.adresse && (
                   <a
@@ -227,7 +241,7 @@ export function EnPratique({ c }: P) {
                     rel="noopener noreferrer"
                     className="group mt-3 inline-flex items-center gap-1.5 text-[14px] font-semibold text-[var(--ad-bleu)]"
                   >
-                    Itinéraire
+                    {t.itineraire}
                     <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
                   </a>
                 )}
@@ -238,7 +252,7 @@ export function EnPratique({ c }: P) {
           {/* Les séances. */}
           <Revele delai={0.08} className={cn(carte, 'md:col-span-2')}>
             <Lueur />
-            <p className="text-[13px] font-semibold text-[var(--ad-gris)]">Les séances</p>
+            <p className="text-[13px] font-semibold text-[var(--ad-gris)]">{t.seances}</p>
             <ul className="mt-4 flex flex-col gap-2.5">
               {c.services.slice(0, 4).map((s) => (
                 <li key={s.id} className="group/seance flex items-center justify-between gap-4 text-[15px]">
@@ -269,15 +283,15 @@ export function EnPratique({ c }: P) {
               ))}
             </div>
             <div>
-              <p className="text-[18px] font-semibold tracking-[-0.02em]">En visio aussi</p>
-              <p className="mt-1 text-[14px] leading-[1.5] text-[var(--ad-gris)]">Si vous êtes loin, ou empêché.</p>
+              <p className="text-[18px] font-semibold tracking-[-0.02em]">{t.visioTitre}</p>
+              <p className="mt-1 text-[14px] leading-[1.5] text-[var(--ad-gris)]">{t.visioTexte}</p>
             </div>
           </Revele>
 
           {/* Les jours. */}
           <Revele delai={0.24} className={cn(carte, 'flex flex-col justify-between')}>
             <Lueur />
-            <p className="text-[13px] font-semibold text-[var(--ad-gris)]">Consultations</p>
+            <p className="text-[13px] font-semibold text-[var(--ad-gris)]">{t.consultations}</p>
             <div>
               <p className="text-[24px] font-semibold capitalize tracking-[-0.03em]">{plage}</p>
               {tries[0] && <p className="mt-1 text-[14px] text-[var(--ad-gris)]">{tries[0].hours}</p>}
@@ -291,9 +305,20 @@ export function EnPratique({ c }: P) {
 
 /* ── Phrase ─────────────────────────────────────────────────────────── */
 
-export function Phrase({ c }: P) {
-  const mots = c.citation.texte.split(' ')
-  const milieu = Math.ceil(mots.length / 2)
+export function Phrase({ c, t = TEXTES.mPhrase(c) }: P & { t?: T<'mPhrase'> }) {
+  /* « *mot* » : les mots entre astérisques sont en accent. */
+  let dansAccent = false
+  const mots = t.texte
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((brut) => {
+      const ouvre = brut.startsWith('*')
+      const ferme = brut.endsWith('*') && brut.length > 1
+      if (ouvre) dansAccent = true
+      const mot = { mot: brut.replace(/\*/g, ''), accent: dansAccent }
+      if (ferme || (ouvre && brut.length > 1 && brut.slice(1).includes('*'))) dansAccent = false
+      return mot
+    })
   return (
     <section className="py-28 md:py-44">
       <div className="mx-auto max-w-[1200px] px-[5vw] text-center">
@@ -301,11 +326,11 @@ export function Phrase({ c }: P) {
         <blockquote>
           {/* Les mots s'allument un à un, à la vitesse où l'on descend. */}
           <Conviction
-            mots={mots.map((mot, i) => ({ mot, accent: i >= milieu }))}
+            mots={mots}
             className="mx-auto max-w-[22ch] text-balance font-[family-name:var(--ad-titre)] text-[clamp(34px,5vw,80px)] font-semibold leading-[1.08] tracking-[-0.03em] text-[var(--ad-nuit)]"
           />
           <Revele delai={0.4}>
-            <footer className="mt-10 text-[12px] uppercase tracking-[0.22em] text-[var(--ad-gris)]">{c.citation.auteur}</footer>
+            <footer className="mt-10 text-[12px] uppercase tracking-[0.22em] text-[var(--ad-gris)]">{t.auteur}</footer>
           </Revele>
         </blockquote>
       </div>
@@ -315,28 +340,31 @@ export function Phrase({ c }: P) {
 
 /* ── Promenade ──────────────────────────────────────────────────────── */
 
-export function SectionPromenade({ c }: P) {
-  const photos = c.photos.filter((p) => !/substitution/i.test(p.alt)).slice(0, 9)
+export function SectionPromenade({
+  c,
+  t = TEXTES.mPromenade(),
+  photos = photosPromenade(c),
+}: P & { t?: T<'mPromenade'>; photos?: Contenu['photos'] }) {
   return (
     <div>
-      <Promenade photos={photos} titre={<>Le <em>cabinet</em></>} />
+      <Promenade photos={photos} titre={accent(t.titre)} legende={t.legende} />
     </div>
   )
 }
 
 /* ── Conversation ───────────────────────────────────────────────────── */
 
-export function SectionConversation({ c }: P) {
+export function SectionConversation({ c, t = TEXTES.mConversation(c) }: P & { t?: T<'mConversation'> }) {
   if (!c.faq.length) return null
   return (
     <section id="questions" className="scroll-mt-24 py-24 md:py-36">
       <div className="mx-auto max-w-[1200px] px-[5vw]">
-        <Surtitre>Questions fréquentes</Surtitre>
+        {t.surtitre && <Surtitre>{t.surtitre}</Surtitre>}
         <h2 className="mb-14 text-[36px] md:text-[54px]">
-          <Lignes lignes={['Ce qu’on me', <em key="d">demande</em>]} />
+          <Lignes lignes={enLignes(t.titre)} />
         </h2>
         <Revele>
-          <Conversation faq={c.faq} prenom={prenomDe(c.nom)} portrait={c.portrait} />
+          <Conversation faq={c.faq} prenom={prenomDe(c.nom)} portrait={c.portrait} signature={t.signature} suivante={t.suivante} />
         </Revele>
       </div>
     </section>
@@ -345,7 +373,7 @@ export function SectionConversation({ c }: P) {
 
 /* ── Rendez-vous ────────────────────────────────────────────────────── */
 
-export function RendezVous({ c }: P) {
+export function RendezVous({ c, t = TEXTES.mRendezVous(c) }: P & { t?: T<'mRendezVous'> }) {
   const lignes = [
     c.telephone && { icone: <Phone />, texte: c.telephone, href: `tel:${toE164(c.telephone)}` },
     c.email && { icone: <Mail />, texte: c.email, href: `mailto:${c.email}` },
@@ -355,9 +383,9 @@ export function RendezVous({ c }: P) {
     <section id="contact" className="scroll-mt-24 py-24 md:py-36">
       <div className="mx-auto grid max-w-[1200px] gap-16 px-[5vw] lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
         <div>
-          <Surtitre>Rendez-vous</Surtitre>
+          {t.surtitre && <Surtitre>{t.surtitre}</Surtitre>}
           <h2 className="text-[36px] md:text-[54px]">
-            <Lignes lignes={['Écrivez-moi,', <em key="e">simplement</em>]} />
+            <Lignes lignes={enLignes(t.titre)} />
           </h2>
           <Revele delai={0.2} className="mt-12">
             <Semaine horaires={c.horaires} />
@@ -377,7 +405,7 @@ export function RendezVous({ c }: P) {
           </Revele>
         </div>
         <Revele delai={0.15}>
-          <Lettre prenom={prenomDe(c.nom)} />
+          <Lettre prenom={prenomDe(c.nom)} textes={t} />
         </Revele>
       </div>
     </section>
@@ -386,7 +414,11 @@ export function RendezVous({ c }: P) {
 
 /* ── Horizon ────────────────────────────────────────────────────────── */
 
-export function Horizon({ c, liens }: P & { liens: { href: string; label: string }[] }) {
+export function Horizon({
+  c,
+  liens,
+  t = TEXTES.mHorizon(),
+}: P & { liens: { href: string; label: string }[]; t?: T<'mHorizon'> }) {
   return (
     /* Derrière la courbe du pied de page : le fond du site, le même partout. */
     <div className="bg-[var(--ad-ivoire)]">
@@ -395,8 +427,8 @@ export function Horizon({ c, liens }: P & { liens: { href: string; label: string
       {/* Une lumière lagon qui suit la souris dans la nuit. */}
       <Lueur couleur="rgba(79,169,166,0.16)" taille={620} />
       <div className="relative mx-auto max-w-[1200px]">
-        <p className="text-center font-[family-name:var(--ad-titre)] font-semibold tracking-[-0.03em] text-[clamp(48px,8.5vw,136px)] leading-[0.98]">
-          <Lignes lignes={['Prenons', <span key="t" className="text-[var(--ad-or)]">le temps.</span>]} />
+        <p className="text-center font-[family-name:var(--ad-titre)] font-semibold tracking-[-0.03em] text-[clamp(48px,8.5vw,136px)] leading-[0.98] [&_em]:[background:none] [&_em]:[-webkit-text-fill-color:var(--ad-or)]">
+          <Lignes lignes={enLignes(t.titre)} />
         </p>
         <Revele delai={0.3} className="mt-12 flex justify-center">
           <Aimant>
@@ -404,7 +436,7 @@ export function Horizon({ c, liens }: P & { liens: { href: string; label: string
             href={c.rdv}
             className="group inline-flex items-center gap-3 rounded-full bg-white py-2 pl-7 pr-2 text-[16px] font-medium text-[var(--ad-nuit)]"
           >
-            Prendre rendez-vous
+            {t.bouton}
             <span className="grid h-10 w-10 place-items-center rounded-full bg-[var(--ad-nuit)] text-white transition-transform duration-500 ease-[var(--ad-ease)] group-hover:rotate-45">
               <ArrowUpRight className="h-4 w-4" />
             </span>
@@ -444,7 +476,7 @@ export function Horizon({ c, liens }: P & { liens: { href: string; label: string
           <span>
             © {new Date().getFullYear()} {c.nom} ·{' '}
             <Link href="/" className="underline-offset-2 hover:text-white hover:underline">
-              version classique
+              {t.mention}
             </Link>
           </span>
         </div>

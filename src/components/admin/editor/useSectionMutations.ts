@@ -333,6 +333,8 @@ export function useSectionMutations({
         return
       }
       let currentId = result.data.id
+      /* Le payload enregistré : prérempli côté serveur (version moderne). */
+      const payload = result.data.payload ?? block.schema.parse(block.defaults)
 
       const rowFor = (id: string) =>
         buildRoot(id, position, {
@@ -340,7 +342,7 @@ export function useSectionMutations({
           anchor: block.suggestedAnchor || null,
           navLabel: block.navigable ? block.label : null,
           showInNav: block.navigable ?? false,
-          payload: block.schema.parse(block.defaults),
+          payload,
         })
 
       insertRootLocally(rowFor(currentId))

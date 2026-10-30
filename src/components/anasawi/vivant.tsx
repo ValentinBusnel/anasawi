@@ -4,6 +4,7 @@ import { ArrowUpRight, Check, Menu, Plus, X } from 'lucide-react'
 import Image from 'next/image'
 import { createContext, useContext, useEffect, useLayoutEffect, useRef, useState } from 'react'
 
+import { lettreParDefaut, type TextesLettre } from '@/blocks/moderne/textes'
 import { BasculeVersion } from '@/components/site/BasculeVersion'
 import { LogoMark } from '@/components/site/Logo'
 import { cn } from '@/lib/utils'
@@ -221,6 +222,16 @@ export function Lignes({
   )
 }
 
+export type TextesSeuil = {
+  surtitre: string
+  pastille2: string
+  pastille3: string
+  bouton: string
+  bouton2: string
+  lienDecouvrir?: string
+  invitation: string
+}
+
 /* ══════════════════════════════════════════════════════════════════════
    LE SEUIL — l'ouverture. Au premier écran, le nom d'Anne, centré, au
    PREMIER PLAN ; juste dessous, une fenêtre sur le cabinet. On fait
@@ -238,8 +249,8 @@ export function Seuil({
   photo,
   rdv,
   horaires,
-  services,
   intro,
+  textes,
 }: {
   prenom: string
   nom: string
@@ -249,9 +260,10 @@ export function Seuil({
   photo: Media | null
   rdv: string
   horaires: OpeningHour[]
-  services: { titre: string }[]
   /** Une phrase de présentation, sous le nom (repli : l’accroche). */
   intro: string
+  /** Les petits textes de l’ouverture, tous modifiables dans l’éditeur. */
+  textes: TextesSeuil
 }) {
   const ref = useAvancement<HTMLElement>('colle', true)
   const edition = useContext(Edition)
@@ -286,7 +298,7 @@ export function Seuil({
         <div className="absolute inset-x-0 top-[calc(var(--ad-vh)*13)] z-30 flex justify-center md:top-[calc(var(--ad-vh)*14)]" style={sEfface}>
           <span className="inline-flex items-center gap-2 rounded-full bg-white px-3.5 py-1.5 text-[13px] font-semibold text-[var(--ad-pierre)] shadow-[0_1px_2px_rgba(46,66,79,0.06),0_6px_18px_-8px_rgba(46,66,79,0.18)] motion-safe:animate-[ad-monter_1.1s_var(--ad-ease)_0.1s_backwards]">
             <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-[var(--ad-or)]" />
-            {metier} · {ville}
+            {textes.surtitre || `${metier} · ${ville}`}
           </span>
         </div>
 
@@ -361,7 +373,7 @@ export function Seuil({
                 href={rdv}
                 className="group mt-10 inline-flex items-center gap-3 rounded-full bg-white py-2 pl-6 pr-2 text-[15px] font-semibold text-[var(--ad-nuit)]"
               >
-                Prendre rendez-vous
+                {textes.bouton}
                 <span className="grid h-9 w-9 place-items-center rounded-full bg-[var(--ad-nuit)] text-white transition-transform duration-500 ease-[var(--ad-ease)] group-hover:rotate-45">
                   <ArrowUpRight className="h-4 w-4" />
                 </span>
@@ -388,18 +400,18 @@ export function Seuil({
               </span>
             </span>
           )}
-          <span className="absolute -right-[72px] top-[44%] motion-safe:animate-[ad-monter_1.2s_var(--ad-ease)_0.95s_backwards]">
+          {textes.pastille2 && <span className="absolute -right-[72px] top-[44%] motion-safe:animate-[ad-monter_1.2s_var(--ad-ease)_0.95s_backwards]">
             <span className={pastille} style={{ animation: 'ad-flotter 8s ease-in-out 1.4s infinite' }}>
               <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-[var(--ad-or)]" />
-              {services.length} accompagnements
+              {textes.pastille2}
             </span>
-          </span>
-          <span className="absolute -left-[40px] bottom-[10%] motion-safe:animate-[ad-monter_1.2s_var(--ad-ease)_1.1s_backwards]">
+          </span>}
+          {textes.pastille3 && <span className="absolute -left-[40px] bottom-[10%] motion-safe:animate-[ad-monter_1.2s_var(--ad-ease)_1.1s_backwards]">
             <span className={pastille} style={{ animation: 'ad-flotter 9s ease-in-out 0.6s infinite' }}>
               <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-[var(--ad-bleu)]" />
-              Au cabinet ou en visio
+              {textes.pastille3}
             </span>
-          </span>
+          </span>}
         </div>
 
         {/* En bas : les deux actions, et l'invitation à entrer. */}
@@ -410,21 +422,21 @@ export function Seuil({
               href={rdv}
               className="pointer-events-auto group inline-flex items-center gap-2.5 rounded-full bg-[var(--ad-nuit)] py-1.5 pl-5 pr-1.5 text-[14px] font-semibold text-white shadow-[0_14px_30px_-14px_rgba(46,66,79,0.6)]"
             >
-              Prendre rendez-vous
+              {textes.bouton}
               <span className="grid h-8 w-8 place-items-center rounded-full bg-white/15 transition-transform duration-500 ease-[var(--ad-ease)] group-hover:rotate-45">
                 <ArrowUpRight className="h-3.5 w-3.5" />
               </span>
             </a>
             </Aimant>
             <a
-              href="#accompagnements"
+              href={textes.lienDecouvrir || '#accompagnements'}
               className="pointer-events-auto inline-flex items-center rounded-full border border-[var(--ad-sable-fonce)] bg-white px-5 text-[14px] font-semibold text-[var(--ad-nuit)] transition-colors hover:border-[var(--ad-nuit)]"
             >
-              Découvrir
+              {textes.bouton2}
             </a>
           </div>
           <span className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--ad-gris)] max-md:hidden">
-            Défiler pour entrer
+            {textes.invitation}
             <span className="relative block h-8 w-px overflow-hidden bg-[var(--ad-sable-fonce)]">
               <span className="absolute inset-x-0 top-0 h-1/2 bg-[var(--ad-or)] motion-safe:animate-[ad-descendre_2.2s_var(--ad-ease-lent)_infinite]" />
             </span>
@@ -552,7 +564,7 @@ const RIDEAU = 'cubic-bezier(0.83,0,0.17,1)'
 const SORTIE = 'cubic-bezier(0.16,1,0.3,1)'
 const OUVERTURE = 3.4
 
-export function Arches({ services, rdv }: { services: ServiceWithMedia[]; rdv: string }) {
+export function Arches({ services, rdv, bouton = 'Réserver cet accompagnement' }: { services: ServiceWithMedia[]; rdv: string; bouton?: string }) {
   const [ouverte, setOuverte] = useState(0)
   const liste = useRef<HTMLUListElement>(null)
   const attente = useRef<number | null>(null)
@@ -784,7 +796,7 @@ export function Arches({ services, rdv }: { services: ServiceWithMedia[]; rdv: s
                   transition: actif ? `opacity 0.8s ${SORTIE} 0.75s, transform 1s cubic-bezier(0.34,1.56,0.64,1) 0.75s` : 'opacity 0.2s, transform 0.3s',
                 }}
               >
-                Réserver cet accompagnement
+                {bouton}
                 <span className="grid h-8 w-8 place-items-center rounded-full bg-[var(--ad-nuit)] text-white transition-transform duration-500 ease-[var(--ad-ease)] group-hover/lien:rotate-45">
                   <ArrowUpRight className="h-4 w-4" />
                 </span>
@@ -804,7 +816,7 @@ export function Arches({ services, rdv }: { services: ServiceWithMedia[]; rdv: s
    doigt.
    ══════════════════════════════════════════════════════════════════════ */
 
-export function Promenade({ photos, titre }: { photos: Media[]; titre: React.ReactNode }) {
+export function Promenade({ photos, titre, legende = 'pièces · défilez' }: { photos: Media[]; titre: React.ReactNode; legende?: string }) {
   const ref = useAvancement<HTMLElement>('colle')
   const edition = useContext(Edition)
   const piste = useRef<HTMLDivElement>(null)
@@ -826,7 +838,7 @@ export function Promenade({ photos, titre }: { photos: Media[]; titre: React.Rea
         <div className="mb-10 flex items-end justify-between gap-6 px-[5vw]">
           <h2 className="text-[48px] md:text-[80px]">{titre}</h2>
           <p className="pb-3 text-[12px] uppercase tracking-[0.2em] text-[var(--ad-gris)] max-md:hidden">
-            <span className="tabular-nums">{photos.length}</span> pièces · défilez
+            <span className="tabular-nums">{photos.length}</span> {legende}
           </p>
         </div>
         <div className="overflow-x-auto [scrollbar-width:none] md:overflow-visible">
@@ -869,7 +881,19 @@ export function Promenade({ photos, titre }: { photos: Media[]; titre: React.Rea
    message, Anne « écrit »… et sa réponse arrive.
    ══════════════════════════════════════════════════════════════════════ */
 
-export function Conversation({ faq, prenom, portrait }: { faq: FaqItem[]; prenom: string; portrait: Media | null }) {
+export function Conversation({
+  faq,
+  prenom,
+  portrait,
+  signature = `${prenom} · répond en personne`,
+  suivante = 'Question suivante',
+}: {
+  faq: FaqItem[]
+  prenom: string
+  portrait: Media | null
+  signature?: string
+  suivante?: string
+}) {
   const [choisie, setChoisie] = useState(0)
   const [ecrit, setEcrit] = useState(false)
   const premier = useRef(true)
@@ -943,7 +967,7 @@ export function Conversation({ faq, prenom, portrait }: { faq: FaqItem[]; prenom
                 </p>
               )}
             </div>
-            <p className="pl-[52px] text-[12px] uppercase tracking-[0.18em] text-[var(--ad-gris)]">{prenom} · répond en personne</p>
+            <p className="pl-[52px] text-[12px] uppercase tracking-[0.18em] text-[var(--ad-gris)]">{signature}</p>
             <div className="mt-auto flex items-center justify-between gap-4 border-t border-[var(--ad-sable-fonce)] pt-5">
               <span className="text-[13px] tabular-nums text-[var(--ad-gris)]">
                 {choisie + 1} / {faq.length}
@@ -953,7 +977,7 @@ export function Conversation({ faq, prenom, portrait }: { faq: FaqItem[]; prenom
                 onClick={() => setChoisie((choisie + 1) % faq.length)}
                 className="group inline-flex items-center gap-2 text-[14px] font-semibold text-[var(--ad-nuit)]"
               >
-                Question suivante
+                {suivante}
                 <span className="grid h-8 w-8 place-items-center rounded-full bg-white transition-transform duration-500 ease-[var(--ad-ease)] group-hover:translate-x-1">
                   <ArrowUpRight className="h-4 w-4 rotate-45" />
                 </span>
@@ -1035,7 +1059,9 @@ function Trait() {
 const LIGNE =
   'peer w-full border-0 border-b border-[var(--ad-sable-fonce)] bg-transparent px-0 py-3 font-[family-name:var(--ad-titre)] font-medium tracking-[-0.01em] text-[18px] text-[var(--ad-nuit)] outline-none transition-[border-color] duration-300 placeholder:text-[var(--ad-gris)]/50 focus:border-[var(--ad-nuit)]'
 
-export function Lettre({ prenom }: { prenom: string }) {
+export function Lettre({ prenom, textes }: { prenom: string; textes?: Partial<TextesLettre> }) {
+  const t = { ...lettreParDefaut(prenom), ...Object.fromEntries(Object.entries(textes ?? {}).filter(([, v]) => v && String(v).trim())) } as TextesLettre
+  const [merciDebut, merciAccent, merciFin] = t.merciTitre.split('*')
   const [etat, setEtat] = useState<'repos' | 'envoi' | 'envole' | 'ok'>('repos')
   const [longueur, setLongueur] = useState(0)
   const [erreur, setErreur] = useState<string | null>(null)
@@ -1092,10 +1118,12 @@ export function Lettre({ prenom }: { prenom: string }) {
           ))}
         </svg>
         <p className="mt-8 font-[family-name:var(--ad-titre)] font-semibold tracking-[-0.03em] text-[40px] leading-none text-[var(--ad-nuit)]">
-          Votre lettre est <em>partie</em>.
+          {merciDebut}
+          {merciAccent && <em>{merciAccent}</em>}
+          {merciFin}
         </p>
         <p className="mt-4 max-w-[36ch] text-[15px] leading-[1.6] text-[var(--ad-pierre)]">
-          {prenom} vous répondra personnellement, en général sous 48 heures.
+          {t.merciTexte}
         </p>
       </div>
     )
@@ -1109,21 +1137,21 @@ export function Lettre({ prenom }: { prenom: string }) {
         etat === 'envole' && 'motion-safe:animate-[ad-envol_0.75s_var(--ad-ease)_forwards]',
       )}
     >
-      <p className="font-[family-name:var(--ad-titre)] font-semibold tracking-[-0.03em] text-[30px] text-[var(--ad-nuit)]">Chère {prenom},</p>
+      <p className="font-[family-name:var(--ad-titre)] font-semibold tracking-[-0.03em] text-[30px] text-[var(--ad-nuit)]">{t.salutation}</p>
       <div className="mt-6 grid gap-x-8 gap-y-2 sm:grid-cols-2">
         <label className="relative block">
           <span className="sr-only">Votre nom</span>
-          <input name="name" required minLength={2} autoComplete="name" placeholder="Je m’appelle…" className={LIGNE} />
+          <input name="name" required minLength={2} autoComplete="name" placeholder={t.nom} className={LIGNE} />
           <Trait />
         </label>
         <label className="relative block">
           <span className="sr-only">Votre téléphone (facultatif)</span>
-          <input name="phone" type="tel" autoComplete="tel" placeholder="Mon téléphone (facultatif)" className={LIGNE} />
+          <input name="phone" type="tel" autoComplete="tel" placeholder={t.telephone} className={LIGNE} />
           <Trait />
         </label>
         <label className="relative block sm:col-span-2">
           <span className="sr-only">Votre adresse e-mail</span>
-          <input name="email" type="email" required autoComplete="email" placeholder="Vous pouvez me répondre à…" className={LIGNE} />
+          <input name="email" type="email" required autoComplete="email" placeholder={t.email} className={LIGNE} />
           <Trait />
         </label>
         <label className="block sm:col-span-2">
@@ -1133,7 +1161,7 @@ export function Lettre({ prenom }: { prenom: string }) {
             required
             minLength={20}
             rows={5}
-            placeholder="Je vous écris parce que…"
+            placeholder={t.message}
             onChange={(e) => setLongueur(e.currentTarget.value.trim().length)}
             aria-describedby="lettre-longueur"
             className={cn(
@@ -1161,7 +1189,7 @@ export function Lettre({ prenom }: { prenom: string }) {
         <span className="mt-0.5 grid h-[18px] w-[18px] shrink-0 place-items-center rounded-full border border-[var(--ad-sable-fonce)] transition-colors peer-checked:border-[var(--ad-nuit)] peer-checked:bg-[var(--ad-nuit)] peer-focus-visible:outline-2 peer-focus-visible:outline-[var(--ad-bleu)] [&_svg]:opacity-0 peer-checked:[&_svg]:opacity-100">
           <Check className="h-3 w-3 text-white" />
         </span>
-        J’accepte que mes coordonnées servent uniquement à me répondre.
+        {t.consentement}
       </label>
       {erreur && (
         <p role="alert" className="mt-4 rounded-[16px] bg-[#f3e1db] px-4 py-3 text-[14px] text-[#9a5a48]">
@@ -1169,13 +1197,13 @@ export function Lettre({ prenom }: { prenom: string }) {
         </p>
       )}
       <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
-        <span className="text-[15px] font-medium text-[var(--ad-gris)]">— avec mes salutations</span>
+        <span className="text-[15px] font-medium text-[var(--ad-gris)]">{t.signature}</span>
         <button
           type="submit"
           disabled={etat !== 'repos'}
           className="group inline-flex items-center gap-3 rounded-full bg-[var(--ad-nuit)] py-2 pl-6 pr-2 text-[15px] font-medium text-white transition-opacity disabled:opacity-60"
         >
-          {etat === 'repos' ? 'Envoyer la lettre' : 'Envoi…'}
+          {etat === 'repos' ? t.bouton : 'Envoi…'}
           <span className="grid h-9 w-9 place-items-center rounded-full bg-[var(--ad-or)] transition-transform duration-500 ease-[var(--ad-ease)] group-hover:rotate-45">
             <ArrowUpRight className="h-4 w-4" />
           </span>
@@ -1406,7 +1434,7 @@ export function Fil({ liens, rdv, logo }: { liens: { href: string; label: string
 
 const DUREE_EXERCICE = 64 // 8 respirations de 8 s
 
-export function Souffle() {
+export function Souffle({ bouton = 'Respirer une minute' }: { bouton?: string }) {
   const [debut, setDebut] = useState<number | null>(null)
   const [ecoule, setEcoule] = useState(0)
   useEffect(() => {
@@ -1467,7 +1495,7 @@ export function Souffle() {
           }}
           className="group inline-flex items-center gap-3 rounded-full bg-[var(--ad-nuit)] py-2 pl-5 pr-2 text-[14px] font-semibold text-white"
         >
-          {enCours ? 'Arrêter' : fini ? 'Recommencer' : 'Respirer une minute'}
+          {enCours ? 'Arrêter' : fini ? 'Recommencer' : bouton}
           <span className="grid h-8 w-8 place-items-center rounded-full bg-white/15">
             {enCours ? <X className="h-3.5 w-3.5" /> : <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-500 group-hover:rotate-45" />}
           </span>

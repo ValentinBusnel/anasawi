@@ -26,6 +26,7 @@ import { nodeStylesSchema, type NodeStyles } from '@/lib/node-styles'
 import { sectionSettingsSchema } from '@/lib/section-settings'
 import { db, runBatch } from '@/server/db'
 import { sections } from '@/server/db/schema'
+import { valeursDeDepart } from '@/server/moderne'
 
 /* ════════════════════════════════════════════════════════════════════
    Sections — CRUD
@@ -125,7 +126,7 @@ export async function insertSection({
   columnIndex?: number
   /** Position initiale dans une grille — cellules du point de dépôt. */
   placement?: GridPosition | null
-}): Promise<ActionResult<{ id: string }>> {
+}): Promise<ActionResult<{ id: string; payload: Record<string, unknown> }>> {
   return adminAction(async () => {
     if (!isUuid(pageId)) return fail(MESSAGES.pageIntrouvable)
     if (parentId !== null && !isUuid(parentId)) return fail(MESSAGES.sectionIntrouvable)
@@ -147,6 +148,13 @@ export async function insertSection({
       return fail(MESSAGES.placementImpossible)
     }
 
+    /* Version moderne : la section arrive préremplie avec le contenu
+       réel (textes, photos), pas avec des champs vides. */
+    const payload = {
+      ...(block.schema.parse(block.defaults) as Record<string, unknown>),
+      ...((await valeursDeDepart(type)) ?? {}),
+    }
+
     const scope = siblingScope({ pageId, parentId, columnIndex })
     const [, created] = await db.batch([
       shiftSiblingsFrom(scope, position),
@@ -164,7 +172,7 @@ export async function insertSection({
           navLabel: !parentId && block.navigable ? block.label : null,
           showInNav: !parentId && (block.navigable ?? false),
           sortOrder: position,
-          payload: block.schema.parse(block.defaults),
+          payload,
         })
         .returning({ id: sections.id }),
     ])
@@ -172,7 +180,7 @@ export async function insertSection({
     if (!created[0]) return fail(MESSAGES.enregistrementEchoue)
 
     revalidatePage(await slugOf(pageId))
-    return ok({ id: created[0].id })
+    return ok({ id: created[0].id, payload })
   })
 }
 

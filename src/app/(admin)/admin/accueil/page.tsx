@@ -3,7 +3,7 @@ import { PageHeader } from '@/components/admin/PageHeader'
 import { TemplateEditor } from '@/components/admin/TemplateEditor'
 import { PoliceModerne } from '@/components/anasawi/PoliceModerne'
 import { chargerContenu } from '@/components/anasawi/charger'
-import { assurerPageModerne } from '@/server/moderne'
+import { assurerPageModerne, menuModerne } from '@/server/moderne'
 import {
   getAllFaq,
   getAllMedia,
@@ -69,7 +69,7 @@ export default async function HomeBuilderPage({
       publishedSnapshot={page.publishedSnapshot}
       publishedAt={page.publishedAt}
       initialSections={page.sections}
-      data={{ services, faqItems, settings, media, partage }}
+      data={{ services, faqItems, settings, media, partage: partage && { ...partage, menu: menuModerne(page.sections, partage) } }}
       theme={theme}
       saved={saved}
       /* `?section=…` : depuis « Votre page » sur l'accueil, l'éditeur

@@ -51,6 +51,8 @@ export type Contenu = {
   ambiance: Media | null
   /** Le logo choisi dans les Réglages (adresse), sinon nul : celui livré. */
   logo: string | null
+  /** Le menu du site moderne (sections qui y figurent), posé par la page. */
+  menu?: { href: string; label: string }[]
 }
 
 

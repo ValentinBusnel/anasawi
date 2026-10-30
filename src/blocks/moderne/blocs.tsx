@@ -3,8 +3,10 @@ import { z } from 'zod'
 import { field } from '../field'
 import type { BlockContext, BlockDefinition } from '../types'
 import { construireContenu, type Contenu } from './contenu'
+import { photosPromenade, TEXTES, textesDe } from './textes'
 import {
   EnPratique,
+  Horizon,
   Phrase,
   Rencontre,
   RendezVous,
@@ -16,21 +18,25 @@ import {
   SectionSeuil,
 } from '@/components/anasawi/sections'
 import { ModeEdition } from '@/components/anasawi/vivant'
+import type { Media } from '@/server/db/schema'
 
 /**
  * LES BLOCS DE LA VERSION MODERNE — le site dans sa nouvelle direction
  * artistique, en cours d'arbitrage avec le site classique.
  *
- * Ils entrent dans le même registre, le même éditeur, la même
- * publication que les blocs classiques ; seul leur `theme` les distingue
- * (l'éditeur ne propose que ceux du site édité).
+ * TOUT SE MODIFIE ICI. Chaque mot affiché par une section est un champ :
+ * surtitres, titres, textes, boutons, pastilles, mentions. À la création
+ * (ou à la première ouverture dans l'éditeur), les champs sont PRÉREMPLIS
+ * avec le texte réellement affiché — tiré du contenu d'Anne (réglages,
+ * textes du site classique) — voir `preremplir` et `textes.ts`. Un champ
+ * qu'on vide retrouve cette valeur de départ.
  *
- * LE CONTENU EST PARTAGÉ. Accompagnements, questions, médias, réglages
- * (nom, coordonnées, horaires) : une seule source, les deux sites. Les
- * TEXTES de présentation viennent des sections du site classique (le
- * « Qui je suis » classique nourrit la « Rencontre » moderne…) — sauf si
- * le bloc moderne les remplace par les siens : un champ laissé vide
- * suit le site classique.
+ * Les listes partagées (accompagnements, questions, coordonnées,
+ * horaires) restent saisies une fois, dans leur écran : l'inspecteur y
+ * renvoie (`dataSource`).
+ *
+ * Titres : une ligne par retour à la ligne ; le mot clé entre
+ * astérisques (« Ce que je vous / *propose* »).
  *
  * Pour supprimer la version moderne après l'arbitrage : voir ARBITRAGE.md.
  */
@@ -50,43 +56,67 @@ export function contenuDe(ctx: BlockContext): Contenu {
   })
 }
 
-const texte = z.string().default('')
-const vide = (v: string | undefined) => !v || !v.trim()
-
 export function Enveloppe({ ctx, children }: { ctx: BlockContext; children: React.ReactNode }) {
   return <ModeEdition actif={Boolean(ctx.editable)}>{children}</ModeEdition>
 }
 
-export const SUIT = 'Laissé vide, ce champ suit le site classique.'
+/** Aide commune des champs préremplis. */
+export const SUIT = 'Prérempli avec le texte affiché sur le site.'
+const TITRE = 'Une ligne par retour à la ligne ; le mot clé entre *astérisques*.'
+const MENU = 'Libellé de cette section dans le menu du haut. Vide : absente du menu.'
+
+const t = z.string().default('')
+/** Posé par le préremplissage : dès lors, un champ vide est VOULU (pastille
+    masquée, pas de citation…) et ne reprend plus sa valeur de départ. */
+const rempli = z.boolean().default(false)
+const media = z.string().nullable().default(null)
+const commun = { group: 'Sections' as const, theme: 'moderne' as const, bleed: true }
+
+/** Les champs de saisie d'un bloc, sans les valeurs de départ (le
+    préremplissage s'en charge, avec le contenu réel). */
+const vides = <S extends z.ZodObject<z.ZodRawShape>>(schema: S) => schema.parse({}) as z.input<S>
 
 /* ── Le seuil ─────────────────────────────────────────────────────────── */
 
-const seuilSchema = z.object({ accroche: texte, intro: texte, mediaId: z.string().nullable().default(null) })
+const seuilSchema = z.object({ rempli,
+  surtitre: t,
+  nom: t,
+  intro: t,
+  accroche: t,
+  mediaId: media,
+  pastille2: t,
+  pastille3: t,
+  bouton: t,
+  bouton2: t,
+  invitation: t,
+})
 export const mSeuilBlock: BlockDefinition<typeof seuilSchema> = {
+  ...commun,
   label: 'Moderne — Le seuil',
   description: 'Votre nom en grand, une fenêtre sur le cabinet qui s’ouvre au défilement.',
-  group: 'Sections',
-  theme: 'moderne',
-  bleed: true,
   schema: seuilSchema,
   fields: [
-    field.textarea('accroche', 'Phrase d’accueil (dans la photo)', { help: `Par défaut : l’accroche des Réglages. ${SUIT}` }),
-    field.textarea('intro', 'Présentation (sous le nom)', { help: SUIT }),
-    field.media('mediaId', 'Photo du cabinet'),
+    field.text('surtitre', 'Étiquette au-dessus du nom', { help: SUIT }),
+    field.text('nom', 'Nom', { help: 'Le premier mot en noir, la suite en accent.' }),
+    field.textarea('intro', 'Présentation (sous le nom)'),
+    field.media('mediaId', 'Photo de la fenêtre'),
+    field.textarea('accroche', 'Phrase d’accueil (dans la photo, en plein écran)'),
+    field.text('pastille2', 'Pastille de droite', { help: 'Vide : pastille masquée.' }),
+    field.text('pastille3', 'Pastille du bas', { help: 'Vide : pastille masquée.' }),
+    field.text('bouton', 'Bouton principal'),
+    field.text('bouton2', 'Bouton secondaire'),
+    field.text('invitation', 'Invitation à défiler'),
   ],
-  defaults: { accroche: '', intro: '', mediaId: null },
+  defaults: vides(seuilSchema),
+  preremplir: (c) => ({ rempli: true, ...TEXTES.mSeuil(c), mediaId: (c.ambiance ?? c.portrait)?.id ?? null }),
+  dataSource: { label: 'Le métier, la ville et les horaires (pastille « ouvert aujourd’hui »)', href: '/admin/reglages' },
   Component: ({ data, ctx }) => {
     const base = contenuDe(ctx)
     const photo = data.mediaId ? ctx.resolveMedia(data.mediaId) : null
-    const c: Contenu = {
-      ...base,
-      accroche: vide(data.accroche) ? base.accroche : data.accroche,
-      ouverture: { ...base.ouverture, intro: vide(data.intro) ? base.ouverture.intro : data.intro },
-      ambiance: photo ?? base.ambiance,
-    }
+    const c: Contenu = { ...base, ambiance: photo ?? base.ambiance }
     return (
       <Enveloppe ctx={ctx}>
-        <SectionSeuil c={c} />
+        <SectionSeuil c={c} t={textesDe('mSeuil', base, data)} />
       </Enveloppe>
     )
   },
@@ -94,57 +124,60 @@ export const mSeuilBlock: BlockDefinition<typeof seuilSchema> = {
 
 /* ── Respiration ──────────────────────────────────────────────────────── */
 
-const vierge = z.object({})
-export const mRespirationBlock: BlockDefinition<typeof vierge> = {
+const respirationSchema = z.object({ rempli, surtitre: t, titre: t, texte: t, bouton: t })
+export const mRespirationBlock: BlockDefinition<typeof respirationSchema> = {
+  ...commun,
   label: 'Moderne — Respiration',
   description: 'Un cercle qui respire, et un exercice guidé d’une minute.',
-  group: 'Sections',
-  theme: 'moderne',
-  bleed: true,
-  schema: vierge,
-  fields: [],
-  defaults: {},
-  Component: ({ ctx }) => (
+  schema: respirationSchema,
+  fields: [
+    field.text('surtitre', 'Étiquette'),
+    field.textarea('titre', 'Titre', { help: TITRE }),
+    field.textarea('texte', 'Texte'),
+    field.text('bouton', 'Bouton de l’exercice'),
+  ],
+  defaults: vides(respirationSchema),
+  preremplir: () => ({ rempli: true, ...TEXTES.mRespiration() }),
+  Component: ({ data, ctx }) => (
     <Enveloppe ctx={ctx}>
-      <Respiration c={contenuDe(ctx)} />
+      <Respiration t={textesDe('mRespiration', contenuDe(ctx), data)} />
     </Enveloppe>
   ),
 }
 
 /* ── Rencontre ────────────────────────────────────────────────────────── */
 
-const rencontreSchema = z.object({ surtitre: texte, texte, citation: texte, mediaId: z.string().nullable().default(null) })
+const rencontreSchema = z.object({ rempli,
+  menu: t,
+  surtitre: t,
+  titre: t,
+  texte: t,
+  citation: t,
+  anneau: t,
+  mediaId: media,
+})
 export const mRencontreBlock: BlockDefinition<typeof rencontreSchema> = {
+  ...commun,
   label: 'Moderne — Rencontre',
   description: 'Votre portrait, son sceau qui tourne, une présentation qui se lit en s’encrant.',
-  group: 'Sections',
-  theme: 'moderne',
-  bleed: true,
   schema: rencontreSchema,
   fields: [
-    field.text('surtitre', 'Étiquette', { placeholder: 'Qui je suis' }),
-    field.richtext('texte', 'Présentation', { help: SUIT }),
-    field.textarea('citation', 'Citation', { help: SUIT }),
+    field.text('surtitre', 'Étiquette'),
+    field.textarea('titre', 'Titre', { help: TITRE }),
+    field.richtext('texte', 'Présentation'),
+    field.textarea('citation', 'Citation', { help: 'Vide : pas de citation.' }),
     field.media('mediaId', 'Portrait'),
+    field.text('anneau', 'Texte du sceau qui tourne'),
+    field.text('menu', 'Dans le menu', { help: MENU }),
   ],
-  defaults: { surtitre: '', texte: '', citation: '', mediaId: null },
-  dataSource: { label: 'Vos coordonnées (adresse, téléphone, horaires)', href: '/admin/reglages' },
+  defaults: vides(rencontreSchema),
+  preremplir: (c) => ({ rempli: true, ...TEXTES.mRencontre(c), mediaId: c.portrait?.id ?? null }),
   Component: ({ data, ctx }) => {
     const base = contenuDe(ctx)
     const portrait = data.mediaId ? ctx.resolveMedia(data.mediaId) : null
-    const c: Contenu = {
-      ...base,
-      apropos: {
-        ...base.apropos,
-        surtitre: vide(data.surtitre) ? base.apropos.surtitre : data.surtitre,
-        texte: vide(data.texte) ? base.apropos.texte : data.texte,
-        citation: vide(data.citation) ? base.apropos.citation : data.citation,
-      },
-      portrait: portrait ?? base.portrait,
-    }
     return (
       <Enveloppe ctx={ctx}>
-        <Rencontre c={c} />
+        <Rencontre c={{ ...base, portrait: portrait ?? base.portrait }} t={textesDe('mRencontre', base, data)} />
       </Enveloppe>
     )
   },
@@ -152,165 +185,239 @@ export const mRencontreBlock: BlockDefinition<typeof rencontreSchema> = {
 
 /* ── Chemin ───────────────────────────────────────────────────────────── */
 
-const cheminSchema = z.object({ surtitre: texte, titre: texte, intro: texte })
+const cheminSchema = z.object({ rempli,
+  menu: t,
+  surtitre: t,
+  titre: t,
+  intro: t,
+  etapes: z.array(z.object({ titre: t, texte: t })).default([]),
+})
 export const mCheminBlock: BlockDefinition<typeof cheminSchema> = {
+  ...commun,
   label: 'Moderne — Le chemin',
   description: 'Vos étapes reliées par un trait qui se dessine à la lecture.',
-  group: 'Sections',
-  theme: 'moderne',
-  bleed: true,
   schema: cheminSchema,
   fields: [
-    field.text('surtitre', 'Étiquette', { placeholder: 'Ma méthode' }),
-    field.textarea('titre', 'Titre', { help: SUIT }),
-    field.textarea('intro', 'Introduction', { help: SUIT }),
+    field.text('surtitre', 'Étiquette'),
+    field.textarea('titre', 'Titre', { help: TITRE }),
+    field.textarea('intro', 'Introduction'),
+    field.list('etapes', 'Étapes', [field.text('titre', 'Titre'), field.textarea('texte', 'Texte')], { addLabel: 'Ajouter une étape' }),
+    field.text('menu', 'Dans le menu', { help: MENU }),
   ],
-  defaults: { surtitre: '', titre: '', intro: '' },
-  dataSource: { label: 'Les étapes : celles de « Ma méthode » du site classique', href: '/admin/accueil' },
-  Component: ({ data, ctx }) => {
-    const base = contenuDe(ctx)
-    const c: Contenu = {
-      ...base,
-      methode: {
-        ...base.methode,
-        surtitre: vide(data.surtitre) ? base.methode.surtitre : data.surtitre,
-        titre: vide(data.titre) ? base.methode.titre : data.titre,
-        intro: vide(data.intro) ? base.methode.intro : data.intro,
-      },
-    }
-    return (
-      <Enveloppe ctx={ctx}>
-        <SectionChemin c={c} />
-      </Enveloppe>
-    )
-  },
+  defaults: vides(cheminSchema),
+  preremplir: (c) => ({ rempli: true, ...TEXTES.mChemin(c) }),
+  Component: ({ data, ctx }) => (
+    <Enveloppe ctx={ctx}>
+      <SectionChemin c={contenuDe(ctx)} t={textesDe('mChemin', contenuDe(ctx), data)} />
+    </Enveloppe>
+  ),
 }
 
 /* ── Arches (accompagnements) ─────────────────────────────────────────── */
 
-export const mArchesBlock: BlockDefinition<typeof vierge> = {
+const archesSchema = z.object({ rempli, menu: t, surtitre: t, titre: t, texte: t, bouton: t })
+export const mArchesBlock: BlockDefinition<typeof archesSchema> = {
+  ...commun,
   label: 'Moderne — Accompagnements',
   description: 'Une carte par accompagnement ; survolée, elle s’ouvre en fiche.',
-  group: 'Sections',
-  theme: 'moderne',
-  bleed: true,
-  schema: vierge,
-  fields: [],
-  defaults: {},
-  dataSource: { label: 'Vos accompagnements', href: '/admin/accompagnements' },
-  Component: ({ ctx }) => (
+  schema: archesSchema,
+  fields: [
+    field.text('surtitre', 'Étiquette'),
+    field.textarea('titre', 'Titre', { help: TITRE }),
+    field.textarea('texte', 'Texte à droite du titre'),
+    field.text('bouton', 'Lien de chaque fiche'),
+    field.text('menu', 'Dans le menu', { help: MENU }),
+  ],
+  defaults: vides(archesSchema),
+  preremplir: (c) => ({ rempli: true, ...TEXTES.mArches(c) }),
+  dataSource: { label: 'Les accompagnements (titres, textes, durées, photos)', href: '/admin/accompagnements' },
+  Component: ({ data, ctx }) => (
     <Enveloppe ctx={ctx}>
-      <SectionArches c={contenuDe(ctx)} />
+      <SectionArches c={contenuDe(ctx)} t={textesDe('mArches', contenuDe(ctx), data)} />
     </Enveloppe>
   ),
 }
 
 /* ── En pratique ──────────────────────────────────────────────────────── */
 
-export const mEnPratiqueBlock: BlockDefinition<typeof vierge> = {
+const pratiqueSchema = z.object({ rempli,
+  surtitre: t,
+  titre: t,
+  cabinet: t,
+  itineraire: t,
+  seances: t,
+  visioTitre: t,
+  visioTexte: t,
+  consultations: t,
+})
+export const mEnPratiqueBlock: BlockDefinition<typeof pratiqueSchema> = {
+  ...commun,
   label: 'Moderne — En pratique',
   description: 'Le plan, les séances, la visio, les jours : tout ce qu’on cherche avant d’appeler.',
-  group: 'Sections',
-  theme: 'moderne',
-  bleed: true,
-  schema: vierge,
-  fields: [],
-  defaults: {},
-  dataSource: { label: 'Vos coordonnées, horaires et accompagnements', href: '/admin/reglages' },
-  Component: ({ ctx }) => (
+  schema: pratiqueSchema,
+  fields: [
+    field.text('surtitre', 'Étiquette'),
+    field.textarea('titre', 'Titre', { help: TITRE }),
+    field.text('cabinet', 'Carte : étiquette de l’adresse'),
+    field.text('itineraire', 'Carte : lien d’itinéraire'),
+    field.text('seances', 'Carte des séances : titre'),
+    field.text('visioTitre', 'Carte visio : titre'),
+    field.text('visioTexte', 'Carte visio : texte'),
+    field.text('consultations', 'Carte des jours : titre'),
+  ],
+  defaults: vides(pratiqueSchema),
+  preremplir: () => ({ rempli: true, ...TEXTES.mEnPratique() }),
+  dataSource: { label: 'L’adresse, les horaires et les accompagnements', href: '/admin/reglages' },
+  Component: ({ data, ctx }) => (
     <Enveloppe ctx={ctx}>
-      <EnPratique c={contenuDe(ctx)} />
+      <EnPratique c={contenuDe(ctx)} t={textesDe('mEnPratique', contenuDe(ctx), data)} />
     </Enveloppe>
   ),
 }
 
 /* ── Phrase ───────────────────────────────────────────────────────────── */
 
-const phraseSchema = z.object({ texte, auteur: texte })
+const phraseSchema = z.object({ rempli, texte: t, auteur: t })
 export const mPhraseBlock: BlockDefinition<typeof phraseSchema> = {
+  ...commun,
   label: 'Moderne — Phrase',
-  description: 'Une conviction, en très grand, ligne après ligne.',
-  group: 'Sections',
-  theme: 'moderne',
-  bleed: true,
+  description: 'Une conviction, en très grand, qui s’allume mot à mot.',
   schema: phraseSchema,
   fields: [
-    field.textarea('texte', 'La phrase', { help: SUIT }),
-    field.text('auteur', 'Signature', { help: SUIT }),
+    field.textarea('texte', 'La phrase', { help: 'Les mots entre *astérisques* sont en accent.' }),
+    field.text('auteur', 'Signature'),
   ],
-  defaults: { texte: '', auteur: '' },
+  defaults: vides(phraseSchema),
+  preremplir: (c) => ({ rempli: true, ...TEXTES.mPhrase(c) }),
+  Component: ({ data, ctx }) => (
+    <Enveloppe ctx={ctx}>
+      <Phrase c={contenuDe(ctx)} t={textesDe('mPhrase', contenuDe(ctx), data)} />
+    </Enveloppe>
+  ),
+}
+
+/* ── Promenade ────────────────────────────────────────────────────────── */
+
+const promenadeSchema = z.object({ rempli, menu: t, titre: t, legende: t, photos: z.array(z.string()).default([]) })
+export const mPromenadeBlock: BlockDefinition<typeof promenadeSchema> = {
+  ...commun,
+  label: 'Moderne — Le cabinet',
+  description: 'Les photos du cabinet, qui glissent de côté au défilement.',
+  schema: promenadeSchema,
+  fields: [
+    field.text('titre', 'Titre', { help: 'Le mot clé entre *astérisques*.' }),
+    field.text('legende', 'Légende (après le nombre de photos)'),
+    field.mediaList('photos', 'Photos', { help: 'Dans l’ordre de la promenade.' }),
+    field.text('menu', 'Dans le menu', { help: MENU }),
+  ],
+  defaults: vides(promenadeSchema),
+  preremplir: (c) => ({ rempli: true, ...TEXTES.mPromenade(), photos: photosPromenade(c).map((p) => p.id) }),
   Component: ({ data, ctx }) => {
-    const base = contenuDe(ctx)
-    const c: Contenu = {
-      ...base,
-      citation: {
-        texte: vide(data.texte) ? base.citation.texte : data.texte,
-        auteur: vide(data.auteur) ? base.citation.auteur : data.auteur,
-      },
-    }
+    const c = contenuDe(ctx)
+    const choisies = data.photos.map((id) => ctx.resolveMedia(id)).filter((m): m is Media => Boolean(m))
     return (
       <Enveloppe ctx={ctx}>
-        <Phrase c={c} />
+        <SectionPromenade c={c} t={textesDe('mPromenade', c, data)} photos={choisies.length ? choisies : undefined} />
       </Enveloppe>
     )
   },
 }
 
-/* ── Promenade ────────────────────────────────────────────────────────── */
-
-export const mPromenadeBlock: BlockDefinition<typeof vierge> = {
-  label: 'Moderne — Le cabinet',
-  description: 'Les photos du cabinet, qui glissent de côté au défilement.',
-  group: 'Sections',
-  theme: 'moderne',
-  bleed: true,
-  schema: vierge,
-  fields: [],
-  defaults: {},
-  dataSource: { label: 'Les photos de votre médiathèque', href: '/admin/medias' },
-  Component: ({ ctx }) => (
-    <Enveloppe ctx={ctx}>
-      <SectionPromenade c={contenuDe(ctx)} />
-    </Enveloppe>
-  ),
-}
-
 /* ── Conversation ─────────────────────────────────────────────────────── */
 
-export const mConversationBlock: BlockDefinition<typeof vierge> = {
+const conversationSchema = z.object({ rempli, menu: t, surtitre: t, titre: t, signature: t, suivante: t })
+export const mConversationBlock: BlockDefinition<typeof conversationSchema> = {
+  ...commun,
   label: 'Moderne — Questions',
   description: 'Vos questions fréquentes, comme une messagerie.',
-  group: 'Sections',
-  theme: 'moderne',
-  bleed: true,
-  schema: vierge,
-  fields: [],
-  defaults: {},
-  dataSource: { label: 'Vos questions fréquentes', href: '/admin/faq' },
-  Component: ({ ctx }) => (
+  schema: conversationSchema,
+  fields: [
+    field.text('surtitre', 'Étiquette'),
+    field.textarea('titre', 'Titre', { help: TITRE }),
+    field.text('signature', 'Signature sous la réponse'),
+    field.text('suivante', 'Bouton « question suivante »'),
+    field.text('menu', 'Dans le menu', { help: MENU }),
+  ],
+  defaults: vides(conversationSchema),
+  preremplir: (c) => ({ rempli: true, ...TEXTES.mConversation(c) }),
+  dataSource: { label: 'Les questions et leurs réponses', href: '/admin/faq' },
+  Component: ({ data, ctx }) => (
     <Enveloppe ctx={ctx}>
-      <SectionConversation c={contenuDe(ctx)} />
+      <SectionConversation c={contenuDe(ctx)} t={textesDe('mConversation', contenuDe(ctx), data)} />
     </Enveloppe>
   ),
 }
 
 /* ── Rendez-vous ──────────────────────────────────────────────────────── */
 
-export const mRendezVousBlock: BlockDefinition<typeof vierge> = {
+const rdvSchema = z.object({ rempli,
+  surtitre: t,
+  titre: t,
+  salutation: t,
+  nom: t,
+  telephone: t,
+  email: t,
+  message: t,
+  consentement: t,
+  signature: t,
+  bouton: t,
+  merciTitre: t,
+  merciTexte: t,
+})
+export const mRendezVousBlock: BlockDefinition<typeof rdvSchema> = {
+  ...commun,
   label: 'Moderne — Rendez-vous',
   description: 'La semaine allumée, vos coordonnées, et une lettre plutôt qu’un formulaire.',
-  group: 'Sections',
-  theme: 'moderne',
-  bleed: true,
-  schema: vierge,
-  fields: [],
-  defaults: {},
-  dataSource: { label: 'Vos coordonnées et horaires', href: '/admin/reglages' },
-  Component: ({ ctx }) => (
+  schema: rdvSchema,
+  fields: [
+    field.text('surtitre', 'Étiquette'),
+    field.textarea('titre', 'Titre', { help: TITRE }),
+    field.text('salutation', 'Lettre : formule d’appel'),
+    field.text('nom', 'Lettre : ligne du nom'),
+    field.text('telephone', 'Lettre : ligne du téléphone'),
+    field.text('email', 'Lettre : ligne de l’e-mail'),
+    field.text('message', 'Lettre : début du message'),
+    field.textarea('consentement', 'Lettre : case à cocher'),
+    field.text('signature', 'Lettre : formule de fin'),
+    field.text('bouton', 'Lettre : bouton d’envoi'),
+    field.text('merciTitre', 'Après l’envoi : titre', { help: 'Le mot clé entre *astérisques*.' }),
+    field.textarea('merciTexte', 'Après l’envoi : texte'),
+  ],
+  defaults: vides(rdvSchema),
+  preremplir: (c) => ({ rempli: true, ...TEXTES.mRendezVous(c) }),
+  dataSource: { label: 'Téléphone, e-mail, adresse et horaires', href: '/admin/reglages' },
+  Component: ({ data, ctx }) => (
     <Enveloppe ctx={ctx}>
-      <RendezVous c={contenuDe(ctx)} />
+      <RendezVous c={contenuDe(ctx)} t={textesDe('mRendezVous', contenuDe(ctx), data)} />
     </Enveloppe>
   ),
+}
+
+/* ── Pied de page ─────────────────────────────────────────────────────── */
+
+const horizonSchema = z.object({ rempli, titre: t, bouton: t, mention: t })
+export const mHorizonBlock: BlockDefinition<typeof horizonSchema> = {
+  ...commun,
+  label: 'Moderne — Pied de page',
+  description: 'Le grand mot de la fin, le rendez-vous, vos coordonnées et le menu.',
+  schema: horizonSchema,
+  piedDePage: true,
+  fields: [
+    field.textarea('titre', 'Grand titre', { help: TITRE }),
+    field.text('bouton', 'Bouton'),
+    field.text('mention', 'Lien vers le site classique'),
+  ],
+  defaults: vides(horizonSchema),
+  preremplir: () => ({ rempli: true, ...TEXTES.mHorizon() }),
+  dataSource: { label: 'Téléphone, e-mail et logo', href: '/admin/reglages' },
+  Component: ({ data, ctx }) => {
+    const c = contenuDe(ctx)
+    return (
+      <Enveloppe ctx={ctx}>
+        <Horizon c={c} liens={c.menu ?? []} t={textesDe('mHorizon', c, data)} />
+      </Enveloppe>
+    )
+  },
 }
 
 /** L'ordre de la page moderne quand on la crée. */
@@ -325,4 +432,5 @@ export const PAGE_MODERNE_PAR_DEFAUT = [
   'mPromenade',
   'mConversation',
   'mRendezVous',
+  'mHorizon',
 ] as const

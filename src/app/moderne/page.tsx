@@ -1,10 +1,12 @@
 import type { Metadata } from 'next'
 
 import { sectionsModernesParDefaut } from '@/blocks/moderne/defaut'
+import { getBlock } from '@/blocks/registry'
 import { chargerContenu } from '@/components/anasawi/charger'
 import { Horizon } from '@/components/anasawi/sections'
 import { Fil } from '@/components/anasawi/vivant'
 import { SectionsView } from '@/components/site/SectionsView'
+import { menuModerne } from '@/server/moderne'
 import { getActiveFaq, getActiveServices, getAllMedia, getPublishedModern, getSettings } from '@/server/queries'
 
 export const revalidate = 3600
@@ -12,14 +14,6 @@ export const revalidate = 3600
 export const metadata: Metadata = {
   title: 'ANASAWI — version moderne',
 }
-
-const LIENS = [
-  { href: '#a-propos', label: 'Rencontre' },
-  { href: '#methode', label: 'Le chemin' },
-  { href: '#accompagnements', label: 'Accompagnements' },
-  { href: '#cabinet', label: 'Le cabinet' },
-  { href: '#questions', label: 'Questions' },
-]
 
 /**
  * La version moderne : les sections publiées de la page « accueil-
@@ -36,14 +30,19 @@ export default async function ModernePage() {
     getAllMedia(),
   ])
   const sections = (page?.sections ?? sectionsModernesParDefaut()).filter((s) => s.isActive)
+  /* Le menu : les sections qui y figurent, avec le libellé saisi. */
+  const liens = menuModerne(sections, c)
+  const partage = { ...c, menu: liens }
+  /* Le pied de page est une section (modifiable) ; à défaut, celui-ci. */
+  const piedEnSection = sections.some((s) => getBlock(s.type)?.piedDePage)
 
   return (
     <>
-      <Fil liens={LIENS} rdv="#contact" logo={c.logo} />
+      <Fil liens={liens} rdv="#contact" logo={c.logo} />
       <main>
-        <SectionsView sections={sections} data={{ services, faqItems, settings, media, partage: c }} />
+        <SectionsView sections={sections} data={{ services, faqItems, settings, media, partage }} />
       </main>
-      <Horizon c={c} liens={LIENS} />
+      {!piedEnSection && <Horizon c={c} liens={liens} />}
     </>
   )
 }
