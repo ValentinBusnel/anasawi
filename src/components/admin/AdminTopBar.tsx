@@ -1,11 +1,6 @@
 'use client'
 
-import {
-  ChevronDown,
-  Eye,
-  LogOut,
-  Users,
-} from 'lucide-react'
+import { ArrowLeftRight, ChevronDown, Eye, LogOut, Users } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
@@ -199,6 +194,10 @@ function Compte({ userName }: { userName: string }) {
         <Link href="/admin/utilisateurs" className={entree}>
           <Users className="h-4 w-4 text-muted-foreground" strokeWidth={1.8} />
           Utilisateurs
+        </Link>
+        <Link href="/admin/synchronisation" className={entree}>
+          <ArrowLeftRight className="h-4 w-4 text-muted-foreground" strokeWidth={1.8} />
+          Synchronisation préprod ⇄ prod
         </Link>
         <Link href="/" className={cn(entree, 'lg:hidden')}>
           <Eye className="h-4 w-4 text-muted-foreground" strokeWidth={1.8} />

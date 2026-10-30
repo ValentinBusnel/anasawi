@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import { mkdir, readFile, unlink, writeFile } from 'node:fs/promises'
+import { access, mkdir, readFile, unlink, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 
 /**
@@ -101,6 +101,7 @@ type Driver = {
   put(key: string, data: ArrayBuffer, mimeType: AllowedMimeType): Promise<void>
   get(key: string): Promise<ArrayBuffer | null>
   remove(key: string): Promise<void>
+  has(key: string): Promise<boolean>
 }
 
 /**
@@ -147,6 +148,9 @@ async function netlifyDriver(): Promise<Driver> {
     async remove(key) {
       await store.delete(key)
     },
+    async has(key) {
+      return (await store.getMetadata(key)) !== null
+    },
   }
 }
 
@@ -176,6 +180,14 @@ function localDriver(): Driver {
         /* Déjà absent : la suppression est idempotente. */
       }
     },
+    async has(key) {
+      try {
+        await access(resolve(key))
+        return true
+      } catch {
+        return false
+      }
+    },
   }
 }
 
@@ -202,4 +214,10 @@ export async function getObject(key: string): Promise<ArrayBuffer | null> {
 export async function removeObject(key: string): Promise<void> {
   const store = await driver()
   await store.remove(key)
+}
+
+/** Le fichier existe-t-il déjà dans le stockage ? (sans le télécharger) */
+export async function objectExists(key: string): Promise<boolean> {
+  const store = await driver()
+  return store.has(key)
 }
