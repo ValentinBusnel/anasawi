@@ -2,13 +2,13 @@ import { ArrowUpRight, Mail, MapPin, Phone } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
-import { Aimant, Arches, Carte, Chemin, Conversation, Encre, Incline, Lettre, Lignes, Promenade, Revele, Semaine, Seuil, Souffle } from './vivant'
+import { Aimant, Arches, Carte, Chemin, Conversation, Conviction, Encre, Incline, Lettre, Lignes, Lueur, Parallaxe, Promenade, Revele, Rideau, Semaine, Seuil, Souffle } from './vivant'
 import type { Contenu } from '@/blocks/moderne/contenu'
 import { LogoMark } from '@/components/site/Logo'
 import { cn, toE164 } from '@/lib/utils'
 
 /**
- * Les sections de la nouvelle DA d'Anasawi. Chacune a une idée, une
+ * Les sections de la nouvelle DA d’Anasawi. Chacune a une idée, une
  * seule, et un mouvement qui la sert :
  *
  *   Seuil          on passe la porte : l'arche s'ouvre sur le cabinet
@@ -69,7 +69,7 @@ export function SectionSeuil({ c }: P) {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars -- même signature que les autres sections (vitrine)
 export function Respiration(_props: P) {
   return (
-    <section className="relative overflow-hidden bg-[var(--ad-sable)] py-24 md:py-32">
+    <section className="relative mx-[2vw] overflow-hidden rounded-[36px] bg-[var(--ad-sable)] py-24 md:rounded-[56px] md:py-32">
       <div className="mx-auto grid max-w-[1200px] items-center gap-16 px-[5vw] md:grid-cols-2">
         <div>
           <Surtitre>Avant de commencer</Surtitre>
@@ -98,9 +98,13 @@ export function Rencontre({ c }: P) {
       <div className="mx-auto grid max-w-[1200px] items-center gap-16 px-[5vw] md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:gap-24">
         <Revele className="relative mx-auto w-full max-w-[440px]">
           <Incline max={8} className="aspect-[3/4]">
-            <div className="relative h-full w-full overflow-hidden rounded-[32px] bg-[var(--ad-sable-fonce)]">
-              {c.portrait && <Image src={c.portrait.url} alt={c.portrait.alt} fill sizes="440px" className="object-cover" />}
-            </div>
+            {/* Le portrait se dévoile comme un rideau qu'on lève, puis
+                glisse un peu moins vite que la page. */}
+            <Rideau className="h-full w-full bg-[var(--ad-sable-fonce)]">
+              <Parallaxe amplitude={56}>
+                {c.portrait && <Image src={c.portrait.url} alt={c.portrait.alt} fill sizes="440px" className="object-cover" />}
+              </Parallaxe>
+            </Rideau>
           </Incline>
           {/* Le sceau : le métier écrit en cercle, qui tourne lentement. */}
           <div aria-hidden="true" className="absolute -bottom-10 -right-6 grid h-36 w-36 place-items-center rounded-full bg-[var(--ad-ivoire)] shadow-[0_20px_50px_-20px_rgba(20,35,46,0.4)] md:-right-12">
@@ -196,7 +200,7 @@ export function EnPratique({ c }: P) {
   const tries = [...ouverts].sort((a, b) => indice(a.day) - indice(b.day))
   const plage = tries.length ? `${tries[0]!.day} → ${tries.at(-1)!.day}` : 'Sur rendez-vous'
   const carte =
-    'rounded-[28px] bg-white p-7 shadow-[0_1px_2px_rgba(20,35,46,0.05),0_20px_50px_-30px_rgba(20,35,46,0.25)] transition-[box-shadow,translate] duration-500 ease-[var(--ad-ease)] hover:-translate-y-1 hover:shadow-[0_2px_4px_rgba(20,35,46,0.06),0_30px_60px_-30px_rgba(20,35,46,0.35)]'
+    'relative isolate overflow-hidden rounded-[28px] bg-white p-7 shadow-[0_1px_2px_rgba(20,35,46,0.05),0_20px_50px_-30px_rgba(20,35,46,0.25)] transition-[box-shadow,translate] duration-500 ease-[var(--ad-ease)] hover:-translate-y-1 hover:shadow-[0_2px_4px_rgba(20,35,46,0.06),0_30px_60px_-30px_rgba(20,35,46,0.35)]'
   return (
     <section className="py-24 md:py-32">
       <div className="mx-auto max-w-[1200px] px-[5vw]">
@@ -233,13 +237,17 @@ export function EnPratique({ c }: P) {
 
           {/* Les séances. */}
           <Revele delai={0.08} className={cn(carte, 'md:col-span-2')}>
+            <Lueur />
             <p className="text-[13px] font-semibold text-[var(--ad-gris)]">Les séances</p>
             <ul className="mt-4 flex flex-col gap-2.5">
               {c.services.slice(0, 4).map((s) => (
-                <li key={s.id} className="flex items-center justify-between gap-4 text-[15px]">
-                  <span className="truncate font-medium">{s.title}</span>
+                <li key={s.id} className="group/seance flex items-center justify-between gap-4 text-[15px]">
+                  <span className="flex min-w-0 items-center gap-2 font-medium">
+                    <span aria-hidden="true" className="h-1.5 w-0 shrink-0 rounded-full bg-[var(--ad-or)] transition-[width] duration-500 ease-[var(--ad-ease)] group-hover/seance:w-3" />
+                    <span className="truncate transition-transform duration-500 ease-[var(--ad-ease)]">{s.title}</span>
+                  </span>
                   {s.duration && (
-                    <span className="shrink-0 rounded-full bg-[var(--ad-sable)] px-3 py-1 text-[12.5px] font-semibold tabular-nums text-[var(--ad-pierre)]">
+                    <span className="shrink-0 rounded-full bg-[var(--ad-sable)] px-3 py-1 text-[12.5px] font-semibold tabular-nums text-[var(--ad-pierre)] transition-colors duration-500 group-hover/seance:bg-[var(--ad-nuit)] group-hover/seance:text-white">
                       {s.duration.split(/[—–]/)[0]!.trim()}
                     </span>
                   )}
@@ -250,6 +258,7 @@ export function EnPratique({ c }: P) {
 
           {/* La visio, et son onde. */}
           <Revele delai={0.16} className={cn(carte, 'flex flex-col justify-between')}>
+            <Lueur />
             <div aria-hidden="true" className="flex h-12 items-center gap-1">
               {[0.1, 0.35, 0.6, 0.2, 0.45, 0.7, 0.3].map((d, i) => (
                 <span
@@ -267,6 +276,7 @@ export function EnPratique({ c }: P) {
 
           {/* Les jours. */}
           <Revele delai={0.24} className={cn(carte, 'flex flex-col justify-between')}>
+            <Lueur />
             <p className="text-[13px] font-semibold text-[var(--ad-gris)]">Consultations</p>
             <div>
               <p className="text-[24px] font-semibold capitalize tracking-[-0.03em]">{plage}</p>
@@ -289,9 +299,11 @@ export function Phrase({ c }: P) {
       <div className="mx-auto max-w-[1200px] px-[5vw] text-center">
         <span aria-hidden="true" className="mx-auto mb-10 block h-16 w-px bg-gradient-to-b from-transparent to-[var(--ad-or)]" />
         <blockquote>
-          <p className="font-[family-name:var(--ad-titre)] font-semibold tracking-[-0.03em] text-[clamp(34px,5vw,80px)] leading-[1.05] text-[var(--ad-nuit)]">
-            <Lignes lignes={[mots.slice(0, milieu).join(' '), <em key="b">{mots.slice(milieu).join(' ')}</em>]} />
-          </p>
+          {/* Les mots s'allument un à un, à la vitesse où l'on descend. */}
+          <Conviction
+            mots={mots.map((mot, i) => ({ mot, accent: i >= milieu }))}
+            className="mx-auto max-w-[22ch] text-balance font-[family-name:var(--ad-titre)] text-[clamp(34px,5vw,80px)] font-semibold leading-[1.08] tracking-[-0.03em] text-[var(--ad-nuit)]"
+          />
           <Revele delai={0.4}>
             <footer className="mt-10 text-[12px] uppercase tracking-[0.22em] text-[var(--ad-gris)]">{c.citation.auteur}</footer>
           </Revele>
@@ -340,7 +352,7 @@ export function RendezVous({ c }: P) {
     c.adresse && { icone: <MapPin />, texte: c.adresse, href: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.adresse)}` },
   ].filter(Boolean) as { icone: React.ReactNode; texte: string; href: string }[]
   return (
-    <section id="contact" className="scroll-mt-24 bg-[var(--ad-sable)] py-24 md:py-36">
+    <section id="contact" className="scroll-mt-24 rounded-t-[40px] bg-[var(--ad-sable)] py-24 md:rounded-t-[56px] md:py-36">
       <div className="mx-auto grid max-w-[1200px] gap-16 px-[5vw] lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
         <div>
           <Surtitre>Rendez-vous</Surtitre>
@@ -378,8 +390,10 @@ export function Horizon({ c, liens }: P & { liens: { href: string; label: string
   return (
     /* Le fond sable continue celui du rendez-vous derrière la courbe. */
     <div className="bg-[var(--ad-sable)]">
-    <footer className="relative overflow-hidden rounded-t-[40px] bg-[var(--ad-nuit)] px-[5vw] pb-10 pt-28 text-white md:rounded-t-[56px] md:pt-40">
-      <div aria-hidden="true" className="absolute -top-40 left-1/2 h-80 w-[60vw] -translate-x-1/2 rounded-full bg-[var(--ad-bleu)]/30 blur-3xl" />
+    <footer className="relative isolate overflow-hidden rounded-t-[40px] bg-[var(--ad-nuit)] px-[5vw] pb-10 pt-28 text-white md:rounded-t-[56px] md:pt-40">
+      <div aria-hidden="true" className="absolute -top-40 left-1/2 -z-10 h-80 w-[60vw] -translate-x-1/2 rounded-full bg-[var(--ad-bleu)]/30 blur-3xl motion-safe:animate-[ad-aurore_16s_ease-in-out_infinite]" />
+      {/* Une lumière lagon qui suit la souris dans la nuit. */}
+      <Lueur couleur="rgba(54,163,155,0.16)" taille={620} />
       <div className="relative mx-auto max-w-[1200px]">
         <p className="text-center font-[family-name:var(--ad-titre)] font-semibold tracking-[-0.03em] text-[clamp(48px,8.5vw,136px)] leading-[0.98]">
           <Lignes lignes={['Prenons', <span key="t" className="text-[var(--ad-or)]">le temps.</span>]} />

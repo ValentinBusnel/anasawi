@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils'
 import type { FaqItem, Media, OpeningHour, ServiceWithMedia } from '@/server/db/schema'
 
 /**
- * Les composants VIVANTS de la nouvelle DA d'Anasawi.
+ * Les composants VIVANTS de la nouvelle DA d’Anasawi.
  *
  * Un principe pour tous : le mouvement suit la lecture. Le défilement
  * écrit une seule variable CSS (`--p`, de 0 à 1) sur l'élément, une fois
@@ -203,8 +203,8 @@ export function Lignes({
         <span key={i} className="block overflow-hidden pb-[0.08em]">
           <span
             className={cn(
-              'block',
-              edition ? '' : vu ? 'motion-safe:animate-[ad-sortir_1.1s_var(--ad-ease)_backwards]' : 'motion-safe:translate-y-[105%]',
+              'block origin-[0%_100%]',
+              edition ? '' : vu ? 'motion-safe:animate-[ad-sortir_1.2s_var(--ad-ease)_backwards]' : 'motion-safe:translate-y-[108%]',
               ligneClassName,
             )}
             style={vu ? { animationDelay: `${delai + i * 0.12}s` } : undefined}
@@ -832,7 +832,13 @@ export function Promenade({ photos, titre }: { photos: Media[]; titre: React.Rea
             style={{ transform: 'translateX(calc(var(--p) * var(--decal, 0px) * -1))' }}
           >
             {photos.map((p, i) => (
-              <figure key={p.id} className={cn('shrink-0', i % 2 ? 'md:mt-24' : 'md:-mt-16')}>
+              <figure
+                key={p.id}
+                className={cn('shrink-0', i % 2 ? 'md:mt-24' : 'md:-mt-16')}
+                /* Chaque pièce penche à peine en passant devant nous, comme
+                   des tirages qu'on fait défiler sur une table. */
+                style={{ transform: `rotate(calc((var(--p) - ${photos.length > 1 ? i / (photos.length - 1) : 0.5}) * ${i % 2 ? 5 : -5}deg))` }}
+              >
                 <Incline max={6} className={cn(i % 3 === 0 ? 'h-[300px] w-[240px] md:h-[calc(var(--ad-vh)*52)] md:w-[calc(var(--ad-vh)*30)]' : 'h-[240px] w-[300px] md:h-[calc(var(--ad-vh)*40)] md:w-[calc(var(--ad-vh)*52)]')}>
                 <div
                   className={cn(
@@ -896,7 +902,7 @@ export function Conversation({ faq, prenom, portrait }: { faq: FaqItem[]; prenom
               onClick={() => setChoisie(i)}
               aria-pressed={choisie === i}
               className={cn(
-                'rounded-full border px-4 py-2.5 text-left text-[14.5px] leading-[1.35] transition-[background-color,border-color,color,transform] duration-500 ease-[var(--ad-ease)] hover:-translate-y-0.5',
+                'rounded-full border px-4 py-2.5 text-left text-[14.5px] leading-[1.35] transition-[background-color,border-color,color,transform] duration-500 ease-[var(--ad-ease)] hover:-translate-y-0.5 active:scale-[0.96] active:duration-150',
                 choisie === i
                   ? 'border-[var(--ad-nuit)] bg-[var(--ad-nuit)] text-white'
                   : 'border-[var(--ad-sable-fonce)] bg-transparent text-[var(--ad-nuit)] hover:border-[var(--ad-nuit)]',
@@ -925,7 +931,23 @@ export function Conversation({ faq, prenom, portrait }: { faq: FaqItem[]; prenom
                 </span>
               ) : (
                 <p className="max-w-[88%] whitespace-pre-line rounded-[22px] rounded-bl-[6px] bg-[var(--ad-nuit)] px-5 py-4 text-[15px] leading-[1.65] text-white/90 origin-bottom-left motion-safe:animate-[ad-bulle_0.6s_cubic-bezier(0.34,1.3,0.64,1)_backwards]">
-                  {q.answer.replace(/\*/g, '')}
+                  {/* La réponse s'écrit : les mots arrivent l'un après l'autre. */}
+                  {q.answer
+                    .replace(/\*/g, '')
+                    .split(/(\s+)/)
+                    .map((m, k) =>
+                      /^\s+$/.test(m) ? (
+                        m
+                      ) : (
+                        <span
+                          key={k}
+                          className="inline-block motion-safe:animate-[ad-mot_0.5s_var(--ad-ease)_backwards]"
+                          style={{ animationDelay: `${0.15 + Math.min(k, 120) * 0.012}s` }}
+                        >
+                          {m}
+                        </span>
+                      ),
+                    )}
                 </p>
               )}
             </div>
@@ -1007,8 +1029,19 @@ export function Semaine({ horaires }: { horaires: OpeningHour[] }) {
    Le VRAI envoi : elle arrive dans « Messages » de l'administration.
    ══════════════════════════════════════════════════════════════════════ */
 
+/* Sous chaque ligne, un trait d'encre qui se tire de gauche à droite
+   quand on y écrit. */
+function Trait() {
+  return (
+    <span
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-x-0 bottom-0 h-[1.5px] origin-left scale-x-0 bg-[linear-gradient(90deg,#2f6f93,#36a39b)] transition-transform duration-700 ease-[var(--ad-ease)] peer-focus:scale-x-100"
+    />
+  )
+}
+
 const LIGNE =
-  'w-full border-0 border-b border-[var(--ad-sable-fonce)] bg-transparent px-0 py-3 font-[family-name:var(--ad-titre)] font-medium tracking-[-0.01em] text-[18px] text-[var(--ad-nuit)] outline-none transition-[border-color] duration-300 placeholder:text-[var(--ad-gris)]/50 focus:border-[var(--ad-nuit)]'
+  'peer w-full border-0 border-b border-[var(--ad-sable-fonce)] bg-transparent px-0 py-3 font-[family-name:var(--ad-titre)] font-medium tracking-[-0.01em] text-[18px] text-[var(--ad-nuit)] outline-none transition-[border-color] duration-300 placeholder:text-[var(--ad-gris)]/50 focus:border-[var(--ad-nuit)]'
 
 export function Lettre({ prenom }: { prenom: string }) {
   const [etat, setEtat] = useState<'repos' | 'envoi' | 'envole' | 'ok'>('repos')
@@ -1086,17 +1119,20 @@ export function Lettre({ prenom }: { prenom: string }) {
     >
       <p className="font-[family-name:var(--ad-titre)] font-semibold tracking-[-0.03em] text-[30px] text-[var(--ad-nuit)]">Chère {prenom},</p>
       <div className="mt-6 grid gap-x-8 gap-y-2 sm:grid-cols-2">
-        <label className="block">
+        <label className="relative block">
           <span className="sr-only">Votre nom</span>
           <input name="name" required minLength={2} autoComplete="name" placeholder="Je m’appelle…" className={LIGNE} />
+          <Trait />
         </label>
-        <label className="block">
+        <label className="relative block">
           <span className="sr-only">Votre téléphone (facultatif)</span>
           <input name="phone" type="tel" autoComplete="tel" placeholder="Mon téléphone (facultatif)" className={LIGNE} />
+          <Trait />
         </label>
-        <label className="block sm:col-span-2">
+        <label className="relative block sm:col-span-2">
           <span className="sr-only">Votre adresse e-mail</span>
           <input name="email" type="email" required autoComplete="email" placeholder="Vous pouvez me répondre à…" className={LIGNE} />
+          <Trait />
         </label>
         <label className="block sm:col-span-2">
           <span className="sr-only">Votre message</span>
@@ -1712,5 +1748,130 @@ export function Carte({ adresse, zoom = 15, className }: { adresse: string; zoom
         </div>
       )}
     </div>
+  )
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   LE RIDEAU — une image qui se dévoile de bas en haut en entrant dans
+   l'écran, pendant que la photo, un peu trop grande, se pose.
+   ══════════════════════════════════════════════════════════════════════ */
+
+export function Rideau({ children, className, rayon = 32 }: { children: React.ReactNode; className?: string; rayon?: number }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const edition = useContext(Edition)
+  const [etat, setEtat] = useState<'ssr' | 'cache' | 'vu'>('ssr')
+  useLayoutEffect(() => {
+    const el = ref.current
+    if (edition) return
+    if (!el || reduit()) return setEtat('vu')
+    if (el.getBoundingClientRect().top < window.innerHeight * 0.85) return setEtat('vu')
+    setEtat('cache')
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e?.isIntersecting) {
+          setEtat('vu')
+          io.disconnect()
+        }
+      },
+      { rootMargin: '0px 0px -15% 0px' },
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [edition])
+  return (
+    <div
+      ref={ref}
+      className={cn('relative overflow-hidden', etat === 'vu' && 'motion-safe:animate-[ad-rideau_1.5s_cubic-bezier(0.77,0,0.18,1)_backwards]', className)}
+      style={{
+        borderRadius: rayon,
+        ['--ad-rayon' as string]: `${rayon}px`,
+        clipPath: etat === 'cache' ? `inset(100% 0 0 0 round ${rayon}px)` : undefined,
+      }}
+    >
+      <div className={cn('absolute inset-0', etat === 'vu' && 'motion-safe:animate-[ad-poser_2.2s_var(--ad-ease)_backwards]')}>{children}</div>
+    </div>
+  )
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   LA PARALLAXE — le contenu glisse un peu moins vite que la page : la
+   photo semble posée plus loin, derrière son cadre.
+   ══════════════════════════════════════════════════════════════════════ */
+
+export function Parallaxe({ children, amplitude = 60, className }: { children: React.ReactNode; amplitude?: number; className?: string }) {
+  const ref = useAvancement<HTMLDivElement>('passage')
+  return (
+    <div ref={ref} className={cn('absolute inset-x-0 [--p:0.5]', className)} style={{ top: -amplitude / 2, bottom: -amplitude / 2 }}>
+      <div className="absolute inset-0 will-change-transform" style={{ transform: `translate3d(0, calc((var(--p) - 0.5) * ${-amplitude}px), 0)` }}>
+        {children}
+      </div>
+    </div>
+  )
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   LA LUEUR — une lumière douce qui suit la souris sur une carte. À poser
+   dans un parent `relative isolate overflow-hidden` (elle passe sous
+   son contenu, au-dessus de son fond).
+   ══════════════════════════════════════════════════════════════════════ */
+
+export function Lueur({ couleur = 'rgba(54,163,155,0.13)', taille = 380 }: { couleur?: string; taille?: number }) {
+  const ref = useRef<HTMLSpanElement>(null)
+  useEffect(() => {
+    const el = ref.current
+    const parent = el?.parentElement
+    if (!el || !parent || reduit()) return
+    const bouge = (e: PointerEvent) => {
+      if (e.pointerType !== 'mouse') return
+      const r = parent.getBoundingClientRect()
+      el.style.setProperty('--lx', `${e.clientX - r.left}px`)
+      el.style.setProperty('--ly', `${e.clientY - r.top}px`)
+      el.style.opacity = '1'
+    }
+    const sort = () => {
+      el.style.opacity = '0'
+    }
+    parent.addEventListener('pointermove', bouge)
+    parent.addEventListener('pointerleave', sort)
+    return () => {
+      parent.removeEventListener('pointermove', bouge)
+      parent.removeEventListener('pointerleave', sort)
+    }
+  }, [])
+  return (
+    <span
+      ref={ref}
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 -z-10 opacity-0 transition-opacity duration-500"
+      style={{ background: `radial-gradient(${taille}px circle at var(--lx, 50%) var(--ly, 50%), ${couleur}, transparent 60%)` }}
+    />
+  )
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   LA CONVICTION — une phrase en très grand dont les mots s'allument un à
+   un, au rythme de la lecture : on la lit à la vitesse où on descend.
+   ══════════════════════════════════════════════════════════════════════ */
+
+export function Conviction({ mots, className }: { mots: { mot: string; accent?: boolean }[]; className?: string }) {
+  const ref = useAvancement<HTMLParagraphElement>('passage')
+  const n = mots.length
+  return (
+    <p ref={ref} className={cn('[--p:1]', className)}>
+      {mots.map((m, i) => {
+        const allume = `clamp(0, calc((var(--p) * 2.3 - 0.55 - ${i / n}) * 7), 1)`
+        const style = {
+          opacity: `calc(0.1 + ${allume} * 0.9)`,
+          transform: `translate3d(0, calc((1 - ${allume}) * 0.12em), 0)`,
+        }
+        return (
+          <span key={i}>
+            <span className="inline-block" style={style}>
+              {m.accent ? <em>{m.mot}</em> : m.mot}
+            </span>{' '}
+          </span>
+        )
+      })}
+    </p>
   )
 }

@@ -808,15 +808,19 @@
 /* Une ligne qui sort de son masque. */
 @keyframes ad-sortir {
   from {
-    transform: translateY(105%);
+    transform: translateY(108%) rotate(2.2deg);
+    filter: blur(3px);
+  }
+  60% {
+    filter: blur(0);
   }
 }
 /* Monter et apparaître. */
 @keyframes ad-monter {
   from {
     opacity: 0;
-    transform: translateY(28px);
-    filter: blur(6px);
+    transform: translateY(34px) scale(0.985);
+    filter: blur(8px);
   }
 }
 /* Le souffle : 4 s pour inspirer, 4 s pour expirer. */
@@ -982,5 +986,29 @@
   }
   to {
     transform: translateX(0);
+  }
+}
+
+/* Un rideau qui se lève sur une image : le cadre s'ouvre de bas en haut
+   pendant que la photo, un peu trop grande, se pose. */
+@keyframes ad-rideau {
+  from {
+    clip-path: inset(100% 0 0 0 round var(--ad-rayon, 32px));
+  }
+  to {
+    clip-path: inset(0 0 0 0 round var(--ad-rayon, 32px));
+  }
+}
+@keyframes ad-poser {
+  from {
+    transform: scale(1.28);
+  }
+}
+/* Un mot qui arrive : il monte d’un rien en se précisant. */
+@keyframes ad-mot {
+  from {
+    opacity: 0;
+    transform: translateY(0.4em);
+    filter: blur(4px);
   }
 }
