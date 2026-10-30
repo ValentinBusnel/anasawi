@@ -5,13 +5,15 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 import { TYPOS, typoDe, variablesDe } from './typos'
+import { ADMIN_HINT_COOKIE } from '@/components/site/AdminBar'
 
 /**
  * Le sélecteur de typographie du site moderne, pour essayer les paires
  * de `typos.ts` en vrai, page entière. Le choix est gardé dans le
  * navigateur (localStorage) ; `/moderne?typo=lora` l'impose.
  *
- * Visible en développement, ou dès qu'une typo a été choisie par
+ * Visible en développement, pour l'administratrice connectée, ou dès
+ * qu'une typo a été choisie par
  * l'adresse (lien « Essayer sur le site » de /moderne/typos) — jamais
  * pour un visiteur qui n'a rien demandé.
  */
@@ -63,7 +65,10 @@ export function EssaiTypo() {
     const parametre = new URLSearchParams(window.location.search).get('typo')
     if (parametre && typoDe(parametre)) ecrire(parametre)
     const id = lire()
-    setVisible(process.env.NODE_ENV === 'development' || Boolean(id))
+    /* Visible pour l'administratrice connectée (cookie-témoin posé à la
+       connexion) : c'est Anne qui choisit. */
+    const connectee = document.cookie.split(';').some((c) => c.trim() === `${ADMIN_HINT_COOKIE}=1`)
+    setVisible(process.env.NODE_ENV === 'development' || Boolean(id) || connectee)
     if (id && typoDe(id)) {
       setChoix(id)
       appliquer(id)

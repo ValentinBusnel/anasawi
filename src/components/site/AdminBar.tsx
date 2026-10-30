@@ -11,7 +11,7 @@ import { AdminPill, PencilIcon } from './AdminPill'
  * PEINE de demander. Tant qu'il n'est pas posé côté serveur, la
  * vérification part quand même, mais une fois la page au repos.
  */
-const ADMIN_HINT_COOKIE = 'anasawi_admin'
+export const ADMIN_HINT_COOKIE = 'anasawi_admin'
 
 function porteLeTemoin(): boolean {
   return document.cookie
@@ -35,7 +35,14 @@ function porteLeTemoin(): boolean {
  * un peu plus tard pour Anne quand le témoin manque, jamais avant le
  * contenu pour un visiteur.
  */
-export function AdminBar() {
+export function AdminBar({
+  editHref = '/admin/accueil',
+  className = 'bottom-24 lg:bottom-7',
+}: {
+  /** L'éditeur ouvert par « Modifier » (le site moderne a le sien). */
+  editHref?: string
+  className?: string
+} = {}) {
   const [state, setState] = useState<{ admin: boolean; name?: string; email?: string } | null>(
     null,
   )
@@ -81,13 +88,13 @@ export function AdminBar() {
       actionLabel="Modifier"
       /* Le site est une page unique : l'éditeur, c'est toujours celui de
          l'accueil. */
-      actionHref="/admin/accueil"
+      actionHref={editHref}
       icon={<PencilIcon />}
       name={state.name ?? 'Admin'}
       email={state.email}
       /* Remontée sur mobile pour ne pas recouvrir la barre
          « Prendre rendez-vous », qui occupe déjà le bas de l'écran. */
-      className="bottom-24 lg:bottom-7"
+      className={className}
     />
   )
 }

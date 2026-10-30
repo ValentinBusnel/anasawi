@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 
 import { EssaiTypo } from '@/components/anasawi/EssaiTypo'
 import { PoliceModerne } from '@/components/anasawi/PoliceModerne'
+import { AdminBar } from '@/components/site/AdminBar'
 
 /**
  * `/moderne` — le site d'Anne dans sa NOUVELLE direction artistique, en
@@ -21,6 +22,8 @@ export default function ModerneLayout({ children }: { children: React.ReactNode 
       {children}
       {/* Banc d'essai typographique (temporaire, voir typos.ts). */}
       <EssaiTypo />
+      {/* Connecté : la pastille « Aperçu · Modifier », vers l'éditeur moderne. */}
+      <AdminBar editHref="/admin/accueil?theme=moderne" className="bottom-5 lg:bottom-7" />
     </div>
   )
 }
