@@ -1,11 +1,14 @@
 import { SettingsWorkbench } from '@/components/admin/SettingsWorkbench'
+import { requireAdmin } from '@/lib/auth'
 import { parseIdentity } from '@/lib/identity'
+import { phraseDeConfirmation } from '@/server/actions/synchronisation'
 import {
   getAllMedia,
   getHomePageForAdmin,
   getNavigationItems,
   getSettings,
 } from '@/server/queries'
+import { configSynchro } from '@/server/synchronisation'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,11 +18,13 @@ export const dynamic = 'force-dynamic'
  * (/navigation, /seo, /parametres, /identite) y redirigent.
  */
 export default async function ReglagesPage() {
-  const [settings, library, home, menuActuel] = await Promise.all([
+  const [settings, library, home, menuActuel, user, phrase] = await Promise.all([
     getSettings(),
     getAllMedia(),
     getHomePageForAdmin(),
     getNavigationItems(),
+    requireAdmin(),
+    phraseDeConfirmation(),
   ])
 
   /* Menu : ce qui est enregistré, sinon la dérivation (ancres des sections
@@ -42,6 +47,7 @@ export default async function ReglagesPage() {
       identity={parseIdentity(settings.identity)}
       library={library}
       menu={{ initial: menuInitial, suggestions }}
+      synchro={{ config: configSynchro(), phrase, proprietaire: user.role === 'owner' }}
       referencement={
         home
           ? { page: home, seo: home.seo, library, siteName: settings.siteName }

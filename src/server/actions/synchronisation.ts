@@ -1,68 +1,66 @@
 'use server'
 
-import { revalidatePath, revalidateTag } from 'next/cache'
-
 import { fail, guard, ok, type ActionResult } from './types'
 import { requireOwner } from '@/lib/auth'
-import { tags } from '@/server/queries'
-import { configSynchro, copierFichiers, remplacerParLaSource, restaurer } from '@/server/synchronisation'
+import { configSynchro, demanderALAutre, type Etat } from '@/server/synchronisation'
 
 /**
- * Les actions de la synchronisation préprod ⇄ production. Réservées au
- * PROPRIÉTAIRE, et le mot de confirmation est revérifié ici : un clic
- * accidentel, ou un appel forgé, ne suffit pas.
+ * « Envoyer vers l'autre site » — réservé au PROPRIÉTAIRE. Chaque étape
+ * est une demande à l'autre site, qui récupère notre contenu (voir
+ * server/synchronisation.ts). Le mot de confirmation est revérifié ici.
  */
 
-/** La phrase à taper pour confirmer (« REMPLACER LA PRODUCTION »). */
+/** La phrase à taper pour confirmer (« ENVOYER VERS LA PRODUCTION »). */
 export async function phraseDeConfirmation(): Promise<string> {
   const config = configSynchro()
-  return config ? `REMPLACER ${config.cible.toUpperCase()}` : ''
+  return config ? `ENVOYER VERS ${config.source.toUpperCase()}` : ''
 }
 
-function toutRafraichir() {
-  for (const tag of [tags.pages, tags.services, tags.faq, tags.settings, tags.media]) revalidateTag(tag)
-  revalidatePath('/', 'layout')
-}
+const message = (e: unknown) => (e instanceof Error ? e.message : 'Erreur inconnue.')
 
-/** Les erreurs de la synchronisation sont faites pour être lues. */
-function message(e: unknown): string {
-  return e instanceof Error ? e.message : 'Erreur inconnue.'
-}
-
-export async function copierFichiersAction(depart: number): Promise<ActionResult<{ suivant: number | null; total: number; copies: number }>> {
+/** L'état vu par l'autre site : nos chiffres (source) et les siens (cible). */
+export async function etatEnvoiAction(): Promise<ActionResult<Etat>> {
   return guard(async () => {
     await requireOwner()
-    if (!Number.isInteger(depart) || depart < 0) return fail('Étape invalide.')
     try {
-      return ok(await copierFichiers(depart))
+      return ok(await demanderALAutre<Etat>({ action: 'etat' }))
     } catch (e) {
       return fail(message(e))
     }
   })
 }
 
-export async function remplacerAction(confirmation: string): Promise<ActionResult<{ sauvegarde: string }>> {
+export async function envoyerFichiersAction(depart: number): Promise<ActionResult<{ suivant: number | null; total: number; copies: number }>> {
+  return guard(async () => {
+    await requireOwner()
+    if (!Number.isInteger(depart) || depart < 0) return fail('Étape invalide.')
+    try {
+      return ok(await demanderALAutre({ action: 'fichiers', depart }))
+    } catch (e) {
+      return fail(message(e))
+    }
+  })
+}
+
+export async function envoyerAction(confirmation: string): Promise<ActionResult<{ sauvegarde: string }>> {
   return guard(async () => {
     await requireOwner()
     const attendue = await phraseDeConfirmation()
     if (!attendue || confirmation.trim() !== attendue) return fail(`Tapez exactement « ${attendue} » pour confirmer.`)
     try {
-      const r = await remplacerParLaSource()
-      toutRafraichir()
-      return ok(r)
+      return ok(await demanderALAutre<{ sauvegarde: string }>({ action: 'remplacer' }))
     } catch (e) {
       return fail(message(e))
     }
   })
 }
 
-export async function restaurerAction(nom: string, confirmation: string): Promise<ActionResult<void>> {
+export async function restaurerChezLAutreAction(nom: string, confirmation: string): Promise<ActionResult<void>> {
   return guard(async () => {
     await requireOwner()
     if (confirmation.trim() !== 'RESTAURER') return fail('Tapez exactement « RESTAURER » pour confirmer.')
     try {
-      await restaurer(nom)
-      toutRafraichir()
+      await demanderALAutre({ action: 'restaurer', nom })
       return ok()
     } catch (e) {
       return fail(message(e))

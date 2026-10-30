@@ -14,9 +14,10 @@ import { randomBytes } from 'node:crypto'
  *    (Accès administrateur lu dans .env.local : PROD_DATABASE_URL,
  *    PREPROD_DATABASE_URL.)
  * 2. Dans Netlify (site « anasawi ») : écrit les variables SYNC_… de
- *    chaque contexte — la production lit la préprod, la préprod
- *    (branche `preprod`) lit la production. Via la CLI Netlify : la
- *    première fois, elle demande de se connecter dans le navigateur.
+ *    chaque contexte — production et branche `preprod` — : l'accès en
+ *    lecture à l'autre base, l'adresse et le nom de chaque site, et un
+ *    secret partagé tiré au hasard. Via la CLI Netlify : la première
+ *    fois, elle demande de se connecter dans le navigateur.
  *
  * Aucun mot de passe n'est affiché ni écrit sur le disque. Relancer la
  * commande change les mots de passe et met les variables à jour.
@@ -94,16 +95,20 @@ async function main() {
 
   console.log('\n  2. Variables Netlify (connexion demandée la première fois)\n')
   netlify(['link', '--name', SITE])
+  /* Le même secret des deux côtés : c'est lui qui authentifie les
+     demandes d'un site à l'autre. */
+  const secret = randomBytes(32).toString('base64url')
   const contextes = [
-    { contexte: 'production', base: lecturePreprod, site: PREPROD_URL, source: 'la préprod', cible: 'la production' },
-    { contexte: 'branch:preprod', base: lectureProd, site: PROD_URL, source: 'la production', cible: 'la préprod' },
+    { contexte: 'production', base: lecturePreprod, site: PREPROD_URL, autre: 'la préprod', ici: 'la production' },
+    { contexte: 'branch:preprod', base: lectureProd, site: PROD_URL, autre: 'la production', ici: 'la préprod' },
   ]
   for (const c of contextes) {
-    netlify(['env:set', 'SYNC_SOURCE_DATABASE_URL', c.base, '--context', c.contexte, '--secret', '--force'], true)
-    netlify(['env:set', 'SYNC_SOURCE_SITE_URL', c.site, '--context', c.contexte, '--force'])
-    netlify(['env:set', 'SYNC_SOURCE_NOM', c.source, '--context', c.contexte, '--force'])
-    netlify(['env:set', 'SYNC_CIBLE_NOM', c.cible, '--context', c.contexte, '--force'])
-    console.log(`  ✓ ${c.cible} : lit ${c.source}`)
+    netlify(['env:set', 'SYNC_AUTRE_DATABASE_URL', c.base, '--context', c.contexte, '--secret', '--force'], true)
+    netlify(['env:set', 'SYNC_SECRET', secret, '--context', c.contexte, '--secret', '--force'], true)
+    netlify(['env:set', 'SYNC_AUTRE_SITE_URL', c.site, '--context', c.contexte, '--force'])
+    netlify(['env:set', 'SYNC_AUTRE_NOM', c.autre, '--context', c.contexte, '--force'])
+    netlify(['env:set', 'SYNC_ICI_NOM', c.ici, '--context', c.contexte, '--force'])
+    console.log(`  ✓ ${c.ici} : peut envoyer vers ${c.autre}`)
   }
 
   console.log('\n  ✓ Configuré. Redéployez les deux sites (git push sur preprod puis main) pour l’activer.\n')

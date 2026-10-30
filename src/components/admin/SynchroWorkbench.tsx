@@ -2,18 +2,19 @@
 
 import { AlertTriangle, ArrowRight, Check, DatabaseBackup, History, Loader2, ShieldCheck } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { copierFichiersAction, remplacerAction, restaurerAction } from '@/server/actions/synchronisation'
-import type { Comptes, Etat } from '@/server/synchronisation'
+import { envoyerAction, envoyerFichiersAction, etatEnvoiAction, restaurerChezLAutreAction } from '@/server/actions/synchronisation'
+import type { Comptes, ConfigSynchro, Etat } from '@/server/synchronisation'
 
 /**
- * L'écran de synchronisation : comparer, puis — avec beaucoup de
- * précautions — remplacer le contenu de CE site par celui de l'autre.
- * Voir `server/synchronisation.ts` pour le principe (récupération,
- * sauvegarde préalable, transaction unique).
+ * Réglages › Synchronisation : comparer, puis — avec beaucoup de
+ * précautions — ENVOYER le contenu de ce site vers l'autre (préprod ⇄
+ * production). Voir `server/synchronisation.ts` pour le principe
+ * (l'autre site récupère, sauvegarde d'abord, remplace en une
+ * transaction).
  */
 
 type Etape = 'repos' | 'confirmer' | 'fichiers' | 'remplacement' | 'fini' | 'erreur'
@@ -30,7 +31,7 @@ function nomSauvegarde(nom: string) {
 function Colonne({ titre, comptes, ton }: { titre: string; comptes: Comptes | null; ton: 'source' | 'cible' }) {
   return (
     <div className={cn('flex-1 rounded-[20px] p-6', ton === 'source' ? 'bg-[#eaf4f1]' : 'bg-[#f4f1ea]')}>
-      <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">{ton === 'source' ? 'Source' : 'Ce site — sera remplacé'}</p>
+      <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">{ton === 'source' ? 'Ce site — envoyé' : 'Sera remplacé'}</p>
       <p className="mt-1 text-[20px] font-semibold capitalize text-foreground">{titre}</p>
       {comptes ? (
         <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 text-[14px]">
@@ -51,8 +52,30 @@ function Colonne({ titre, comptes, ton }: { titre: string; comptes: Comptes | nu
   )
 }
 
-export function SynchroWorkbench({ etat, phrase }: { etat: Etat; phrase: string }) {
+export function SynchroWorkbench({
+  config,
+  phrase,
+  proprietaire,
+}: {
+  /** Du point de vue de CE site : `cible` = ce site, `source` = l'autre. */
+  config: ConfigSynchro | null
+  phrase: string
+  proprietaire: boolean
+}) {
   const router = useRouter()
+  const [etat, setEtat] = useState<Etat | null>(null)
+  const [chargement, setChargement] = useState<string | null>(null)
+  const recharger = async () => {
+    const r = await etatEnvoiAction()
+    if (r.ok) {
+      setEtat(r.data)
+      setChargement(null)
+    } else setChargement(r.error)
+  }
+  useEffect(() => {
+    if (config && proprietaire) void recharger()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- une fois, à l'ouverture
+  }, [])
   const [etape, setEtape] = useState<Etape>('repos')
   const [compris, setCompris] = useState(false)
   const [saisie, setSaisie] = useState('')
@@ -63,8 +86,7 @@ export function SynchroWorkbench({ etat, phrase }: { etat: Etat; phrase: string 
   const [saisieRestauration, setSaisieRestauration] = useState('')
   const [restauration, setRestauration] = useState<'repos' | 'en cours' | 'faite'>('repos')
 
-  const { config } = etat
-  const pret = Boolean(config && etat.source && etat.memeSchema && !etat.erreur)
+  const pret = Boolean(config && etat?.source && etat.memeSchema && !etat.erreur)
 
   async function lancer() {
     setErreur(null)
@@ -72,7 +94,7 @@ export function SynchroWorkbench({ etat, phrase }: { etat: Etat; phrase: string 
     setEtape('fichiers')
     let depart: number | null = 0
     while (depart !== null) {
-      const r = await copierFichiersAction(depart)
+      const r = await envoyerFichiersAction(depart)
       if (!r.ok) {
         setErreur(r.error)
         setEtape('erreur')
@@ -83,7 +105,7 @@ export function SynchroWorkbench({ etat, phrase }: { etat: Etat; phrase: string 
     }
     /* 2. Sauvegarde du contenu actuel, puis remplacement en une transaction. */
     setEtape('remplacement')
-    const r = await remplacerAction(saisie)
+    const r = await envoyerAction(saisie)
     if (!r.ok) {
       setErreur(r.error)
       setEtape('erreur')
@@ -91,14 +113,14 @@ export function SynchroWorkbench({ etat, phrase }: { etat: Etat; phrase: string 
     }
     setSauvegarde(r.data.sauvegarde)
     setEtape('fini')
-    router.refresh()
+    void recharger()
   }
 
   async function restaurerLa() {
     if (!aRestaurer) return
     setRestauration('en cours')
     setErreur(null)
-    const r = await restaurerAction(aRestaurer, saisieRestauration)
+    const r = await restaurerChezLAutreAction(aRestaurer, saisieRestauration)
     if (!r.ok) {
       setErreur(r.error)
       setRestauration('repos')
@@ -107,22 +129,41 @@ export function SynchroWorkbench({ etat, phrase }: { etat: Etat; phrase: string 
     setRestauration('faite')
     setARestaurer(null)
     setSaisieRestauration('')
+    void recharger()
     router.refresh()
+  }
+
+  if (!proprietaire) {
+    return <p className="text-[14px] text-muted-foreground">Réservé au compte propriétaire du site.</p>
   }
 
   if (!config) {
     return (
-      <div className="rounded-[20px] bg-white p-7 shadow-[0_1px_2px_rgba(22,73,81,0.06)]">
-        <p className="text-[16px] font-semibold text-foreground">La synchronisation n’est pas configurée sur ce site.</p>
+      <div>
+        <p className="text-[15px] font-semibold text-foreground">La synchronisation n’est pas encore configurée.</p>
         <p className="mt-2 max-w-[70ch] text-[14px] leading-[1.6] text-muted-foreground">
-          Pour l’activer, la personne qui gère l’hébergement ajoute dans Netlify (variables d’environnement de CE site) :
+          Elle se configure une fois pour toutes, depuis l’ordinateur de la personne qui gère le site, avec la commande{' '}
+          <code className="rounded bg-[#f2f3f4] px-1.5 py-0.5 text-[13px]">npm run sync:configurer</code>, puis un nouveau déploiement.
         </p>
-        <ul className="mt-4 space-y-1.5 font-mono text-[13px] text-foreground">
-          <li>SYNC_SOURCE_DATABASE_URL — la base de l’autre site, avec un rôle en LECTURE SEULE</li>
-          <li>SYNC_SOURCE_SITE_URL — l’adresse publique de l’autre site</li>
-          <li>SYNC_SOURCE_NOM — « la préprod » ou « la production »</li>
-          <li>SYNC_CIBLE_NOM — le nom de ce site</li>
-        </ul>
+      </div>
+    )
+  }
+
+  if (!etat) {
+    return (
+      <div className="text-[14px] text-muted-foreground" aria-live="polite">
+        {chargement ? (
+          <p role="alert" className="rounded-[14px] bg-[#fbf0ee] px-5 py-4 text-[#9a3a2c]">
+            {chargement}{' '}
+            <button type="button" className="underline" onClick={() => void recharger()}>
+              Réessayer
+            </button>
+          </p>
+        ) : (
+          <p className="flex items-center gap-2">
+            <Loader2 className="h-4 w-4 animate-spin" /> Comparaison avec {config.source}…
+          </p>
+        )}
       </div>
     )
   }
@@ -131,9 +172,9 @@ export function SynchroWorkbench({ etat, phrase }: { etat: Etat; phrase: string 
     <div className="flex flex-col gap-6">
       {/* Comparaison */}
       <div className="flex flex-col items-stretch gap-3 md:flex-row md:items-center">
-        <Colonne titre={config.source} comptes={etat.source} ton="source" />
+        <Colonne titre={config.cible} comptes={etat.source} ton="source" />
         <ArrowRight className="mx-auto h-6 w-6 shrink-0 rotate-90 text-muted-foreground md:rotate-0" />
-        <Colonne titre={config.cible} comptes={etat.cible} ton="cible" />
+        <Colonne titre={config.source} comptes={etat.cible} ton="cible" />
       </div>
 
       {etat.erreur && (
@@ -150,11 +191,11 @@ export function SynchroWorkbench({ etat, phrase }: { etat: Etat; phrase: string 
           </span>
           <div className="min-w-0 flex-1">
             <h2 className="text-[18px] font-semibold text-foreground">
-              Remplacer le contenu de {config.cible} par celui de {config.source}
+              Envoyer le contenu de {config.cible} vers {config.source}
             </h2>
             <p className="mt-2 max-w-[72ch] text-[14px] leading-[1.65] text-muted-foreground">
-              Opération délicate. Tout ce qui a été modifié sur {config.cible} et pas sur {config.source} sera <strong className="text-foreground">perdu</strong> — sauf
-              à restaurer la sauvegarde faite automatiquement juste avant.
+              Opération délicate : le contenu de {config.source} sera <strong className="text-foreground">remplacé</strong> par celui d’ici. Tout ce qui a été
+              modifié sur {config.source} et pas ici sera perdu — sauf à restaurer la sauvegarde faite automatiquement juste avant.
             </p>
             <div className="mt-5 grid gap-4 text-[14px] md:grid-cols-2">
               <div>
@@ -172,7 +213,7 @@ export function SynchroWorkbench({ etat, phrase }: { etat: Etat; phrase: string 
 
             {etape === 'repos' && (
               <Button variant="destructive" className="mt-6" disabled={!pret} onClick={() => setEtape('confirmer')}>
-                Préparer le remplacement…
+                Préparer l’envoi…
               </Button>
             )}
 
@@ -180,7 +221,7 @@ export function SynchroWorkbench({ etat, phrase }: { etat: Etat; phrase: string 
               <div className="mt-6 rounded-[16px] bg-[#fbf7f6] p-5">
                 <label className="flex items-start gap-3 text-[14px] leading-[1.55] text-foreground">
                   <input type="checkbox" checked={compris} onChange={(e) => setCompris(e.target.checked)} className="mt-1 h-4 w-4 accent-[#b4342c]" />
-                  J’ai compris que le contenu actuel de {config.cible} sera remplacé, et qu’une sauvegarde est faite juste avant.
+                  J’ai compris que le contenu actuel de {config.source} sera remplacé, et qu’une sauvegarde est faite juste avant.
                 </label>
                 <label className="mt-4 block text-[14px] text-foreground">
                   Pour confirmer, tapez <strong className="font-mono">{phrase}</strong>
@@ -194,7 +235,7 @@ export function SynchroWorkbench({ etat, phrase }: { etat: Etat; phrase: string 
                 </label>
                 <div className="mt-5 flex flex-wrap gap-3">
                   <Button variant="destructive" disabled={!compris || saisie.trim() !== phrase} onClick={() => void lancer()}>
-                    Remplacer maintenant
+                    Envoyer maintenant
                   </Button>
                   <Button
                     variant="outline"
@@ -227,7 +268,7 @@ export function SynchroWorkbench({ etat, phrase }: { etat: Etat; phrase: string 
             {etape === 'fini' && (
               <p className="mt-6 flex items-start gap-2 rounded-[14px] bg-[#e8f4ec] px-5 py-4 text-[14px] text-[#256b47]">
                 <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" />
-                C’est fait : {config.cible} affiche maintenant le contenu de {config.source}. Le contenu d’avant est sauvegardé
+                C’est fait : {config.source} affiche maintenant le contenu d’ici. Son contenu d’avant est sauvegardé
                 {sauvegarde ? ` (${nomSauvegarde(sauvegarde)})` : ''} — vous pouvez le restaurer ci-dessous.
               </p>
             )}
@@ -237,7 +278,7 @@ export function SynchroWorkbench({ etat, phrase }: { etat: Etat; phrase: string 
                 <p className="font-semibold">L’opération s’est arrêtée.</p>
                 <p className="mt-1">{erreur}</p>
                 <p className="mt-2 text-[13px]">
-                  Le remplacement se fait en une seule transaction : s’il a échoué, le contenu de {config.cible} n’a pas changé.
+                  Le remplacement se fait en une seule transaction : s’il a échoué, le contenu de {config.source} n’a pas changé.
                 </p>
                 <Button variant="outline" size="sm" className="mt-3" onClick={() => setEtape('repos')}>
                   Revenir
@@ -252,7 +293,7 @@ export function SynchroWorkbench({ etat, phrase }: { etat: Etat; phrase: string 
       <section className="rounded-[20px] bg-white p-7 shadow-[0_1px_2px_rgba(22,73,81,0.06)]">
         <div className="flex items-center gap-3">
           <History className="h-5 w-5 text-muted-foreground" />
-          <h2 className="text-[16px] font-semibold text-foreground">Sauvegardes de {config.cible}</h2>
+          <h2 className="text-[16px] font-semibold text-foreground">Sauvegardes de {config.source}</h2>
         </div>
         <p className="mt-2 text-[14px] leading-[1.6] text-muted-foreground">
           Faites automatiquement avant chaque remplacement et chaque restauration. Restaurer remet le contenu tel qu’il était à ce moment.
@@ -285,7 +326,7 @@ export function SynchroWorkbench({ etat, phrase }: { etat: Etat; phrase: string 
                 {aRestaurer === nom && (
                   <div className="mt-3 rounded-[14px] bg-[#fbf7f6] p-4 text-[14px]">
                     <p>
-                      Le contenu actuel de {config.cible} sera remplacé par cette sauvegarde (il est lui-même sauvegardé avant). Tapez{' '}
+                      Le contenu actuel de {config.source} sera remplacé par cette sauvegarde (il est lui-même sauvegardé avant). Tapez{' '}
                       <strong className="font-mono">RESTAURER</strong> :
                     </p>
                     <input

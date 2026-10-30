@@ -1,6 +1,6 @@
 'use client'
 
-import { Check, IdCard, Menu, Palette, Search } from 'lucide-react'
+import { ArrowLeftRight, Check, IdCard, Menu, Palette, Search } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -12,6 +12,7 @@ import {
   type NavigationItem,
 } from './NavigationEditor'
 import { AdminContent } from './AdminContent'
+import { SynchroWorkbench } from './SynchroWorkbench'
 import { PASTELS } from './editor/pastels'
 import { PageHeader } from './PageHeader'
 import { PaletteProvider } from './PaletteProvider'
@@ -38,9 +39,11 @@ import { updateIdentity } from '@/server/actions/identity'
 import { updateNavigation } from '@/server/actions/navigation'
 import { updateSeo } from '@/server/actions/seo'
 import type { Media, Settings, OpeningHour, SocialLink } from '@/server/db/schema'
+import type { ConfigSynchro } from '@/server/synchronisation'
 
 /**
- * Les réglages du site — un écran, quatre onglets.
+ * Les réglages du site — un écran, cinq onglets (le dernier,
+ * Synchronisation, n'a rien à enregistrer : il agit).
  *
  *   Coordonnées   qui vous êtes, comment on vous joint, vos horaires
  *   Apparence     vos couleurs et vos formes
@@ -94,6 +97,14 @@ const ONGLETS = [
     icone: Search,
     tone: PASTELS[5]!,
   },
+  {
+    id: 'synchronisation',
+    label: 'Synchronisation',
+    resume: 'Préprod ⇄ production',
+    description: 'Envoyer le contenu de ce site vers l’autre environnement — avec sauvegarde.',
+    icone: ArrowLeftRight,
+    tone: { bg: '#f6e7e4', fg: '#9a3a2c' },
+  },
 ] as const
 type Onglet = (typeof ONGLETS)[number]['id']
 
@@ -126,12 +137,14 @@ export function SettingsWorkbench({
   library,
   menu,
   referencement,
+  synchro,
 }: {
   settings: Settings
   identity: Identity
   library: Media[]
   menu: NavigationEditorProps
   referencement: SeoEditorProps | null
+  synchro: { config: ConfigSynchro | null; phrase: string; proprietaire: boolean }
 }) {
   const router = useRouter()
   const [onglet, setOnglet] = useState<Onglet>('coordonnees')
@@ -140,6 +153,7 @@ export function SettingsWorkbench({
     apparence: null,
     menu: null,
     referencement: null,
+    synchronisation: null,
   })
 
   /* L'onglet suit l'adresse, et l'adresse suit l'onglet. */
@@ -402,7 +416,7 @@ export function SettingsWorkbench({
           >
             {ONGLETS.map((o) => {
               const actif = onglet === o.id
-              const modifie = dirtyDe[groupeDe(o.id)]
+              const modifie = o.id !== 'synchronisation' && dirtyDe[groupeDe(o.id)]
               const Icone = o.icone
               return (
                 <button
@@ -554,11 +568,16 @@ export function SettingsWorkbench({
                   </p>
                 )}
               </Panneau>
+
+              <Panneau id="synchronisation" actif={onglet === 'synchronisation'}>
+                {/* Monté à la première ouverture seulement : il interroge l'autre site. */}
+                {onglet === 'synchronisation' && <SynchroWorkbench {...synchro} />}
+              </Panneau>
             </div>
 
             {/* LA barre d'enregistrement : une seule, au pied du panneau,
                 toujours au même endroit. */}
-            {(groupe !== 'referencement' || referencement) && (
+            {onglet !== 'synchronisation' && (groupe !== 'referencement' || referencement) && (
               <BarreEnregistrement
                 dirty={barre.dirty}
                 pending={barre.etat.pending}

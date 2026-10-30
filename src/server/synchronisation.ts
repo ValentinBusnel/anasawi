@@ -3,6 +3,7 @@ import 'server-only'
 import { neon } from '@neondatabase/serverless'
 import { asc, isNotNull, isNull, sql } from 'drizzle-orm'
 import { drizzle } from 'drizzle-orm/neon-http'
+import { timingSafeEqual } from 'node:crypto'
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 
@@ -26,50 +27,90 @@ const {
 /**
  * SYNCHRONISATION DU CONTENU ENTRE LA PRÉPROD ET LA PRODUCTION.
  *
- * Principe : chaque site RÉCUPÈRE le contenu de l'autre (il ne pousse
- * jamais chez l'autre). Le bouton « Remplacer par le contenu de la
- * préprod » est dans l'admin de la PRODUCTION, et inversement. Ainsi :
- *  - chaque site n'a besoin que d'un accès en LECTURE à la base de
- *    l'autre (utiliser un rôle Neon en lecture seule) ;
- *  - aucun jeton Netlify n'est nécessaire : les fichiers médias sont
- *    téléchargés depuis l'adresse publique de l'autre site et rangés
- *    dans le stockage du site qui récupère.
+ * Dans l'admin (Réglages › Synchronisation), on ENVOIE le contenu du
+ * site où l'on est vers l'autre : depuis la préprod, « Envoyer vers la
+ * production » ; depuis la production, « Envoyer vers la préprod ».
  *
- * Configuration (variables d'environnement du site qui RÉCUPÈRE) :
- *   SYNC_SOURCE_DATABASE_URL  base de l'autre site (lecture seule)
- *   SYNC_SOURCE_SITE_URL      adresse publique de l'autre site
- *   SYNC_SOURCE_NOM           « la préprod » / « la production »
- *   SYNC_CIBLE_NOM            le nom de CE site (« la production »…)
- * Sans elles, l'écran l'explique et aucun bouton n'apparaît.
+ * Sous le capot, c'est le site qui REÇOIT qui fait le travail : le site
+ * qui envoie lui demande (appel serveur signé d'un secret partagé) de
+ * récupérer son contenu. Ainsi :
+ *  - chaque site n'a qu'un accès en LECTURE à la base de l'autre (rôle
+ *    Neon `sync_lecture`) — jamais d'écriture croisée ;
+ *  - aucun jeton Netlify : les fichiers médias sont téléchargés depuis
+ *    l'adresse publique de l'autre site et rangés dans le stockage du
+ *    site qui reçoit ;
+ *  - la sauvegarde avant remplacement est faite chez celui qui reçoit.
+ *
+ * Configuration (variables d'environnement de CHAQUE site ; voir
+ * `npm run sync:configurer`, qui les pose toutes) :
+ *   SYNC_AUTRE_DATABASE_URL  base de l'autre site (rôle en lecture seule)
+ *   SYNC_AUTRE_SITE_URL      adresse publique de l'autre site
+ *   SYNC_AUTRE_NOM           « la préprod » / « la production »
+ *   SYNC_ICI_NOM             le nom de CE site
+ *   SYNC_SECRET              secret partagé, identique sur les deux sites
  *
  * Ce qui est remplacé : médias (lignes) et dossiers, pages et leurs
  * versions publiées, sections, référencement, accompagnements et leurs
  * familles, questions, réglages, modèles enregistrés. Ce qui n'est
  * JAMAIS touché : comptes, invitations, messages reçus.
  *
- * Filet de sécurité : avant tout remplacement, le contenu actuel est
- * SAUVEGARDÉ (fichier JSON dans le stockage du site) ; « Restaurer la
- * sauvegarde » le remet en place. Le remplacement lui-même part en UNE
- * transaction : tout ou rien.
+ * Le remplacement part en UNE transaction (tout ou rien), après une
+ * SAUVEGARDE du contenu remplacé, restaurable depuis le même écran.
+ *
+ * Vocabulaire du code : du point de vue du site qui reçoit, `source` est
+ * l'autre site (celui qui envoie) et `cible` ce site-ci.
  */
 
 export type ConfigSynchro = {
+  /** L'autre site. */
   source: string
+  /** Ce site. */
   cible: string
   urlSite: string
 }
 
 export function configSynchro(): ConfigSynchro | null {
-  const url = process.env.SYNC_SOURCE_DATABASE_URL
-  const urlSite = process.env.SYNC_SOURCE_SITE_URL
-  const source = process.env.SYNC_SOURCE_NOM
-  const cible = process.env.SYNC_CIBLE_NOM
-  if (!url || !urlSite || !source || !cible) return null
+  const url = process.env.SYNC_AUTRE_DATABASE_URL
+  const urlSite = process.env.SYNC_AUTRE_SITE_URL
+  const source = process.env.SYNC_AUTRE_NOM
+  const cible = process.env.SYNC_ICI_NOM
+  if (!url || !urlSite || !source || !cible || !process.env.SYNC_SECRET) return null
   return { source, cible, urlSite: urlSite.replace(/\/+$/, '') }
 }
 
+/** Le secret partagé est-il bien celui reçu ? (comparaison à temps constant) */
+export function secretValide(recu: string | null): boolean {
+  const attendu = process.env.SYNC_SECRET
+  if (!attendu || !recu) return false
+  const a = Buffer.from(attendu)
+  const b = Buffer.from(recu)
+  return a.length === b.length && timingSafeEqual(a, b)
+}
+
+/** Demande à L'AUTRE site d'exécuter une étape (il récupère notre contenu). */
+export async function demanderALAutre<T>(corps: Record<string, unknown>): Promise<T> {
+  const config = configSynchro()
+  if (!config) throw new Error('Synchronisation non configurée.')
+  let r: Response
+  try {
+    r = await fetch(`${config.urlSite}/api/synchronisation`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-synchro-secret': process.env.SYNC_SECRET ?? '' },
+      body: JSON.stringify(corps),
+      cache: 'no-store',
+    })
+  } catch {
+    throw new Error(`${config.source} ne répond pas.`)
+  }
+  const reponse = (await r.json().catch(() => null)) as { ok: boolean; data?: T; error?: string } | null
+  if (!r.ok || !reponse?.ok) {
+    throw new Error(reponse?.error ?? `${config.source} a refusé la demande (${r.status}). Le code est-il à jour des deux côtés ?`)
+  }
+  return reponse.data as T
+}
+
 function baseSource() {
-  const url = process.env.SYNC_SOURCE_DATABASE_URL
+  const url = process.env.SYNC_AUTRE_DATABASE_URL
   if (!url) throw new Error('Synchronisation non configurée.')
   if (process.env.DATABASE_URL && new URL(url).host === new URL(process.env.DATABASE_URL).host) {
     throw new Error('La base source est la même que celle du site : rien à récupérer.')
