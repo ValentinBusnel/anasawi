@@ -2,7 +2,7 @@ import { ArrowUpRight, Mail, MapPin, Phone } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
-import { Aimant, Arches, Chemin, Conversation, Encre, Lettre, Lignes, Promenade, Revele, Semaine, Seuil, Souffle } from './vivant'
+import { Aimant, Arches, Carte, Chemin, Conversation, Encre, Incline, Lettre, Lignes, Promenade, Revele, Semaine, Seuil, Souffle } from './vivant'
 import type { Contenu } from '@/blocks/moderne/contenu'
 import { LogoMark } from '@/components/site/Logo'
 import { cn, toE164 } from '@/lib/utils'
@@ -31,7 +31,7 @@ const prenomDe = (nom: string) => nom.split(' ')[0] ?? nom
 const nomDe = (nom: string) => nom.split(' ').slice(1).join(' ') || nom
 
 /** Surtitre : un trait d'or et des petites capitales. */
-function Surtitre({ children, clair = false }: { children: React.ReactNode; clair?: boolean }) {
+export function Surtitre({ children, clair = false }: { children: React.ReactNode; clair?: boolean }) {
   return (
     <p
       className={cn(
@@ -97,9 +97,11 @@ export function Rencontre({ c }: P) {
     <section id="a-propos" className="scroll-mt-24 py-28 md:py-40">
       <div className="mx-auto grid max-w-[1200px] items-center gap-16 px-[5vw] md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:gap-24">
         <Revele className="relative mx-auto w-full max-w-[440px]">
-          <div className="relative aspect-[3/4] overflow-hidden rounded-[32px] bg-[var(--ad-sable-fonce)]">
-            {c.portrait && <Image src={c.portrait.url} alt={c.portrait.alt} fill sizes="440px" className="object-cover" />}
-          </div>
+          <Incline max={8} className="aspect-[3/4]">
+            <div className="relative h-full w-full overflow-hidden rounded-[32px] bg-[var(--ad-sable-fonce)]">
+              {c.portrait && <Image src={c.portrait.url} alt={c.portrait.alt} fill sizes="440px" className="object-cover" />}
+            </div>
+          </Incline>
           {/* Le sceau : le métier écrit en cercle, qui tourne lentement. */}
           <div aria-hidden="true" className="absolute -bottom-10 -right-6 grid h-36 w-36 place-items-center rounded-full bg-[var(--ad-ivoire)] shadow-[0_20px_50px_-20px_rgba(20,35,46,0.4)] md:-right-12">
             <svg viewBox="0 0 100 100" className="absolute inset-2 motion-safe:animate-[ad-tourner_28s_linear_infinite]">
@@ -193,7 +195,8 @@ export function EnPratique({ c }: P) {
   const indice = (j: string) => JOURS_COURTS.findIndex((d) => j.toLowerCase().startsWith(d))
   const tries = [...ouverts].sort((a, b) => indice(a.day) - indice(b.day))
   const plage = tries.length ? `${tries[0]!.day} → ${tries.at(-1)!.day}` : 'Sur rendez-vous'
-  const carte = 'rounded-[28px] bg-white p-7 shadow-[0_1px_2px_rgba(20,35,46,0.05),0_20px_50px_-30px_rgba(20,35,46,0.25)]'
+  const carte =
+    'rounded-[28px] bg-white p-7 shadow-[0_1px_2px_rgba(20,35,46,0.05),0_20px_50px_-30px_rgba(20,35,46,0.25)] transition-[box-shadow,translate] duration-500 ease-[var(--ad-ease)] hover:-translate-y-1 hover:shadow-[0_2px_4px_rgba(20,35,46,0.06),0_30px_60px_-30px_rgba(20,35,46,0.35)]'
   return (
     <section className="py-24 md:py-32">
       <div className="mx-auto max-w-[1200px] px-[5vw]">
@@ -202,25 +205,20 @@ export function EnPratique({ c }: P) {
           <Lignes lignes={['Tout ce qu’il faut', <em key="s">savoir</em>]} />
         </h2>
         <div className="grid gap-4 md:auto-rows-[220px] md:grid-cols-4">
-          {/* Le plan : des rues dessinées, l'épingle qui bat. */}
+          {/* Le plan : une vraie carte, teintée aux couleurs du site. */}
           <Revele className={cn(carte, 'relative overflow-hidden p-0 md:col-span-2 md:row-span-2')}>
-            <div
-              aria-hidden="true"
-              className="absolute inset-0 bg-[var(--ad-brume)] [background-image:linear-gradient(115deg,transparent_46%,#fff_46%,#fff_49%,transparent_49%),linear-gradient(15deg,transparent_58%,#fff_58%,#fff_60%,transparent_60%),linear-gradient(90deg,transparent_30%,rgba(255,255,255,0.7)_30%,rgba(255,255,255,0.7)_31.5%,transparent_31.5%),linear-gradient(0deg,transparent_70%,rgba(255,255,255,0.7)_70%,rgba(255,255,255,0.7)_71.5%,transparent_71.5%)]"
-            />
-            <span aria-hidden="true" className="absolute left-[54%] top-[42%] grid -translate-x-1/2 -translate-y-1/2 place-items-center">
-              <span className="absolute h-16 w-16 rounded-full bg-[var(--ad-or)]/30 motion-safe:animate-[ad-pouls_2.4s_ease-out_infinite]" />
-              <span className="relative grid h-11 w-11 place-items-center rounded-full bg-[var(--ad-nuit)] text-white shadow-[0_10px_30px_-8px_rgba(20,35,46,0.5)]">
-                <MapPin className="h-5 w-5" />
-              </span>
-            </span>
-            <div className="relative flex h-full min-h-[300px] flex-col justify-end p-7">
-              <div className="rounded-[20px] bg-white/90 p-5 backdrop-blur">
+            {c.adresse ? (
+              <Carte adresse={c.adresse} className="absolute inset-0" />
+            ) : (
+              <div aria-hidden="true" className="absolute inset-0 bg-[var(--ad-brume)]" />
+            )}
+            <div className="pointer-events-none relative flex h-full min-h-[340px] flex-col justify-end p-5">
+              <div className="pointer-events-auto rounded-[20px] bg-white/90 p-5 shadow-[0_14px_40px_-20px_rgba(20,35,46,0.4)] backdrop-blur">
                 <p className="text-[13px] font-semibold text-[var(--ad-gris)]">Le cabinet</p>
                 <p className="mt-1 text-[18px] font-semibold tracking-[-0.02em]">{c.adresse ?? c.ville}</p>
                 {c.adresse && (
                   <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.adresse)}`}
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(c.adresse)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="group mt-3 inline-flex items-center gap-1.5 text-[14px] font-semibold text-[var(--ad-bleu)]"

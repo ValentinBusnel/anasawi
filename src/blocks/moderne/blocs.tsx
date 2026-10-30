@@ -37,7 +37,7 @@ import { ModeEdition } from '@/components/anasawi/vivant'
 
 /** Le contenu partagé, ou — hors du site moderne (bibliothèque de
     modèles…) — un contenu minimal tiré du contexte. */
-function contenuDe(ctx: BlockContext): Contenu {
+export function contenuDe(ctx: BlockContext): Contenu {
   if (ctx.partage) return ctx.partage
   return construireContenu({
     settings: ctx.settings,
@@ -53,11 +53,11 @@ function contenuDe(ctx: BlockContext): Contenu {
 const texte = z.string().default('')
 const vide = (v: string | undefined) => !v || !v.trim()
 
-function Enveloppe({ ctx, children }: { ctx: BlockContext; children: React.ReactNode }) {
+export function Enveloppe({ ctx, children }: { ctx: BlockContext; children: React.ReactNode }) {
   return <ModeEdition actif={Boolean(ctx.editable)}>{children}</ModeEdition>
 }
 
-const SUIT = 'Laissé vide, ce champ suit le site classique.'
+export const SUIT = 'Laissé vide, ce champ suit le site classique.'
 
 /* ── Le seuil ─────────────────────────────────────────────────────────── */
 

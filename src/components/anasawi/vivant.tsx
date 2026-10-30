@@ -26,7 +26,7 @@ import type { FaqItem, Media, OpeningHour, ServiceWithMedia } from '@/server/db/
    d'emblée, et un « écran » vaut 860 px.
    ══════════════════════════════════════════════════════════════════════ */
 
-const Edition = createContext(false)
+export const Edition = createContext(false)
 
 /** L'enveloppe de tout bloc moderne : la classe `ad` (jetons, police),
     et le mode édition pour ses composants. */
@@ -50,7 +50,7 @@ const reduit = () =>
  * - `passage` : 0 quand l'élément entre par le bas, 1 quand il sort par
  *   le haut.
  */
-function useAvancement<T extends HTMLElement>(mode: 'colle' | 'passage', lisse = false) {
+export function useAvancement<T extends HTMLElement>(mode: 'colle' | 'passage', lisse = false) {
   const ref = useRef<T>(null)
   const edition = useContext(Edition)
   useEffect(() => {
@@ -310,49 +310,61 @@ export function Seuil({
           <p className="max-w-[54ch] text-[16px] leading-[1.6] text-[var(--ad-pierre)] motion-safe:animate-[ad-monter_1.2s_var(--ad-ease)_0.45s_backwards]">{intro}</p>
         </div>
 
-        {/* La fenêtre sur le cabinet : sous le nom, puis plein écran. */}
-        <div
-          className="absolute left-1/2 z-10 overflow-hidden bg-[var(--ad-sable-fonce)] shadow-[0_50px_120px_-50px_rgba(20,35,46,0.55)] motion-safe:animate-[ad-monter_1.4s_var(--ad-ease)_0.35s_backwards]"
+        {/* La fenêtre sur le cabinet : sous le nom, puis plein écran.
+            Deux étages : le cadre extérieur suit le défilement (place,
+            taille) ; l'intérieur bascule vers la souris (inclinaison),
+            avec son propre ressort — et n'incline plus une fois entré. */}
+        <Incline
+          variables
+          className="absolute left-1/2 z-10 [perspective:1400px] motion-safe:animate-[ad-monter_1.4s_var(--ad-ease)_0.35s_backwards]"
           style={{
             top: 'calc(66% - 16% * var(--e))',
             width: `calc(${larg} + (100vw - ${larg}) * var(--e))`,
             height: `calc(${haut} + (var(--ad-vh) * 100 - ${haut}) * var(--e))`,
             transform: 'translate(-50%, -50%)',
-            borderRadius: 'calc((1 - var(--e)) * 32px)',
           }}
         >
-          {photo && (
-            <Image
-              src={photo.url}
-              alt={photo.alt}
-              fill
-              priority
-              sizes="100vw"
-              className="object-cover"
-              style={{ transform: 'scale(calc(1.15 - var(--e) * 0.15))' }}
-            />
-          )}
-          <div aria-hidden="true" className="absolute inset-0 bg-[var(--ad-nuit)]" style={{ opacity: 'calc(var(--e) * 0.5)' }} />
-          {/* La phrase d'accueil, dans la pièce. */}
           <div
-            className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center text-white"
+            className="relative h-full w-full overflow-hidden bg-[var(--ad-sable-fonce)] shadow-[0_50px_120px_-50px_rgba(20,35,46,0.55)] transition-[transform,box-shadow] duration-[700ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-data-[survol=oui]/incline:duration-200 group-data-[survol=oui]/incline:shadow-[0_60px_120px_-40px_rgba(20,35,46,0.6)]"
             style={{
-              opacity: 'clamp(0, calc((var(--e) - 0.55) * 3), 1)',
-              transform: 'translateY(calc((1 - var(--e)) * 40px))',
+              borderRadius: 'calc((1 - var(--e)) * 32px)',
+              transform: 'rotateX(calc(var(--rx) * (1 - var(--e)))) rotateY(calc(var(--ry) * (1 - var(--e))))',
             }}
           >
-            <p className="max-w-[18ch] text-balance text-[clamp(34px,5.2vw,80px)] font-semibold leading-[1.04] tracking-[-0.035em]">{accroche}</p>
-            <a
-              href={rdv}
-              className="group mt-10 inline-flex items-center gap-3 rounded-full bg-white py-2 pl-6 pr-2 text-[15px] font-semibold text-[var(--ad-nuit)]"
+            {photo && (
+              <Image
+                src={photo.url}
+                alt={photo.alt}
+                fill
+                priority
+                sizes="100vw"
+                className="object-cover"
+                style={{ transform: 'scale(calc(1.15 - var(--e) * 0.15))' }}
+              />
+            )}
+            <Reflet />
+            <div aria-hidden="true" className="absolute inset-0 bg-[var(--ad-nuit)]" style={{ opacity: 'calc(var(--e) * 0.5)' }} />
+            {/* La phrase d'accueil, dans la pièce. */}
+            <div
+              className="absolute inset-0 z-20 flex flex-col items-center justify-center px-6 text-center text-white"
+              style={{
+                opacity: 'clamp(0, calc((var(--e) - 0.55) * 3), 1)',
+                transform: 'translateY(calc((1 - var(--e)) * 40px))',
+              }}
             >
-              Prendre rendez-vous
-              <span className="grid h-9 w-9 place-items-center rounded-full bg-[var(--ad-nuit)] text-white transition-transform duration-500 ease-[var(--ad-ease)] group-hover:rotate-45">
-                <ArrowUpRight className="h-4 w-4" />
-              </span>
-            </a>
+              <p className="max-w-[18ch] text-balance text-[clamp(34px,5.2vw,80px)] font-semibold leading-[1.04] tracking-[-0.035em]">{accroche}</p>
+              <a
+                href={rdv}
+                className="group mt-10 inline-flex items-center gap-3 rounded-full bg-white py-2 pl-6 pr-2 text-[15px] font-semibold text-[var(--ad-nuit)]"
+              >
+                Prendre rendez-vous
+                <span className="grid h-9 w-9 place-items-center rounded-full bg-[var(--ad-nuit)] text-white transition-transform duration-500 ease-[var(--ad-ease)] group-hover:rotate-45">
+                  <ArrowUpRight className="h-4 w-4" />
+                </span>
+              </a>
+            </div>
           </div>
-        </div>
+        </Incline>
 
         {/* Autour de la fenêtre : trois petites pastilles de verre, posées
             sur ses bords, qui flottent à peine — discrètes, pas des cartes. */}
@@ -664,11 +676,11 @@ export function Promenade({ photos, titre }: { photos: Media[]; titre: React.Rea
           >
             {photos.map((p, i) => (
               <figure key={p.id} className={cn('shrink-0', i % 2 ? 'md:mt-24' : 'md:-mt-16')}>
+                <Incline max={6} className={cn(i % 3 === 0 ? 'h-[300px] w-[240px] md:h-[calc(var(--ad-vh)*52)] md:w-[calc(var(--ad-vh)*30)]' : 'h-[240px] w-[300px] md:h-[calc(var(--ad-vh)*40)] md:w-[calc(var(--ad-vh)*52)]')}>
                 <div
                   className={cn(
-                    'relative overflow-hidden bg-[var(--ad-sable-fonce)]',
+                    'relative h-full w-full overflow-hidden bg-[var(--ad-sable-fonce)]',
                     formes[i % formes.length],
-                    i % 3 === 0 ? 'h-[300px] w-[240px] md:h-[calc(var(--ad-vh)*52)] md:w-[calc(var(--ad-vh)*30)]' : 'h-[240px] w-[300px] md:h-[calc(var(--ad-vh)*40)] md:w-[calc(var(--ad-vh)*52)]',
                   )}
                 >
                   <Image
@@ -680,6 +692,7 @@ export function Promenade({ photos, titre }: { photos: Media[]; titre: React.Rea
                     style={{ transform: `translateX(calc((var(--p) - ${i / photos.length}) * -60px)) scale(1.15)` }}
                   />
                 </div>
+                </Incline>
                 {p.caption && (
                   <figcaption className="mt-3 text-[14px] font-medium text-[var(--ad-gris)]">{p.caption}</figcaption>
                 )}
@@ -1309,5 +1322,196 @@ export function Aimant({ children, force = 0.3, className }: { children: React.R
     >
       {children}
     </span>
+  )
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   L'INCLINAISON — une image (ou une carte) qui bascule légèrement vers la
+   souris, le coin le plus proche s'enfonçant, avec un reflet de lumière
+   qui suit le pointeur. Revient en place avec un ressort.
+   L'élément reçoit --rx / --ry (degrés) et --mx / --my (% du reflet) :
+   `Incline` les applique elle-même ; `variables` les laisse à l'enfant.
+   ══════════════════════════════════════════════════════════════════════ */
+
+export function Incline({
+  children,
+  className,
+  max = 7,
+  reflet = true,
+  variables = false,
+  style,
+}: {
+  children: React.ReactNode
+  className?: string
+  style?: React.CSSProperties
+  /** Bascule maximale, en degrés. */
+  max?: number
+  reflet?: boolean
+  /** Ne pose que les variables : l'enfant compose sa propre transformation. */
+  variables?: boolean
+}) {
+  const ref = useRef<HTMLDivElement>(null)
+  const edition = useContext(Edition)
+  const bouge = (e: React.PointerEvent) => {
+    const el = ref.current
+    if (!el || e.pointerType !== 'mouse' || edition || reduit()) return
+    const r = el.getBoundingClientRect()
+    const x = (e.clientX - r.left) / r.width
+    const y = (e.clientY - r.top) / r.height
+    el.style.setProperty('--ry', `${((x - 0.5) * 2 * max).toFixed(2)}deg`)
+    el.style.setProperty('--rx', `${((0.5 - y) * 2 * max).toFixed(2)}deg`)
+    el.style.setProperty('--mx', `${(x * 100).toFixed(1)}%`)
+    el.style.setProperty('--my', `${(y * 100).toFixed(1)}%`)
+    el.dataset.survol = 'oui'
+  }
+  const relache = () => {
+    const el = ref.current
+    if (!el) return
+    el.style.setProperty('--rx', '0deg')
+    el.style.setProperty('--ry', '0deg')
+    delete el.dataset.survol
+  }
+  return (
+    <div
+      ref={ref}
+      onPointerMove={bouge}
+      onPointerLeave={relache}
+      style={style}
+      className={cn('group/incline relative [--rx:0deg] [--ry:0deg] [--mx:50%] [--my:50%] [perspective:1100px]', className)}
+    >
+      {variables ? (
+        children
+      ) : (
+        <div className="relative h-full w-full transition-transform duration-[600ms] ease-[cubic-bezier(0.22,1,0.36,1)] [transform:rotateX(var(--rx))_rotateY(var(--ry))] [transform-style:preserve-3d] group-data-[survol=oui]/incline:duration-150">
+          {children}
+          {reflet && <Reflet />}
+        </div>
+      )}
+    </div>
+  )
+}
+
+/** Le reflet de lumière, à poser dans un élément qui suit `Incline`. */
+export function Reflet({ className }: { className?: string }) {
+  return (
+    <span
+      aria-hidden="true"
+      className={cn(
+        'pointer-events-none absolute inset-0 z-10 rounded-[inherit] opacity-0 mix-blend-soft-light transition-opacity duration-500 [background:radial-gradient(circle_at_var(--mx)_var(--my),rgba(255,255,255,0.55),transparent_55%)] group-data-[survol=oui]/incline:opacity-100',
+        className,
+      )}
+    />
+  )
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   LE COMPTEUR — un nombre qui monte jusqu'à sa valeur quand il apparaît
+   (courbe qui ralentit à l'arrivée). Affiché d'emblée dans l'éditeur et
+   pour qui réduit les animations.
+   ══════════════════════════════════════════════════════════════════════ */
+
+export function Compteur({ valeur, duree = 1600 }: { valeur: number; duree?: number }) {
+  const ref = useRef<HTMLSpanElement>(null)
+  const edition = useContext(Edition)
+  const [affiche, setAffiche] = useState(valeur)
+  useEffect(() => {
+    const el = ref.current
+    if (!el || edition || reduit()) return
+    setAffiche(0)
+    let image = 0
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (!e?.isIntersecting) return
+        io.disconnect()
+        const debut = performance.now()
+        const pas = (t: number) => {
+          const k = Math.min(1, (t - debut) / duree)
+          setAffiche(Math.round(valeur * (1 - Math.pow(1 - k, 4))))
+          if (k < 1) image = requestAnimationFrame(pas)
+        }
+        image = requestAnimationFrame(pas)
+      },
+      { rootMargin: '0px 0px -10% 0px' },
+    )
+    io.observe(el)
+    return () => {
+      io.disconnect()
+      cancelAnimationFrame(image)
+    }
+  }, [valeur, duree, edition])
+  return (
+    <span ref={ref} className="tabular-nums">
+      {affiche}
+    </span>
+  )
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   LA CARTE — une vraie carte Google, fondue dans la DA : désaturée et
+   teintée aux couleurs du site, l'épingle qui bat au centre. Chargée
+   seulement à l'approche (pas de tiers tant qu'on ne la voit pas), et
+   inerte jusqu'au clic — la molette fait défiler la page, pas la carte.
+   ══════════════════════════════════════════════════════════════════════ */
+
+export function Carte({ adresse, zoom = 15, className }: { adresse: string; zoom?: number; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [proche, setProche] = useState(false)
+  const [active, setActive] = useState(false)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e?.isIntersecting) {
+          setProche(true)
+          io.disconnect()
+        }
+      },
+      { rootMargin: '300px 0px' },
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
+  return (
+    <div ref={ref} className={cn('relative overflow-hidden bg-[var(--ad-brume)]', className)} onMouseLeave={() => setActive(false)}>
+      {proche && (
+        <iframe
+          title={`Plan d’accès : ${adresse}`}
+          src={`https://www.google.com/maps?q=${encodeURIComponent(adresse)}&z=${zoom}&output=embed`}
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          className={cn(
+            'absolute left-0 top-0 h-[calc(100%+60px)] w-[calc(var(--centre,50%)*2)] max-w-none -translate-y-[30px] border-0 transition-[filter] duration-700 [filter:grayscale(1)_contrast(1.05)_brightness(1.04)]',
+            active && '[filter:grayscale(0.25)_contrast(1)_brightness(1)]',
+            !active && 'pointer-events-none',
+          )}
+        />
+      )}
+      {/* La teinte du site, posée sur le gris de la carte. */}
+      <div
+        aria-hidden="true"
+        className={cn(
+          'pointer-events-none absolute inset-0 bg-[linear-gradient(140deg,#2f6f93,#36a39b)] mix-blend-color transition-opacity duration-700',
+          active ? 'opacity-0' : 'opacity-60',
+        )}
+      />
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(246,247,249,0.55))]" />
+      {/* L'épingle, au centre — là où la carte place l'adresse. */}
+      <span aria-hidden="true" className={cn('pointer-events-none absolute left-[var(--centre,50%)] top-1/2 grid -translate-x-1/2 -translate-y-full place-items-center transition-opacity duration-500', active && 'opacity-0')}>
+        <span className="absolute top-full h-20 w-20 -translate-y-1/2 rounded-full bg-[var(--ad-or)]/35 motion-safe:animate-[ad-pouls_2.4s_ease-out_infinite]" />
+        <span className="relative grid h-12 w-12 place-items-center rounded-full rounded-br-none bg-[var(--ad-nuit)] text-white shadow-[0_14px_30px_-10px_rgba(20,35,46,0.6)] [transform:rotate(45deg)]">
+          <span className="h-3 w-3 rounded-full bg-[var(--ad-or)] [transform:rotate(-45deg)]" />
+        </span>
+      </span>
+      {!active && proche && (
+        <button
+          type="button"
+          onClick={() => setActive(true)}
+          className="absolute right-4 top-4 z-10 rounded-full bg-white/85 px-3.5 py-1.5 text-[12px] font-semibold text-[var(--ad-nuit)] shadow-[0_6px_18px_-10px_rgba(20,35,46,0.5)] backdrop-blur transition-colors hover:bg-white"
+        >
+          Explorer la carte
+        </button>
+      )}
+    </div>
   )
 }

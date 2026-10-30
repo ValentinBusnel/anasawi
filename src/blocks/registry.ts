@@ -53,6 +53,23 @@ import {
   mRespirationBlock,
   mSeuilBlock,
 } from './moderne/blocs'
+import {
+  mAppelBlock,
+  mCarteBlock,
+  mDefilantBlock,
+  mEngagementsBlock,
+  mMosaiqueBlock,
+  mOuverturePartageeBlock,
+  mOuverturePleineBlock,
+  mParcoursBlock,
+  mPileBlock,
+  mPortraitChiffresBlock,
+  mQuestionsAccordeonBlock,
+  mServicesGrilleBlock,
+  mServicesListeBlock,
+  mTexteImageBlock,
+  mVideoBlock,
+} from './moderne/modeles'
 import { quoteBlock } from './quote'
 import { servicesBlock } from './services'
 import {
@@ -234,6 +251,21 @@ export const blockRegistry = {
   mPromenade: mPromenadeBlock,
   mConversation: mConversationBlock,
   mRendezVous: mRendezVousBlock,
+  mOuverturePleine: mOuverturePleineBlock,
+  mOuverturePartagee: mOuverturePartageeBlock,
+  mPortraitChiffres: mPortraitChiffresBlock,
+  mParcours: mParcoursBlock,
+  mPile: mPileBlock,
+  mEngagements: mEngagementsBlock,
+  mServicesListe: mServicesListeBlock,
+  mServicesGrille: mServicesGrilleBlock,
+  mQuestionsAccordeon: mQuestionsAccordeonBlock,
+  mMosaique: mMosaiqueBlock,
+  mVideo: mVideoBlock,
+  mDefilant: mDefilantBlock,
+  mTexteImage: mTexteImageBlock,
+  mCarte: mCarteBlock,
+  mAppel: mAppelBlock,
 } as const satisfies Record<string, AnyBlockDefinition>
 
 export type BlockType = keyof typeof blockRegistry
@@ -337,6 +369,21 @@ const CATEGORY_OF: Partial<Record<BlockType, TemplateCategory>> = {
   mPhrase: 'Textes',
   mEnPratique: 'Contact & rendez-vous',
   mRendezVous: 'Contact & rendez-vous',
+  mOuverturePleine: 'Ouverture',
+  mOuverturePartagee: 'Ouverture',
+  mPortraitChiffres: 'Qui je suis',
+  mParcours: 'Qui je suis',
+  mPile: 'Ma méthode',
+  mEngagements: 'Ma méthode',
+  mServicesListe: 'Accompagnements',
+  mServicesGrille: 'Accompagnements',
+  mQuestionsAccordeon: 'Questions',
+  mMosaique: 'Photos & vidéos',
+  mVideo: 'Photos & vidéos',
+  mDefilant: 'Textes',
+  mTexteImage: 'Textes',
+  mCarte: 'Contact & rendez-vous',
+  mAppel: 'Contact & rendez-vous',
 
   heroPleinEcran: 'Ouverture',
   hero: 'Ouverture',

@@ -1,13 +1,13 @@
 import { PAGE_MODERNE_PAR_DEFAUT } from './blocs'
 import type { Section } from '@/server/db/schema'
 
-/** La page moderne avant sa création en base : les dix sections par
-    défaut, en mémoire (payloads vides : tout suit le contenu partagé). */
-export function sectionsModernesParDefaut(): Section[] {
+/** Des sections en mémoire, payloads vides (les valeurs par défaut des
+    blocs s'appliquent, le reste suit le contenu partagé). */
+export function sectionsEnMemoire(types: readonly string[], prefixe = 'moderne'): Section[] {
   const maintenant = new Date(0)
-  return PAGE_MODERNE_PAR_DEFAUT.map((type, i) => ({
-    id: `moderne-${type}`,
-    pageId: 'moderne',
+  return types.map((type, i) => ({
+    id: `${prefixe}-${type}`,
+    pageId: prefixe,
     parentId: null,
     columnIndex: 0,
     placement: null,
@@ -26,3 +26,27 @@ export function sectionsModernesParDefaut(): Section[] {
     updatedAt: maintenant,
   }))
 }
+
+/** La page moderne avant sa création en base : les dix sections par défaut. */
+export function sectionsModernesParDefaut(): Section[] {
+  return sectionsEnMemoire(PAGE_MODERNE_PAR_DEFAUT)
+}
+
+/** Les modèles supplémentaires, dans l'ordre de la vitrine /moderne/modeles. */
+export const MODELES_MODERNES = [
+  'mOuverturePleine',
+  'mOuverturePartagee',
+  'mDefilant',
+  'mPortraitChiffres',
+  'mParcours',
+  'mPile',
+  'mEngagements',
+  'mServicesListe',
+  'mServicesGrille',
+  'mTexteImage',
+  'mMosaique',
+  'mVideo',
+  'mQuestionsAccordeon',
+  'mCarte',
+  'mAppel',
+] as const

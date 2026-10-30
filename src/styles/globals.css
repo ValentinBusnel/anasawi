@@ -957,3 +957,30 @@
     transform: translateY(10px) scale(0.92);
   }
 }
+/* Ken Burns : la photo d'ouverture qui avance à peine. */
+@keyframes ad-kenburns {
+  from {
+    transform: scale(1.12) translate(1.5%, 1%);
+  }
+  to {
+    transform: scale(1) translate(0, 0);
+  }
+}
+/* Aurore : des halos qui dérivent lentement derrière un appel. */
+@keyframes ad-aurore {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(8%, -6%) scale(1.15);
+  }
+}
+@keyframes ad-defiler-inverse {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}

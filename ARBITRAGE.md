@@ -6,7 +6,7 @@ Le temps de choisir, le site existe en deux versions qui partagent **le même co
 |---|---|---|
 | Adresse | `/` | `/moderne` (non indexée) |
 | Page en base | la page d'accueil (`isHome`) | la page `accueil-moderne` |
-| Sections | les blocs classiques | les blocs `theme: 'moderne'` (`src/blocks/moderne/blocs.tsx`) |
+| Sections | les blocs classiques | les blocs `theme: 'moderne'` : les 10 de départ (`src/blocks/moderne/blocs.tsx`) + 15 modèles (`src/blocks/moderne/modeles.tsx`, vitrine `/moderne/modeles`) |
 | Éditeur | `/admin/accueil` | `/admin/accueil?theme=moderne` (bascule dans la barre de l'éditeur) |
 
 **Partagé entre les deux** : réglages (nom, coordonnées, horaires, logo), accompagnements, questions, médias.
@@ -26,7 +26,7 @@ Les visiteurs passent de l'un à l'autre par la bascule « Classique | Moderne �
    - `src/components/site/BasculeVersion.tsx`
    - (démonstration) `src/app/qeeps/`, `src/components/qeeps/`
 2. Retirer les branchements :
-   - `src/blocks/registry.ts` : les imports `./moderne/blocs`, les 10 entrées `m…` du registre et de `CATEGORY_OF`.
+   - `src/blocks/registry.ts` : les imports `./moderne/blocs` et `./moderne/modeles`, les 25 entrées `m…` du registre et de `CATEGORY_OF`.
    - `src/blocks/types.ts` : `partage` (BlockContext) et l'import de `Contenu` (le champ `theme` peut rester).
    - `src/components/site/SectionsViewCore.tsx` : `partage` (SectionsViewData, buildBlockContext) et la branche `block.theme === 'moderne'`.
    - `src/server/queries/index.ts` : le bloc « Version moderne » (`SLUG_MODERNE`, `getModernPageForAdmin`, `getPublishedModern`).

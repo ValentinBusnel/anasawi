@@ -127,17 +127,16 @@ export function TemplateLibrary({
   }
 
   const templateCard = (option: TemplateOption) => (
-    <button
+    /* Une carte, et un bouton qui la couvre entièrement : l'aperçu peut
+       contenir des boutons (formulaire de contact…), qu'un <button>
+       englobant rendrait invalide. */
+    <div
       key={option.type}
-      type="button"
-      disabled={busy !== null}
-      aria-label={`Ajouter la section « ${option.label} »`}
-      onClick={() => void pick(() => onPick(option.type, option.label), option.type)}
       className={cn(
         /* Les cartes de l'espace Qeeps : blanches sur le gris, arrondies à
            20 px, elles se soulèvent d'un rien au survol. */
         'group relative rounded-[20px] bg-white p-2 text-left shadow-[0_1px_2px_rgba(22,73,81,0.06)] transition-[box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]',
-        'hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgba(22,73,81,0.1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+        'hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgba(22,73,81,0.1)] has-[>button:focus-visible]:ring-2 has-[>button:focus-visible]:ring-ring',
         busy === option.type && 'opacity-60',
       )}
     >
@@ -152,7 +151,7 @@ export function TemplateLibrary({
         {/* L'action, écrite : on ajoute, on ne « sélectionne » pas. */}
         <span
           aria-hidden="true"
-          className="mt-0.5 flex h-8 shrink-0 items-center gap-1.5 rounded-[8px] bg-secondary px-3 text-[13px] font-medium text-foreground transition-colors group-hover:bg-primary group-hover:text-white group-focus-visible:bg-primary group-focus-visible:text-white"
+          className="mt-0.5 flex h-8 shrink-0 items-center gap-1.5 rounded-[8px] bg-secondary px-3 text-[13px] font-medium text-foreground transition-colors group-hover:bg-primary group-hover:text-white group-has-[>button:focus-visible]:bg-primary group-has-[>button:focus-visible]:text-white"
         >
           {busy === option.type ? 'Ajout…' : (
             <>
@@ -161,7 +160,16 @@ export function TemplateLibrary({
           )}
         </span>
       </div>
-    </button>
+      <button
+        type="button"
+        disabled={busy !== null}
+        aria-label={`Ajouter la section « ${option.label} »`}
+        onClick={() => void pick(() => onPick(option.type, option.label), option.type)}
+        className="absolute inset-0 z-10 rounded-[20px] focus-visible:outline-none"
+      >
+        <span className="sr-only">{option.label}</span>
+      </button>
+    </div>
   )
 
   const savedCard = (model: SavedSection) => (
@@ -172,12 +180,7 @@ export function TemplateLibrary({
         busy === model.id && 'opacity-60',
       )}
     >
-      <button
-        type="button"
-        disabled={busy !== null}
-        onClick={() => void pick(() => onPickSaved(model), model.id)}
-        className="block w-full text-left"
-      >
+      <div className="text-left">
         <TemplatePreview
           type={model.type as BlockType}
           data={data}
@@ -191,13 +194,21 @@ export function TemplateLibrary({
         <p className="mt-0.5 px-2 pb-1.5 text-[13px] text-muted-foreground">
           {getBlock(model.type)?.label ?? model.type}
         </p>
-      </button>
+      </div>
+      {/* Bouton couvrant (l'aperçu peut contenir ses propres boutons). */}
+      <button
+        type="button"
+        disabled={busy !== null}
+        aria-label={`Ajouter le modèle « ${model.name} »`}
+        onClick={() => void pick(() => onPickSaved(model), model.id)}
+        className="absolute inset-0 z-10 rounded-[20px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      />
       {confirmSavedId === model.id ? (
         /* Confirmation en place : pas de corbeille qui efface d'un clic. */
         <div
           role="alertdialog"
           aria-label="Confirmer la suppression du modèle"
-          className="absolute inset-x-2 top-2 flex items-center gap-1.5 rounded-md bg-white/95 px-2 py-1.5 text-[12px] text-foreground shadow-sm"
+          className="absolute inset-x-2 top-2 z-20 flex items-center gap-1.5 rounded-md bg-white/95 px-2 py-1.5 text-[12px] text-foreground shadow-sm"
         >
           <span className="mr-auto">Supprimer ce modèle ?</span>
           <button
@@ -230,7 +241,7 @@ export function TemplateLibrary({
             e.stopPropagation()
             setConfirmSavedId(model.id)
           }}
-          className="absolute right-2 top-2 hidden rounded-md bg-white/90 p-1.5 text-neutral-400 shadow-sm transition-colors hover:text-red-600 focus-visible:block group-hover:block"
+          className="absolute right-2 top-2 z-20 hidden rounded-md bg-white/90 p-1.5 text-neutral-400 shadow-sm transition-colors hover:text-red-600 focus-visible:block group-hover:block"
         >
           <Trash2 className="h-3.5 w-3.5" />
         </button>
