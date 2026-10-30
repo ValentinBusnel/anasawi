@@ -1,6 +1,6 @@
 /**
- * LES TYPOGRAPHIES À ESSAYER sur le site moderne — une sélection resserrée
- * de six paires, toutes gratuites et libres (licence SIL Open Font
+ * LES TYPOGRAPHIES À ESSAYER sur le site moderne — une sélection
+ * d'une dizaine de paires, toutes gratuites et libres (licence SIL Open Font
  * License, servies par Google Fonts), retenues pour leur douceur.
  *
  * Banc d'essai : /moderne/typos (spécimens), et sur /moderne le
@@ -98,6 +98,71 @@ export const TYPOS: Typo[] = [
     espace: '-0.01em',
   },
   {
+    id: 'literata',
+    nom: 'Literata + Nunito Sans',
+    esprit: 'Une serif de livre, ronde et posée : on a envie de lire.',
+    titre: 'Literata',
+    texte: 'Nunito Sans',
+    url: `${G}family=Literata:ital,opsz,wght@0,7..72,300..600;1,7..72,300..600&family=Nunito+Sans:wght@400..700&display=swap`,
+    poids: 340,
+    poidsFort: 420,
+    poidsEm: 320,
+    italique: true,
+    espace: '-0.025em',
+  },
+  {
+    id: 'spectral',
+    nom: 'Spectral + Karla',
+    esprit: 'Très fine et lumineuse, une élégance discrète.',
+    titre: 'Spectral',
+    texte: 'Karla',
+    url: `${G}family=Spectral:ital,wght@0,300;0,400;1,300;1,400&family=Karla:wght@400..700&display=swap`,
+    poids: 300,
+    poidsFort: 400,
+    poidsEm: 300,
+    italique: true,
+    espace: '-0.02em',
+  },
+  {
+    id: 'crimson',
+    nom: 'Crimson Pro + Figtree',
+    esprit: 'Classique et chaleureuse, avec un texte moderne et rond.',
+    titre: 'Crimson Pro',
+    texte: 'Figtree',
+    url: `${G}family=Crimson+Pro:ital,wght@0,300..600;1,300..600&family=Figtree:wght@400..700&display=swap`,
+    poids: 400,
+    poidsFort: 500,
+    poidsEm: 400,
+    italique: true,
+    espace: '-0.015em',
+  },
+  {
+    id: 'petrona',
+    nom: 'Petrona + Mulish',
+    esprit: 'Une serif aux formes souples et un peu manuscrites.',
+    titre: 'Petrona',
+    texte: 'Mulish',
+    url: `${G}family=Petrona:ital,wght@0,300..600;1,300..600&family=Mulish:wght@400..700&display=swap`,
+    poids: 350,
+    poidsFort: 450,
+    poidsEm: 330,
+    italique: true,
+    espace: '-0.02em',
+  },
+  {
+    id: 'figtree',
+    nom: 'Figtree (sans serif moderne)',
+    esprit: 'Une sans serif contemporaine aux courbes douces, nette mais jamais froide.',
+    titre: 'Figtree',
+    texte: 'Figtree',
+    url: `${G}family=Figtree:wght@300..700&display=swap`,
+    poids: 400,
+    poidsFort: 500,
+    poidsEm: 400,
+    italique: false,
+    espace: '-0.035em',
+  },
+  {
     id: 'nunito',
     nom: 'Nunito (tout rond)',
     esprit: 'Sans serif, aux bouts de lettres arrondis : l’effet « cocon ».',
@@ -112,7 +177,7 @@ export const TYPOS: Typo[] = [
   },
 ]
 
-/** La paire d'un identifiant (null si inconnue, ex. une paire retirée). */
+/** La paire d’un identifiant (null si inconnue, ex. une paire retirée). */
 export const typoDe =(id: string | null | undefined) => TYPOS.find((t) => t.id === id) ?? null
 
 /** Les variables CSS qui appliquent une typographie au site moderne. */
