@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 
+import { EssaiTypo } from '@/components/anasawi/EssaiTypo'
 import { PoliceModerne } from '@/components/anasawi/PoliceModerne'
 
 /**
@@ -18,6 +19,8 @@ export default function ModerneLayout({ children }: { children: React.ReactNode 
     <div className="ad min-h-screen overflow-x-clip bg-[var(--ad-ivoire)] antialiased">
       <PoliceModerne />
       {children}
+      {/* Banc d'essai typographique (temporaire, voir typos.ts). */}
+      <EssaiTypo />
     </div>
   )
 }
