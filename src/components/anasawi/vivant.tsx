@@ -291,30 +291,12 @@ export function Seuil({
 
         {/* Le nom : centré, AU PREMIER PLAN, jusqu'à ce qu'on fasse défiler. */}
         <h1
-          className="pointer-events-none absolute inset-x-0 top-[calc(var(--ad-vh)*19)] z-30 px-5 text-center text-[clamp(52px,9.4vw,156px)] leading-[0.95] text-[var(--ad-nuit)] md:top-[calc(var(--ad-vh)*20)] md:flex md:items-center md:justify-center md:gap-x-[0.24em]"
+          className="pointer-events-none absolute inset-x-0 top-[calc(var(--ad-vh)*19)] z-30 px-5 text-center text-[clamp(52px,9.4vw,156px)] leading-[0.95] text-[var(--ad-nuit)] md:top-[calc(var(--ad-vh)*20)]"
           style={{
             transform: 'translateY(calc(var(--e) * var(--ad-vh) * -16)) scale(calc(1 - var(--e) * 0.25))',
             opacity: 'clamp(0, calc(1 - var(--e) * 2.2), 1)',
           }}
         >
-          {/* Le logo, en sceau devant le nom : il se pose en tournant
-              d’un quart, cerclé d’un anneau lagon, et respire doucement.
-              Sur grand écran, il est aligné au centre de la ligne du nom. */}
-          <span className="pointer-events-auto group/sceau relative mx-auto mb-[0.14em] block h-[0.9em] w-[0.9em] shrink-0 md:mx-0 md:mb-0 md:-translate-y-[0.02em]">
-            <span
-              aria-hidden="true"
-              className="absolute -inset-[18%] rounded-full bg-[radial-gradient(closest-side,rgba(54,163,155,0.28),transparent)] blur-md motion-safe:animate-[ad-souffle_8s_var(--ad-ease-lent)_infinite]"
-            />
-            <span className="relative grid h-full w-full place-items-center rounded-[0.28em] bg-white shadow-[0_1px_2px_rgba(20,35,46,0.06),0_24px_50px_-22px_rgba(20,35,46,0.45)] motion-safe:animate-[ad-sceau_1.5s_var(--ad-ease)_0.05s_backwards]">
-              <span aria-hidden="true" className="absolute inset-0 rounded-[0.28em] p-[2px] [background:linear-gradient(140deg,#2f6f93,#36a39b)] [mask:linear-gradient(#000_0_0)_content-box_exclude,linear-gradient(#000_0_0)]" />
-              <LogoMark
-                src={logo}
-                priority
-                resolution={320}
-                className="h-[72%] w-[72%] transition-transform duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover/sceau:rotate-[-10deg] group-hover/sceau:scale-105"
-              />
-            </span>
-          </span>
           <span className="block overflow-hidden pb-[0.06em] md:inline-block">
             <span className="block motion-safe:animate-[ad-resserrer_1.6s_var(--ad-ease)_0.15s_backwards]">{prenom}</span>
           </span>{' '}
@@ -325,7 +307,7 @@ export function Seuil({
 
         {/* Sous le nom : la présentation, et les deux actions. */}
         <div
-          className="absolute inset-x-0 top-[calc(var(--ad-vh)*19+clamp(120px,21vw,330px))] z-30 hidden flex-col items-center px-6 text-center md:top-[calc(var(--ad-vh)*20+clamp(76px,11.6vw,188px))] md:flex"
+          className="absolute inset-x-0 top-[calc(var(--ad-vh)*19+clamp(120px,21vw,330px))] z-30 hidden flex-col items-center px-6 text-center md:top-[calc(var(--ad-vh)*20+clamp(68px,11vw,180px))] md:flex"
           style={sEfface}
         >
           <p className="max-w-[54ch] text-[16px] leading-[1.6] text-[var(--ad-pierre)] motion-safe:animate-[ad-monter_1.2s_var(--ad-ease)_0.45s_backwards]">{intro}</p>
@@ -365,9 +347,29 @@ export function Seuil({
             )}
             <Reflet />
             <div aria-hidden="true" className="absolute inset-0 bg-[var(--ad-nuit)]" style={{ opacity: 'calc(var(--e) * 0.5)' }} />
+            {/* LE LOGO, sur la fenêtre : un médaillon de verre clair au
+                centre de la photo quand elle est sous le nom ; on entre dans
+                la pièce : il grandit et monte se poser au-dessus de la
+                phrase d’accueil, toujours en couleurs. */}
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute left-1/2 z-20 grid place-items-center"
+              style={{
+                top: 'calc(50% - var(--e) * 27%)',
+                width: 'calc(92px + var(--e) * 36px)',
+                height: 'calc(92px + var(--e) * 36px)',
+                transform: 'translate(-50%, -50%)',
+              }}
+            >
+              <span className="absolute inset-0 rounded-full border border-white/70 motion-safe:animate-[ad-pouls_3.6s_ease-out_1.6s_infinite]" style={{ opacity: 'clamp(0, calc(1 - var(--e) * 3), 1)' }} />
+              <span className="absolute inset-0 rounded-full bg-white/80 shadow-[0_24px_50px_-20px_rgba(20,35,46,0.55)] ring-1 ring-white backdrop-blur-xl" />
+              <span className="relative grid h-full w-full place-items-center motion-safe:animate-[ad-sceau_1.5s_var(--ad-ease)_0.9s_backwards]">
+                <LogoMark src={logo} priority resolution={256} className="h-[66%] w-[66%]" />
+              </span>
+            </div>
             {/* La phrase d'accueil, dans la pièce. */}
             <div
-              className="absolute inset-0 z-20 flex flex-col items-center justify-center px-6 text-center text-white"
+              className="absolute inset-0 z-20 flex flex-col items-center justify-center px-6 pt-[calc(var(--ad-vh)*12)] text-center text-white"
               style={{
                 opacity: 'clamp(0, calc((var(--e) - 0.55) * 3), 1)',
                 transform: 'translateY(calc((1 - var(--e)) * 40px))',
