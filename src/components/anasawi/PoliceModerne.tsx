@@ -1,5 +1,6 @@
 /**
- * La police de la VERSION MODERNE, Plus Jakarta Sans, chargée depuis
+ * Les polices de la VERSION MODERNE — Fraunces (titres, réglée « douce »)
+ * et Figtree (texte) —, chargées depuis
  * Google Fonts par une feuille de style (React la remonte dans <head>).
  *
  * Pourquoi pas `next/font` : pour cette police, Google sert des adresses
@@ -10,7 +11,7 @@
  * local`). Dans l'éditeur, l'aperçu recopie les feuilles de <head> :
  * la police y arrive aussi.
  */
-export function PoliceModerne() {
+export function PoliceModerne(): React.ReactElement {
   return (
     <>
       <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -19,7 +20,7 @@ export function PoliceModerne() {
       {/* eslint-disable-next-line @next/next/no-page-custom-font */}
       <link
         rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..700,100;1,9..144,300..700,100&family=Figtree:wght@400..700&display=swap"
         precedence="default"
       />
     </>

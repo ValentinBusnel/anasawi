@@ -37,7 +37,7 @@ export function PleinCadre({ photo, children }: { photo: Media | null; children:
           />
         )}
       </div>
-      <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(180deg,rgba(20,35,46,0.15)_0%,rgba(20,35,46,0.1)_40%,rgba(20,35,46,0.78)_100%)]" />
+      <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(180deg,rgba(46,66,79,0.15)_0%,rgba(46,66,79,0.1)_40%,rgba(46,66,79,0.78)_100%)]" />
       <div className="relative flex h-full flex-col justify-end px-[5vw] pb-[calc(var(--ad-vh)*9)] text-white">{children}</div>
     </section>
   )
@@ -58,7 +58,7 @@ export function Frise({ etapes }: { etapes: { annee: string; titre: string; text
       <span aria-hidden="true" className="absolute left-0 right-0 top-[11px] h-px bg-[var(--ad-sable-fonce)] max-md:hidden" />
       <span
         aria-hidden="true"
-        className="absolute left-0 right-0 top-[11px] h-[2px] origin-left bg-[linear-gradient(90deg,#2f6f93,#36a39b)] max-md:hidden"
+        className="absolute left-0 right-0 top-[11px] h-[2px] origin-left bg-[linear-gradient(90deg,#46728a,#7ba3b6)] max-md:hidden"
         style={{ transform: `scaleX(${avance})` }}
       />
       {etapes.map((e, i) => {
@@ -100,13 +100,13 @@ export function CarteLumiere({ children, className }: { children: React.ReactNod
         el.style.setProperty('--ly', `${e.clientY - r.top}px`)
       }}
       className={cn(
-        'group/lumiere relative overflow-hidden rounded-[28px] bg-white p-8 shadow-[0_1px_2px_rgba(20,35,46,0.05),0_20px_50px_-30px_rgba(20,35,46,0.25)] transition-[translate,box-shadow] duration-500 ease-[var(--ad-ease)] [--lx:50%] [--ly:50%] hover:-translate-y-1',
+        'group/lumiere relative overflow-hidden rounded-[28px] bg-white p-8 shadow-[0_1px_2px_rgba(46,66,79,0.05),0_20px_50px_-30px_rgba(46,66,79,0.25)] transition-[translate,box-shadow] duration-500 ease-[var(--ad-ease)] [--lx:50%] [--ly:50%] hover:-translate-y-1',
         className,
       )}
     >
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 [background:radial-gradient(420px_circle_at_var(--lx)_var(--ly),rgba(54,163,155,0.14),transparent_45%)] group-hover/lumiere:opacity-100"
+        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 [background:radial-gradient(420px_circle_at_var(--lx)_var(--ly),rgba(185,130,95,0.14),transparent_45%)] group-hover/lumiere:opacity-100"
       />
       <div className="relative">{children}</div>
     </div>
@@ -147,7 +147,7 @@ export function ListeVivante({
           photo ? 'opacity-100' : 'opacity-0',
         )}
       >
-        <div className={cn('relative h-full w-full overflow-hidden rounded-[22px] shadow-[0_30px_60px_-20px_rgba(20,35,46,0.45)] transition-transform duration-500 ease-[var(--ad-ease)]', photo ? 'rotate-[-4deg] scale-100' : 'rotate-0 scale-75')}>
+        <div className={cn('relative h-full w-full overflow-hidden rounded-[22px] shadow-[0_30px_60px_-20px_rgba(46,66,79,0.45)] transition-transform duration-500 ease-[var(--ad-ease)]', photo ? 'rotate-[-4deg] scale-100' : 'rotate-0 scale-75')}>
           {lignes.map((l, i) =>
             l.photo ? (
               <Image
@@ -205,7 +205,7 @@ export function Accordeon({ faq }: { faq: FaqItem[] }) {
             key={f.id}
             className={cn(
               'rounded-[24px] transition-[background-color,box-shadow] duration-500',
-              open ? 'bg-white shadow-[0_1px_2px_rgba(20,35,46,0.05),0_24px_50px_-30px_rgba(20,35,46,0.3)]' : 'bg-[var(--ad-sable)] hover:bg-[var(--ad-sable-fonce)]/60',
+              open ? 'bg-white shadow-[0_1px_2px_rgba(46,66,79,0.05),0_24px_50px_-30px_rgba(46,66,79,0.3)]' : 'bg-[var(--ad-sable)] hover:bg-[var(--ad-sable-fonce)]/60',
             )}
           >
             <button
@@ -296,7 +296,7 @@ export function VideoCadre({ video, affiche }: { video: Media | null; affiche: M
   const largeur = 'min(1, calc(0.82 + var(--p) * 0.36))'
   return (
     <div ref={ref} className="[--p:0.5]">
-      <div className="relative mx-auto aspect-video overflow-hidden rounded-[36px] bg-[var(--ad-nuit)] shadow-[0_50px_100px_-50px_rgba(20,35,46,0.6)]" style={{ transform: `scale(${largeur})` }}>
+      <div className="relative mx-auto aspect-video overflow-hidden rounded-[36px] bg-[var(--ad-nuit)] shadow-[0_50px_100px_-50px_rgba(46,66,79,0.6)]" style={{ transform: `scale(${largeur})` }}>
         {video ? (
           <video ref={lecteur} src={video.url} poster={affiche?.url} muted loop playsInline preload="metadata" className="absolute inset-0 h-full w-full object-cover" />
         ) : affiche ? (
@@ -363,13 +363,13 @@ export function ImageDevoilee({ photo }: { photo: Media | null }) {
 
 export function Pile({ etapes }: { etapes: { titre: string; texte: string }[] }) {
   const edition = useContext(Edition)
-  const teintes = ['#ffffff', '#e3eef5', '#ddf1ee', '#e7e8f6', '#e9eef3', '#dfedf7']
+  const teintes = ['#ffffff', '#f4ece0', '#eaf1f4', '#f1e7da', '#e8ece6', '#efe5d6']
   return (
     <ol className="flex flex-col gap-6">
       {etapes.map((e, i) => (
         <li
           key={i}
-          className={cn('rounded-[32px] p-8 shadow-[0_-20px_50px_-30px_rgba(20,35,46,0.25)] md:p-12', !edition && 'sticky')}
+          className={cn('rounded-[32px] p-8 shadow-[0_-20px_50px_-30px_rgba(46,66,79,0.25)] md:p-12', !edition && 'sticky')}
           style={{ top: `calc(110px + ${i * 26}px)`, background: teintes[i % teintes.length] }}
         >
           <div className="flex flex-col gap-6 md:flex-row md:items-start md:gap-14">

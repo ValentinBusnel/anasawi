@@ -20,7 +20,7 @@ export function sectionsEnMemoire(types: readonly string[], prefixe = 'moderne')
     showInNav: false,
     sortOrder: i,
     isActive: true,
-    backgroundColor: '#f6f7f9',
+    backgroundColor: '#fbf8f2',
     payload: {},
     createdAt: maintenant,
     updatedAt: maintenant,

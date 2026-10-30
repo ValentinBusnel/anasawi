@@ -26,7 +26,7 @@ const ou = (v: string | undefined, defaut: string) => (vide(v) ? defaut : v!)
 const sansEtoiles = (s: string) => s.replace(/\*/g, '')
 
 const BOUTON =
-  'group inline-flex items-center gap-2.5 rounded-full bg-[var(--ad-nuit)] py-1.5 pl-5 pr-1.5 text-[14px] font-semibold text-white shadow-[0_14px_30px_-14px_rgba(20,35,46,0.6)]'
+  'group inline-flex items-center gap-2.5 rounded-full bg-[var(--ad-nuit)] py-1.5 pl-5 pr-1.5 text-[14px] font-semibold text-white shadow-[0_14px_30px_-14px_rgba(46,66,79,0.6)]'
 const ROND = 'grid h-8 w-8 place-items-center rounded-full bg-white/15 transition-transform duration-500 ease-[var(--ad-ease)] group-hover:rotate-45'
 const TITRE = 'text-[36px] md:text-[54px]'
 const SECTION = 'py-24 md:py-32'
@@ -130,7 +130,7 @@ export const mOuverturePartageeBlock: BlockDefinition<typeof partageeSchema> = {
     return (
       <Enveloppe ctx={ctx}>
         <section className="relative overflow-hidden pb-24 pt-36 md:pb-32 md:pt-44">
-          <div aria-hidden="true" className="absolute -right-[10%] top-[10%] h-[60%] w-[50%] rounded-full bg-[radial-gradient(closest-side,rgba(54,163,155,0.16),transparent)] blur-2xl" />
+          <div aria-hidden="true" className="absolute -right-[10%] top-[10%] h-[60%] w-[50%] rounded-full bg-[radial-gradient(closest-side,rgba(185,130,95,0.16),transparent)] blur-2xl" />
           <div className={cn(CONTENEUR, 'relative grid items-center gap-14 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]')}>
             <div>
               <Surtitre>
@@ -151,12 +151,12 @@ export const mOuverturePartageeBlock: BlockDefinition<typeof partageeSchema> = {
             </div>
             <Revele delai={0.15} className="relative mx-auto w-full max-w-[460px]">
               <Incline max={9} className="aspect-[4/5]">
-                <div className="relative h-full w-full overflow-hidden rounded-[36px] bg-[var(--ad-sable-fonce)] shadow-[0_50px_100px_-50px_rgba(20,35,46,0.55)]">
+                <div className="relative h-full w-full overflow-hidden rounded-[36px] bg-[var(--ad-sable-fonce)] shadow-[0_50px_100px_-50px_rgba(46,66,79,0.55)]">
                   {photo && <Image src={photo.url} alt={photo.alt} fill priority sizes="460px" className="object-cover" />}
                 </div>
               </Incline>
-              <span className="absolute -left-6 bottom-12 flex items-center gap-2 rounded-full border border-white/80 bg-white/70 px-3.5 py-2 text-[12.5px] font-semibold text-[var(--ad-nuit)] shadow-[0_14px_30px_-16px_rgba(20,35,46,0.4)] backdrop-blur-md motion-safe:animate-[ad-flotter_7s_ease-in-out_infinite]">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#4caf8b]" />
+              <span className="absolute -left-6 bottom-12 flex items-center gap-2 rounded-full border border-white/80 bg-white/70 px-3.5 py-2 text-[12.5px] font-semibold text-[var(--ad-nuit)] shadow-[0_14px_30px_-16px_rgba(46,66,79,0.4)] backdrop-blur-md motion-safe:animate-[ad-flotter_7s_ease-in-out_infinite]">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#6e9a6b]" />
                 Nouveaux patients bienvenus
               </span>
             </Revele>
@@ -222,7 +222,7 @@ export const mPortraitChiffresBlock: BlockDefinition<typeof chiffresSchema> = {
               <dl className="mt-12 grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-4">
                 {chiffres.slice(0, 3).map((ch, i) => (
                   <Revele key={i} delai={i * 0.1}>
-                    <div className="rounded-[24px] bg-white p-5 shadow-[0_1px_2px_rgba(20,35,46,0.05),0_20px_50px_-30px_rgba(20,35,46,0.25)]">
+                    <div className="rounded-[24px] bg-white p-5 shadow-[0_1px_2px_rgba(46,66,79,0.05),0_20px_50px_-30px_rgba(46,66,79,0.25)]">
                       <dt className="sr-only">{ch.libelle}</dt>
                       <dd className="text-[40px] font-semibold leading-none tracking-[-0.04em] text-[var(--ad-nuit)]">
                         <Compteur valeur={ch.valeur} />
@@ -350,7 +350,7 @@ export const mEngagementsBlock: BlockDefinition<typeof engagementsSchema> = {
                 return (
                   <Revele as="li" key={i} delai={i * 0.08}>
                     <CarteLumiere className="h-full">
-                      <span className="grid h-12 w-12 place-items-center rounded-[16px] bg-[linear-gradient(140deg,#2f6f93,#36a39b)] text-white shadow-[0_14px_30px_-14px_rgba(47,111,147,0.7)] transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover/lumiere:-rotate-6 group-hover/lumiere:scale-110">
+                      <span className="grid h-12 w-12 place-items-center rounded-[16px] bg-[linear-gradient(140deg,#46728a,#7ba3b6)] text-white shadow-[0_14px_30px_-14px_rgba(70,114,138,0.7)] transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover/lumiere:-rotate-6 group-hover/lumiere:scale-110">
                         <Icone className="h-5 w-5" />
                       </span>
                       <h3 className="mt-6 text-[22px]">{it.titre}</h3>
@@ -420,7 +420,7 @@ export const mServicesGrilleBlock: BlockDefinition<typeof titreSeul> = {
   Component: ({ data, ctx }) => {
     const c = contenuDe(ctx)
     const titre = data.titre
-    const teintes = ['#e3eef5', '#ddf1ee', '#e7e8f6', '#e9eef3', '#dfedf7', '#e4f3ea']
+    const teintes = ['#efe6d8', '#e6edef', '#f2e8dc', '#e8ebe4', '#ede3d3', '#e4eaec']
     return (
       <Enveloppe ctx={ctx}>
         <section className={cn(SECTION, 'bg-[var(--ad-sable)]')}>
@@ -433,7 +433,7 @@ export const mServicesGrilleBlock: BlockDefinition<typeof titreSeul> = {
               {c.services.map((s, i) => (
                 <Revele as="li" key={s.id} delai={(i % 3) * 0.08}>
                   <Incline max={6} className="h-full">
-                    <a href={c.rdv} className="flex h-full flex-col overflow-hidden rounded-[28px] bg-white shadow-[0_1px_2px_rgba(20,35,46,0.05),0_24px_50px_-30px_rgba(20,35,46,0.3)]">
+                    <a href={c.rdv} className="flex h-full flex-col overflow-hidden rounded-[28px] bg-white shadow-[0_1px_2px_rgba(46,66,79,0.05),0_24px_50px_-30px_rgba(46,66,79,0.3)]">
                       <div className="relative aspect-[4/3] overflow-hidden" style={{ background: teintes[i % teintes.length] }}>
                         {s.media ? (
                           <Image src={s.media.url} alt="" fill sizes="(max-width: 640px) 100vw, 380px" className="object-cover transition-transform duration-[1200ms] ease-[var(--ad-ease)] group-data-[survol=oui]/incline:scale-[1.06]" />
@@ -677,10 +677,10 @@ export const mCarteBlock: BlockDefinition<typeof titreSeul> = {
             <h2 className={cn(TITRE, 'mb-12')}>
               <Lignes lignes={[emphase(titre)]} />
             </h2>
-            <Revele className="relative overflow-hidden rounded-[36px] shadow-[0_50px_100px_-60px_rgba(20,35,46,0.55)]">
+            <Revele className="relative overflow-hidden rounded-[36px] shadow-[0_50px_100px_-60px_rgba(46,66,79,0.55)]">
               {c.adresse ? <Carte adresse={c.adresse} className="h-[560px] md:[--centre:68%]" /> : <div className="h-[560px] bg-[var(--ad-brume)]" />}
               <div className="pointer-events-none absolute inset-0 flex items-end p-5 md:items-center md:p-10">
-                <div className="pointer-events-auto w-full max-w-[380px] rounded-[28px] border border-white/70 bg-white/85 p-7 shadow-[0_30px_60px_-30px_rgba(20,35,46,0.45)] backdrop-blur-xl">
+                <div className="pointer-events-auto w-full max-w-[380px] rounded-[28px] border border-white/70 bg-white/85 p-7 shadow-[0_30px_60px_-30px_rgba(46,66,79,0.45)] backdrop-blur-xl">
                   <p className="flex items-center gap-2 text-[13px] font-semibold text-[var(--ad-gris)]">
                     <MapPin className="h-4 w-4 text-[var(--ad-or)]" />
                     Le cabinet
@@ -733,10 +733,10 @@ export const mAppelBlock: BlockDefinition<typeof appelSchema> = {
       <Enveloppe ctx={ctx}>
         <section className="px-[3vw] py-16">
           <div className="relative isolate overflow-hidden rounded-[44px] bg-[var(--ad-nuit)] px-[6vw] py-24 text-center text-white md:py-32">
-            <span aria-hidden="true" className="absolute -left-[10%] -top-[30%] -z-10 h-[80%] w-[55%] rounded-full bg-[#2f6f93]/60 blur-[90px] motion-safe:animate-[ad-aurore_14s_ease-in-out_infinite]" />
-            <span aria-hidden="true" className="absolute -bottom-[35%] -right-[10%] -z-10 h-[85%] w-[55%] rounded-full bg-[#36a39b]/45 blur-[90px] motion-safe:animate-[ad-aurore_18s_ease-in-out_-6s_infinite_reverse]" />
+            <span aria-hidden="true" className="absolute -left-[10%] -top-[30%] -z-10 h-[80%] w-[55%] rounded-full bg-[#46728a]/60 blur-[90px] motion-safe:animate-[ad-aurore_14s_ease-in-out_infinite]" />
+            <span aria-hidden="true" className="absolute -bottom-[35%] -right-[10%] -z-10 h-[85%] w-[55%] rounded-full bg-[#7ba3b6]/45 blur-[90px] motion-safe:animate-[ad-aurore_18s_ease-in-out_-6s_infinite_reverse]" />
             <h2 className="mx-auto max-w-[16ch] text-[clamp(40px,6vw,88px)] leading-[1] text-white">
-              <Lignes lignes={[emphase(titre, '[-webkit-text-fill-color:#9fe0d8]! [background:none]!')]} />
+              <Lignes lignes={[emphase(titre, '[-webkit-text-fill-color:#e6cfb3]! [background:none]!')]} />
             </h2>
             <Revele delai={0.3}>
               <p className="mx-auto mt-6 max-w-[44ch] text-[17px] leading-[1.6] text-white/75">{data.texte}</p>

@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils'
 import type { FaqItem, Media, OpeningHour, ServiceWithMedia } from '@/server/db/schema'
 
 /**
- * Les composants VIVANTS de la nouvelle DA d’Anasawi.
+ * Les composants VIVANTS de la nouvelle DA d’Anasawi (couleurs chaudes du classique).
  *
  * Un principe pour tous : le mouvement suit la lecture. Le défilement
  * écrit une seule variable CSS (`--p`, de 0 à 1) sur l'élément, une fois
@@ -264,7 +264,7 @@ export function Seuil({
   const sFondu = { opacity: 'clamp(0, calc(1 - var(--e) * 7), 1)' }
   const sEfface = { ...sFondu, transform: 'translateY(calc(var(--e) * -24px))' }
   const pastille =
-    'flex items-center gap-2 whitespace-nowrap rounded-full border border-white/80 bg-white/55 px-3 py-1.5 text-[12px] font-medium text-[var(--ad-pierre)] shadow-[0_8px_24px_-14px_rgba(20,35,46,0.35)] backdrop-blur-md'
+    'flex items-center gap-2 whitespace-nowrap rounded-full border border-white/80 bg-white/55 px-3 py-1.5 text-[12px] font-medium text-[var(--ad-pierre)] shadow-[0_8px_24px_-14px_rgba(46,66,79,0.35)] backdrop-blur-md'
   /* La fenêtre : sous le nom au départ, plein écran à l'arrivée. */
   const larg = 'min(460px, 64vw)'
   const haut = 'min(400px, var(--ad-vh) * 38)'
@@ -274,13 +274,13 @@ export function Seuil({
         {/* Un halo très doux, derrière tout. */}
         <div
           aria-hidden="true"
-          className="absolute left-1/2 top-[30%] h-[calc(var(--ad-vh)*70)] w-[90vw] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(54,163,155,0.14),rgba(47,111,147,0.08)_55%,transparent)] blur-2xl"
+          className="absolute left-1/2 top-[30%] h-[calc(var(--ad-vh)*70)] w-[90vw] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(185,130,95,0.14),rgba(70,114,138,0.08)_55%,transparent)] blur-2xl"
           style={sFondu}
         />
 
         {/* Le métier, au-dessus du nom. */}
         <div className="absolute inset-x-0 top-[calc(var(--ad-vh)*13)] z-30 flex justify-center md:top-[calc(var(--ad-vh)*14)]" style={sEfface}>
-          <span className="inline-flex items-center gap-2 rounded-full bg-white px-3.5 py-1.5 text-[13px] font-semibold text-[var(--ad-pierre)] shadow-[0_1px_2px_rgba(20,35,46,0.06),0_6px_18px_-8px_rgba(20,35,46,0.18)] motion-safe:animate-[ad-monter_1.1s_var(--ad-ease)_0.1s_backwards]">
+          <span className="inline-flex items-center gap-2 rounded-full bg-white px-3.5 py-1.5 text-[13px] font-semibold text-[var(--ad-pierre)] shadow-[0_1px_2px_rgba(46,66,79,0.06),0_6px_18px_-8px_rgba(46,66,79,0.18)] motion-safe:animate-[ad-monter_1.1s_var(--ad-ease)_0.1s_backwards]">
             <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-[var(--ad-or)]" />
             {metier} · {ville}
           </span>
@@ -325,7 +325,7 @@ export function Seuil({
           }}
         >
           <div
-            className="relative h-full w-full overflow-hidden bg-[var(--ad-sable-fonce)] shadow-[0_50px_120px_-50px_rgba(20,35,46,0.55)] transition-[transform,box-shadow] duration-[700ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-data-[survol=oui]/incline:duration-200 group-data-[survol=oui]/incline:shadow-[0_60px_120px_-40px_rgba(20,35,46,0.6)]"
+            className="relative h-full w-full overflow-hidden bg-[var(--ad-sable-fonce)] shadow-[0_50px_120px_-50px_rgba(46,66,79,0.55)] transition-[transform,box-shadow] duration-[700ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-data-[survol=oui]/incline:duration-200 group-data-[survol=oui]/incline:shadow-[0_60px_120px_-40px_rgba(46,66,79,0.6)]"
             style={{
               borderRadius: 'calc((1 - var(--e)) * 32px)',
               transform: 'rotateX(calc(var(--rx) * (1 - var(--e)))) rotateY(calc(var(--ry) * (1 - var(--e))))',
@@ -377,8 +377,8 @@ export function Seuil({
             <span className="absolute -left-[88px] top-[14%] motion-safe:animate-[ad-monter_1.2s_var(--ad-ease)_0.8s_backwards]">
               <span className={pastille} style={{ animation: 'ad-flotter 7s ease-in-out infinite' }}>
                 <span className="relative grid h-2.5 w-2.5 place-items-center">
-                  {jour && <span className="absolute inset-0 rounded-full bg-[#4caf8b] motion-safe:animate-[ad-pouls_2.2s_ease-out_infinite]" />}
-                  <span className={cn('relative h-1.5 w-1.5 rounded-full', jour ? 'bg-[#4caf8b]' : 'bg-[var(--ad-gris)]')} />
+                  {jour && <span className="absolute inset-0 rounded-full bg-[#6e9a6b] motion-safe:animate-[ad-pouls_2.2s_ease-out_infinite]" />}
+                  <span className={cn('relative h-1.5 w-1.5 rounded-full', jour ? 'bg-[#6e9a6b]' : 'bg-[var(--ad-gris)]')} />
                 </span>
                 {jour ? `Ouvert aujourd’hui · ${jour}` : 'Fermé aujourd’hui'}
               </span>
@@ -404,7 +404,7 @@ export function Seuil({
             <Aimant>
             <a
               href={rdv}
-              className="pointer-events-auto group inline-flex items-center gap-2.5 rounded-full bg-[var(--ad-nuit)] py-1.5 pl-5 pr-1.5 text-[14px] font-semibold text-white shadow-[0_14px_30px_-14px_rgba(20,35,46,0.6)]"
+              className="pointer-events-auto group inline-flex items-center gap-2.5 rounded-full bg-[var(--ad-nuit)] py-1.5 pl-5 pr-1.5 text-[14px] font-semibold text-white shadow-[0_14px_30px_-14px_rgba(46,66,79,0.6)]"
             >
               Prendre rendez-vous
               <span className="grid h-8 w-8 place-items-center rounded-full bg-white/15 transition-transform duration-500 ease-[var(--ad-ease)] group-hover:rotate-45">
@@ -540,7 +540,7 @@ export function Chemin({ etapes }: { etapes: { titre: string; texte: string }[] 
    resserrent, et sa fiche apparaît.
    ══════════════════════════════════════════════════════════════════════ */
 
-const TEINTES = ['#e3eef5', '#ddf1ee', '#e7e8f6', '#e9eef3', '#dfedf7', '#e4f3ea']
+const TEINTES = ['#efe6d8', '#e6edef', '#f2e8dc', '#e8ebe4', '#ede3d3', '#e4eaec']
 
 /* La courbe des arches : un départ et une arrivée très doux, un milieu
    franc : le rideau glisse, il ne rebondit pas. */
@@ -659,7 +659,7 @@ export function Arches({ services, rdv }: { services: ServiceWithMedia[]; rdv: s
             <div
               aria-hidden="true"
               className={cn(
-                'pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(20,35,46,0.92),rgba(20,35,46,0.35)_45%,transparent_75%)] transition-opacity duration-[900ms]',
+                'pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(46,66,79,0.92),rgba(46,66,79,0.35)_45%,transparent_75%)] transition-opacity duration-[900ms]',
                 actif && sombre ? 'opacity-100' : 'opacity-0',
               )}
             />
@@ -679,7 +679,7 @@ export function Arches({ services, rdv }: { services: ServiceWithMedia[]; rdv: s
               aria-hidden="true"
               className={cn(
                 'pointer-events-none absolute left-7 top-5 z-[6] font-[family-name:var(--ad-titre)] text-[clamp(90px,11vw,170px)] font-semibold leading-none tracking-[-0.06em] text-transparent max-lg:hidden',
-                sombre ? '[-webkit-text-stroke:1.5px_rgba(255,255,255,0.45)]' : '[-webkit-text-stroke:1.5px_rgba(20,35,46,0.18)]',
+                sombre ? '[-webkit-text-stroke:1.5px_rgba(255,255,255,0.45)]' : '[-webkit-text-stroke:1.5px_rgba(46,66,79,0.18)]',
               )}
               style={{
                 opacity: actif ? 1 : 0,
@@ -916,7 +916,7 @@ export function Conversation({ faq, prenom, portrait }: { faq: FaqItem[]; prenom
       <div className="relative flex min-h-[340px] flex-col rounded-[36px] bg-[var(--ad-sable)] p-6 sm:p-9" aria-live="polite">
         {q && (
           <div key={q.id} className="flex flex-1 flex-col gap-5">
-            <p className="ml-auto max-w-[80%] rounded-[22px] rounded-br-[6px] bg-white px-5 py-3.5 text-[15px] leading-[1.5] text-[var(--ad-nuit)] shadow-[0_8px_24px_-12px_rgba(20,35,46,0.25)] origin-bottom-right motion-safe:animate-[ad-bulle_0.55s_cubic-bezier(0.34,1.4,0.64,1)_backwards]">
+            <p className="ml-auto max-w-[80%] rounded-[22px] rounded-br-[6px] bg-white px-5 py-3.5 text-[15px] leading-[1.5] text-[var(--ad-nuit)] shadow-[0_8px_24px_-12px_rgba(46,66,79,0.25)] origin-bottom-right motion-safe:animate-[ad-bulle_0.55s_cubic-bezier(0.34,1.4,0.64,1)_backwards]">
               {q.question}
             </p>
             <div className="flex items-end gap-3">
@@ -1035,7 +1035,7 @@ function Trait() {
   return (
     <span
       aria-hidden="true"
-      className="pointer-events-none absolute inset-x-0 bottom-0 h-[1.5px] origin-left scale-x-0 bg-[linear-gradient(90deg,#2f6f93,#36a39b)] transition-transform duration-700 ease-[var(--ad-ease)] peer-focus:scale-x-100"
+      className="pointer-events-none absolute inset-x-0 bottom-0 h-[1.5px] origin-left scale-x-0 bg-[linear-gradient(90deg,#46728a,#7ba3b6)] transition-transform duration-700 ease-[var(--ad-ease)] peer-focus:scale-x-100"
     />
   )
 }
@@ -1081,7 +1081,7 @@ export function Lettre({ prenom }: { prenom: string }) {
 
   if (etat === 'ok') {
     return (
-      <div className="flex min-h-[520px] flex-col items-center justify-center rounded-[36px] bg-white p-10 text-center shadow-[0_30px_80px_-40px_rgba(20,35,46,0.35)]">
+      <div className="flex min-h-[520px] flex-col items-center justify-center rounded-[36px] bg-white p-10 text-center shadow-[0_30px_80px_-40px_rgba(46,66,79,0.35)]">
         <svg viewBox="0 0 120 84" className="h-24 w-32" aria-hidden="true">
           {['M6 10 h108 v64 h-108 z', 'M6 10 L60 50 L114 10', 'M6 74 L46 40', 'M114 74 L74 40'].map((d, i) => (
             <path
@@ -1113,7 +1113,7 @@ export function Lettre({ prenom }: { prenom: string }) {
     <form
       onSubmit={envoyer}
       className={cn(
-        'relative rounded-[36px] bg-white p-7 shadow-[0_30px_80px_-40px_rgba(20,35,46,0.35)] sm:p-12',
+        'relative rounded-[36px] bg-white p-7 shadow-[0_30px_80px_-40px_rgba(46,66,79,0.35)] sm:p-12',
         etat === 'envole' && 'motion-safe:animate-[ad-envol_0.75s_var(--ad-ease)_forwards]',
       )}
     >
@@ -1269,7 +1269,7 @@ export function Fil({ liens, rdv, logo }: { liens: { href: string; label: string
         <div
           ref={ref}
           className={cn(
-            'pointer-events-auto relative flex items-center gap-2 overflow-hidden rounded-full border border-white/60 bg-white/75 shadow-[0_10px_40px_-20px_rgba(20,35,46,0.3)] backdrop-blur-xl transition-[padding,gap,box-shadow] duration-700 ease-[var(--ad-ease)] [--lu:0] [--sec:0]',
+            'pointer-events-auto relative flex items-center gap-2 overflow-hidden rounded-full border border-white/60 bg-white/75 shadow-[0_10px_40px_-20px_rgba(46,66,79,0.3)] backdrop-blur-xl transition-[padding,gap,box-shadow] duration-700 ease-[var(--ad-ease)] [--lu:0] [--sec:0]',
             serre ? 'py-1.5 pl-2 pr-1.5' : 'py-2 pl-2.5 pr-2.5',
           )}
         >
@@ -1279,8 +1279,8 @@ export function Fil({ liens, rdv, logo }: { liens: { href: string; label: string
               <svg aria-hidden="true" viewBox="0 0 40 40" className="absolute inset-0 -rotate-90">
                 <defs>
                   <linearGradient id="ad-anneau" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="#2f6f93" />
-                    <stop offset="100%" stopColor="#36a39b" />
+                    <stop offset="0%" stopColor="#46728a" />
+                    <stop offset="100%" stopColor="#7ba3b6" />
                   </linearGradient>
                 </defs>
                 <circle cx="20" cy="20" r="18.5" fill="none" stroke="var(--ad-sable-fonce)" strokeWidth="1.5" />
@@ -1316,7 +1316,7 @@ export function Fil({ liens, rdv, logo }: { liens: { href: string; label: string
             >
               <span
                 className={cn(
-                  'absolute inset-y-0 left-0 w-full origin-left bg-[linear-gradient(90deg,rgba(47,111,147,0.16),rgba(54,163,155,0.26))] transition-opacity duration-300',
+                  'absolute inset-y-0 left-0 w-full origin-left bg-[linear-gradient(90deg,rgba(70,114,138,0.16),rgba(185,130,95,0.26))] transition-opacity duration-300',
                   survol && survol !== actif ? 'opacity-0' : 'opacity-100',
                 )}
                 style={{ transform: 'scaleX(var(--sec))' }}
@@ -1456,7 +1456,7 @@ export function Souffle() {
         <span
           key={`c-${debut ?? 'repos'}`}
           aria-hidden="true"
-          className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_38%_32%,#ffffff_0%,var(--ad-brume)_48%,#c9e3ee_100%)] shadow-[0_40px_100px_-30px_rgba(47,111,147,0.45)] motion-safe:animate-[ad-souffle_8s_var(--ad-ease-lent)_infinite]"
+          className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_38%_32%,#ffffff_0%,var(--ad-brume)_48%,#d8e5ea_100%)] shadow-[0_40px_100px_-30px_rgba(70,114,138,0.45)] motion-safe:animate-[ad-souffle_8s_var(--ad-ease-lent)_infinite]"
         />
         <span key={`t-${debut ?? 'repos'}`} className="relative grid place-items-center text-[30px] font-semibold tracking-[-0.03em] text-[var(--ad-nuit)]">
           <span className="col-start-1 row-start-1 motion-safe:animate-[ad-inspirez_8s_linear_infinite]">Inspirez</span>
@@ -1691,7 +1691,7 @@ export function Carte({ adresse, zoom = 15, className }: { adresse: string; zoom
   const cadre =
     'absolute left-0 top-[-150px] h-[calc(100%+300px)] w-[calc(var(--centre,50%)*2)] max-w-none border-0 [filter:grayscale(1)_contrast(1.05)_brightness(1.04)]'
   const bouton =
-    'rounded-full bg-white/85 px-3.5 py-1.5 text-[12px] font-semibold text-[var(--ad-nuit)] shadow-[0_6px_18px_-10px_rgba(20,35,46,0.5)] backdrop-blur transition-colors hover:bg-white'
+    'rounded-full bg-white/85 px-3.5 py-1.5 text-[12px] font-semibold text-[var(--ad-nuit)] shadow-[0_6px_18px_-10px_rgba(46,66,79,0.5)] backdrop-blur transition-colors hover:bg-white'
 
   return (
     <div ref={ref} className={cn('relative isolate overflow-hidden bg-[var(--ad-brume)]', className)} onMouseLeave={() => setActive(false)}>
@@ -1718,7 +1718,7 @@ export function Carte({ adresse, zoom = 15, className }: { adresse: string; zoom
         />
       )}
       {/* La teinte du site, posée sur le gris de la carte — même en exploration. */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[linear-gradient(140deg,#2f6f93,#36a39b)] opacity-60 mix-blend-color" />
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[linear-gradient(140deg,#46728a,#7ba3b6)] opacity-60 mix-blend-color" />
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(246,247,249,0.55))]" />
       {/* L'épingle, au centre — là où la carte place l'adresse. */}
       <span
@@ -1729,7 +1729,7 @@ export function Carte({ adresse, zoom = 15, className }: { adresse: string; zoom
         )}
       >
         <span className="absolute top-full h-20 w-20 -translate-y-1/2 rounded-full bg-[var(--ad-or)]/35 motion-safe:animate-[ad-pouls_2.4s_ease-out_infinite]" />
-        <span className="relative grid h-12 w-12 place-items-center rounded-full rounded-br-none bg-[var(--ad-nuit)] text-white shadow-[0_14px_30px_-10px_rgba(20,35,46,0.6)] [transform:rotate(45deg)]">
+        <span className="relative grid h-12 w-12 place-items-center rounded-full rounded-br-none bg-[var(--ad-nuit)] text-white shadow-[0_14px_30px_-10px_rgba(46,66,79,0.6)] [transform:rotate(45deg)]">
           <span className="h-3 w-3 rounded-full bg-[var(--ad-or)] [transform:rotate(-45deg)]" />
         </span>
       </span>
@@ -1815,7 +1815,7 @@ export function Parallaxe({ children, amplitude = 60, className }: { children: R
    son contenu, au-dessus de son fond).
    ══════════════════════════════════════════════════════════════════════ */
 
-export function Lueur({ couleur = 'rgba(54,163,155,0.13)', taille = 380 }: { couleur?: string; taille?: number }) {
+export function Lueur({ couleur = 'rgba(185,130,95,0.13)', taille = 380 }: { couleur?: string; taille?: number }) {
   const ref = useRef<HTMLSpanElement>(null)
   useEffect(() => {
     const el = ref.current

@@ -8,7 +8,7 @@ import { LogoMark } from '@/components/site/Logo'
 import { cn, toE164 } from '@/lib/utils'
 
 /**
- * Les sections de la nouvelle DA d’Anasawi. Chacune a une idée, une
+ * Les sections de la nouvelle DA d’Anasawi (couleurs chaudes du classique). Chacune a une idée, une
  * seule, et un mouvement qui la sert :
  *
  *   Seuil          on passe la porte : l'arche s'ouvre sur le cabinet
@@ -36,7 +36,7 @@ export function Surtitre({ children, clair = false }: { children: React.ReactNod
     <p
       className={cn(
         'mb-5 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[13px] font-semibold',
-        clair ? 'bg-white/10 text-white/80' : 'bg-white text-[var(--ad-pierre)] shadow-[0_1px_2px_rgba(20,35,46,0.06),0_4px_14px_-6px_rgba(20,35,46,0.12)]',
+        clair ? 'bg-white/10 text-white/80' : 'bg-white text-[var(--ad-pierre)] shadow-[0_1px_2px_rgba(46,66,79,0.06),0_4px_14px_-6px_rgba(46,66,79,0.12)]',
       )}
     >
       <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-[var(--ad-or)]" />
@@ -107,7 +107,7 @@ export function Rencontre({ c }: P) {
             </Rideau>
           </Incline>
           {/* Le sceau : le métier écrit en cercle, qui tourne lentement. */}
-          <div aria-hidden="true" className="absolute -bottom-10 -right-6 grid h-36 w-36 place-items-center rounded-full bg-[var(--ad-ivoire)] shadow-[0_20px_50px_-20px_rgba(20,35,46,0.4)] md:-right-12">
+          <div aria-hidden="true" className="absolute -bottom-10 -right-6 grid h-36 w-36 place-items-center rounded-full bg-[var(--ad-ivoire)] shadow-[0_20px_50px_-20px_rgba(46,66,79,0.4)] md:-right-12">
             <svg viewBox="0 0 100 100" className="absolute inset-2 motion-safe:animate-[ad-tourner_28s_linear_infinite]">
               <defs>
                 <path id="ad-cercle" d="M50,50 m-38,0 a38,38 0 1,1 76,0 a38,38 0 1,1 -76,0" />
@@ -200,7 +200,7 @@ export function EnPratique({ c }: P) {
   const tries = [...ouverts].sort((a, b) => indice(a.day) - indice(b.day))
   const plage = tries.length ? `${tries[0]!.day} → ${tries.at(-1)!.day}` : 'Sur rendez-vous'
   const carte =
-    'relative isolate overflow-hidden rounded-[28px] bg-white p-7 shadow-[0_1px_2px_rgba(20,35,46,0.05),0_20px_50px_-30px_rgba(20,35,46,0.25)] transition-[box-shadow,translate] duration-500 ease-[var(--ad-ease)] hover:-translate-y-1 hover:shadow-[0_2px_4px_rgba(20,35,46,0.06),0_30px_60px_-30px_rgba(20,35,46,0.35)]'
+    'relative isolate overflow-hidden rounded-[28px] bg-white p-7 shadow-[0_1px_2px_rgba(46,66,79,0.05),0_20px_50px_-30px_rgba(46,66,79,0.25)] transition-[box-shadow,translate] duration-500 ease-[var(--ad-ease)] hover:-translate-y-1 hover:shadow-[0_2px_4px_rgba(46,66,79,0.06),0_30px_60px_-30px_rgba(46,66,79,0.35)]'
   return (
     <section className="py-24 md:py-32">
       <div className="mx-auto max-w-[1200px] px-[5vw]">
@@ -217,7 +217,7 @@ export function EnPratique({ c }: P) {
               <div aria-hidden="true" className="absolute inset-0 bg-[var(--ad-brume)]" />
             )}
             <div className="pointer-events-none relative flex h-full min-h-[340px] flex-col justify-end p-5">
-              <div className="pointer-events-auto rounded-[20px] bg-white/90 p-5 shadow-[0_14px_40px_-20px_rgba(20,35,46,0.4)] backdrop-blur">
+              <div className="pointer-events-auto rounded-[20px] bg-white/90 p-5 shadow-[0_14px_40px_-20px_rgba(46,66,79,0.4)] backdrop-blur">
                 <p className="text-[13px] font-semibold text-[var(--ad-gris)]">Le cabinet</p>
                 <p className="mt-1 text-[18px] font-semibold tracking-[-0.02em]">{c.adresse ?? c.ville}</p>
                 {c.adresse && (
@@ -263,7 +263,7 @@ export function EnPratique({ c }: P) {
               {[0.1, 0.35, 0.6, 0.2, 0.45, 0.7, 0.3].map((d, i) => (
                 <span
                   key={i}
-                  className="h-full w-1.5 origin-center rounded-full bg-gradient-to-t from-[#2f6f93] to-[#36a39b] motion-safe:animate-[ad-onde_1.2s_ease-in-out_infinite]"
+                  className="h-full w-1.5 origin-center rounded-full bg-gradient-to-t from-[#46728a] to-[#7ba3b6] motion-safe:animate-[ad-onde_1.2s_ease-in-out_infinite]"
                   style={{ animationDelay: `${d}s` }}
                 />
               ))}
@@ -393,7 +393,7 @@ export function Horizon({ c, liens }: P & { liens: { href: string; label: string
     <footer className="relative isolate overflow-hidden rounded-t-[40px] bg-[var(--ad-nuit)] px-[5vw] pb-10 pt-28 text-white md:rounded-t-[56px] md:pt-40">
       <div aria-hidden="true" className="absolute -top-40 left-1/2 -z-10 h-80 w-[60vw] -translate-x-1/2 rounded-full bg-[var(--ad-bleu)]/30 blur-3xl motion-safe:animate-[ad-aurore_16s_ease-in-out_infinite]" />
       {/* Une lumière lagon qui suit la souris dans la nuit. */}
-      <Lueur couleur="rgba(54,163,155,0.16)" taille={620} />
+      <Lueur couleur="rgba(185,130,95,0.16)" taille={620} />
       <div className="relative mx-auto max-w-[1200px]">
         <p className="text-center font-[family-name:var(--ad-titre)] font-semibold tracking-[-0.03em] text-[clamp(48px,8.5vw,136px)] leading-[0.98]">
           <Lignes lignes={['Prenons', <span key="t" className="text-[var(--ad-or)]">le temps.</span>]} />

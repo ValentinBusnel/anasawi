@@ -753,59 +753,67 @@
 
 /* ══════════════════════════════════════════════════════════════════════
    /nouvelle-da — LES COMPOSANTS PROPRES D'ANASAWI (`components/anasawi`)
-   Dans l'ESPRIT des sites produits modernes (comme Qeeps) — sans-serif
-   franche, grands titres serrés, mots clés en dégradé, gris froids,
-   cartes blanches, ombres douces — mais avec une identité à elle :
-   - Plus Jakarta Sans (et non Poppins) ;
-   - une encre ardoise #14232e et un dégradé « lagon » bleu → turquoise
-     (#2f6f93 → #36a39b) au lieu du pétrole ;
-   - un accent turquoise pour les traits, les points, les fils ;
+   Dans l'ESPRIT des sites produits modernes — grands titres, cartes
+   blanches, ombres douces, mouvement lié à la lecture — avec l'identité
+   chaleureuse d'Anasawi :
+   - les couleurs du site classique (ivoire, sable, nuit, bleu profond),
+     avec une argile douce pour les accents ;
+   - Fraunces (titres) et Figtree (texte) ;
    - des fenêtres arrondies (28–36 px), plus généreuses que Qeeps.
    (Les noms de variables gardent leur premier sens : `--ad-or` est
-   l'accent, `--ad-sable` le gris de bloc.)
+   l’accent chaud, `--ad-sable` le fond de bloc.)
    ══════════════════════════════════════════════════════════════════════ */
 :root:has(.ad),
 :root:has(.ad) body {
-  background: #f6f7f9;
+  background: #fbf8f2;
 }
 .ad {
-  --ad-ivoire: #f6f7f9;
-  --ad-sable: #eef1f4;
-  --ad-sable-fonce: #dfe4ea;
-  --ad-nuit: #14232e;
-  --ad-bleu: #2f6f93;
-  --ad-brume: #e2f0f6;
-  --ad-or: #36a39b;
-  --ad-pierre: #4c5b67;
-  --ad-gris: #7a8894;
-  --font-jakarta: 'Plus Jakarta Sans';
-  --ad-titre: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  /* Les couleurs du site CLASSIQUE, réchauffées : blancs ivoire et
+     sable, encre nuit, bleu profond d'Anasawi — et une argile douce pour
+     les petits accents (pastilles, traits, pouls). */
+  --ad-ivoire: #fbf8f2;
+  --ad-sable: #f4eee3;
+  --ad-sable-fonce: #e8dfcf;
+  --ad-nuit: #2e424f;
+  --ad-bleu: #46728a;
+  --ad-bleu-clair: #7ba3b6;
+  --ad-brume: #eaf1f4;
+  --ad-or: #b9825f;
+  --ad-pierre: #4f524d;
+  --ad-gris: #77746c;
+  /* Typographie : Fraunces (serif douce, aux terminaisons arrondies) pour
+     les titres, Figtree (sans moderne, ronde) pour le texte. */
+  --ad-titre: 'Fraunces', ui-serif, Georgia, serif;
+  --ad-texte: 'Figtree', ui-sans-serif, system-ui, sans-serif;
   /* La hauteur d'écran des mises en scène (ouverture, promenade). Dans
      l'aperçu de l'éditeur, le cadre est aussi haut que toute la page :
      on y fige un écran de 860 px (voir \`ModeEdition\`). */
   --ad-vh: 1svh;
   --ad-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --ad-ease-lent: cubic-bezier(0.65, 0, 0.35, 1);
-  font-family: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--ad-texte);
   color: var(--ad-nuit);
+  background-color: var(--ad-ivoire);
 }
 .ad :is(h1, h2, h3, h4) {
   font-family: var(--ad-titre);
-  font-weight: 600;
+  font-weight: 450;
   line-height: 1.04;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.025em;
+  font-optical-sizing: auto;
 }
-/* Le mot clé d'un titre : en dégradé « lagon », pas en italique. */
+/* Le mot clé d'un titre : en italique, dans le bleu d'Anasawi. */
 .ad em {
-  font-style: normal;
-  background-image: linear-gradient(100deg, #2f6f93 0%, #36a39b 100%);
+  font-style: italic;
+  font-weight: 400;
+  background-image: linear-gradient(100deg, var(--ad-bleu) 0%, var(--ad-bleu-clair) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
+  padding-right: 0.06em;
 }
 
-/* Une ligne qui sort de son masque. */
 @keyframes ad-sortir {
   from {
     transform: translateY(108%) rotate(2.2deg);
