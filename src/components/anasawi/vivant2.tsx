@@ -106,7 +106,7 @@ export function CarteLumiere({ children, className }: { children: React.ReactNod
     >
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 [background:radial-gradient(420px_circle_at_var(--lx)_var(--ly),rgba(185,130,95,0.14),transparent_45%)] group-hover/lumiere:opacity-100"
+        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 [background:radial-gradient(420px_circle_at_var(--lx)_var(--ly),rgba(79,169,166,0.14),transparent_45%)] group-hover/lumiere:opacity-100"
       />
       <div className="relative">{children}</div>
     </div>

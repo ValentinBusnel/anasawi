@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils'
 import type { FaqItem, Media, OpeningHour, ServiceWithMedia } from '@/server/db/schema'
 
 /**
- * Les composants VIVANTS de la nouvelle DA d’Anasawi (couleurs chaudes du classique).
+ * Les composants VIVANTS de la nouvelle DA d’Anasawi (couleurs chaudes du classique, accents turquoise).
  *
  * Un principe pour tous : le mouvement suit la lecture. Le défilement
  * écrit une seule variable CSS (`--p`, de 0 à 1) sur l'élément, une fois
@@ -274,7 +274,7 @@ export function Seuil({
         {/* Un halo très doux, derrière tout. */}
         <div
           aria-hidden="true"
-          className="absolute left-1/2 top-[30%] h-[calc(var(--ad-vh)*70)] w-[90vw] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(185,130,95,0.14),rgba(70,114,138,0.08)_55%,transparent)] blur-2xl"
+          className="absolute left-1/2 top-[30%] h-[calc(var(--ad-vh)*70)] w-[90vw] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(79,169,166,0.14),rgba(70,114,138,0.08)_55%,transparent)] blur-2xl"
           style={sFondu}
         />
 
@@ -1316,7 +1316,7 @@ export function Fil({ liens, rdv, logo }: { liens: { href: string; label: string
             >
               <span
                 className={cn(
-                  'absolute inset-y-0 left-0 w-full origin-left bg-[linear-gradient(90deg,rgba(70,114,138,0.16),rgba(185,130,95,0.26))] transition-opacity duration-300',
+                  'absolute inset-y-0 left-0 w-full origin-left bg-[linear-gradient(90deg,rgba(70,114,138,0.16),rgba(79,169,166,0.26))] transition-opacity duration-300',
                   survol && survol !== actif ? 'opacity-0' : 'opacity-100',
                 )}
                 style={{ transform: 'scaleX(var(--sec))' }}
@@ -1815,7 +1815,7 @@ export function Parallaxe({ children, amplitude = 60, className }: { children: R
    son contenu, au-dessus de son fond).
    ══════════════════════════════════════════════════════════════════════ */
 
-export function Lueur({ couleur = 'rgba(185,130,95,0.13)', taille = 380 }: { couleur?: string; taille?: number }) {
+export function Lueur({ couleur = 'rgba(79,169,166,0.13)', taille = 380 }: { couleur?: string; taille?: number }) {
   const ref = useRef<HTMLSpanElement>(null)
   useEffect(() => {
     const el = ref.current

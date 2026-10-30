@@ -17,7 +17,7 @@ import { cn, toE164 } from '@/lib/utils'
  * textes, contact. Tous animés, tous dans la DA moderne, tous branchés
  * sur le contenu partagé (un champ laissé vide suit le site classique ou
  * les écrans du CMS). Vitrine : /moderne/modeles. Fond : celui du site,
- * le même pour toutes les sections.
+ * le même pour toutes les sections ; accents turquoise.
  */
 
 const t = z.string().default('')
@@ -131,7 +131,7 @@ export const mOuverturePartageeBlock: BlockDefinition<typeof partageeSchema> = {
     return (
       <Enveloppe ctx={ctx}>
         <section className="relative overflow-hidden pb-24 pt-36 md:pb-32 md:pt-44">
-          <div aria-hidden="true" className="absolute -right-[10%] top-[10%] h-[60%] w-[50%] rounded-full bg-[radial-gradient(closest-side,rgba(185,130,95,0.16),transparent)] blur-2xl" />
+          <div aria-hidden="true" className="absolute -right-[10%] top-[10%] h-[60%] w-[50%] rounded-full bg-[radial-gradient(closest-side,rgba(79,169,166,0.16),transparent)] blur-2xl" />
           <div className={cn(CONTENEUR, 'relative grid items-center gap-14 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]')}>
             <div>
               <Surtitre>
@@ -737,7 +737,7 @@ export const mAppelBlock: BlockDefinition<typeof appelSchema> = {
             <span aria-hidden="true" className="absolute -left-[10%] -top-[30%] -z-10 h-[80%] w-[55%] rounded-full bg-[#46728a]/60 blur-[90px] motion-safe:animate-[ad-aurore_14s_ease-in-out_infinite]" />
             <span aria-hidden="true" className="absolute -bottom-[35%] -right-[10%] -z-10 h-[85%] w-[55%] rounded-full bg-[#7ba3b6]/45 blur-[90px] motion-safe:animate-[ad-aurore_18s_ease-in-out_-6s_infinite_reverse]" />
             <h2 className="mx-auto max-w-[16ch] text-[clamp(40px,6vw,88px)] leading-[1] text-white">
-              <Lignes lignes={[emphase(titre, '[-webkit-text-fill-color:#e6cfb3]! [background:none]!')]} />
+              <Lignes lignes={[emphase(titre, '[-webkit-text-fill-color:#bfe5e2]! [background:none]!')]} />
             </h2>
             <Revele delai={0.3}>
               <p className="mx-auto mt-6 max-w-[44ch] text-[17px] leading-[1.6] text-white/75">{data.texte}</p>

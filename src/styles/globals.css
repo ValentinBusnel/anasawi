@@ -757,7 +757,7 @@
    blanches, ombres douces, mouvement lié à la lecture — avec l'identité
    chaleureuse d'Anasawi :
    - les couleurs du site classique (ivoire, sable, nuit, bleu profond),
-     avec une argile douce pour les accents ;
+     avec un turquoise clair pour les accents ;
    - Fraunces légère et arrondie (titres), Nunito (texte) ;
    - des fenêtres arrondies (28–36 px), plus généreuses que Qeeps.
    (Les noms de variables gardent leur premier sens : `--ad-or` est
@@ -769,7 +769,7 @@
 }
 .ad {
   /* Les couleurs du site CLASSIQUE, réchauffées : blancs ivoire et
-     sable, encre nuit, bleu profond d'Anasawi — et une argile douce pour
+     sable, encre nuit, bleu profond d'Anasawi — et un turquoise clair pour
      les petits accents (pastilles, traits, pouls). */
   --ad-ivoire: #fbf8f2;
   --ad-sable: #f4eee3;
@@ -778,7 +778,7 @@
   --ad-bleu: #46728a;
   --ad-bleu-clair: #7ba3b6;
   --ad-brume: #eaf1f4;
-  --ad-or: #b9825f;
+  --ad-or: #4fa9a6;
   --ad-pierre: #4f524d;
   --ad-gris: #77746c;
   /* Typographie DOUCE : Fraunces en version légère et arrondie (axe
