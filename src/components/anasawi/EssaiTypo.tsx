@@ -12,7 +12,8 @@ import { TYPOS, typoDe, variablesDe } from './typos'
  * navigateur (localStorage) ; `/moderne?typo=lora` l'impose.
  *
  * Visible en développement, ou dès qu'une typo a été choisie par
- * l'adresse — jamais pour un visiteur qui n'a rien demandé.
+ * l'adresse (lien « Essayer sur le site » de /moderne/typos) — jamais
+ * pour un visiteur qui n'a rien demandé.
  */
 
 const CLE = 'ad-typo'
@@ -89,7 +90,7 @@ export function EssaiTypo() {
             </Link>
           </div>
           <ul className="max-h-[60vh] overflow-y-auto p-1.5">
-            {TYPOS.map((t) => (
+            {TYPOS.map((t, i) => (
               <li key={t.id}>
                 <button
                   type="button"
@@ -99,7 +100,9 @@ export function EssaiTypo() {
                   <span className="block text-[19px] leading-tight text-[#2e424f]" style={{ fontFamily: `'${t.titre}', serif`, fontWeight: t.poids }}>
                     {t.titre}
                   </span>
-                  <span className="mt-0.5 block text-[11.5px] text-[#77746c]">{t.nom}</span>
+                  <span className="mt-0.5 block text-[11.5px] text-[#77746c]">
+                    {String(i + 1).padStart(2, '0')} · {t.nom}
+                  </span>
                 </button>
               </li>
             ))}

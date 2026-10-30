@@ -31,8 +31,9 @@ export default async function TyposPage() {
         Typographies <em>douces</em>
       </h1>
       <p className="mt-4 max-w-[60ch] text-[16px] leading-[1.7] text-[var(--ad-pierre)]">
-        Dix paires gratuites et libres (licence SIL Open Font License). Chacune est montrée sur votre vrai contenu ; « Essayer sur le
-        site » l’applique à toute la version moderne — un sélecteur en bas à droite permet ensuite d’en changer.
+        {TYPOS.length} associations choisies pour leur douceur, toutes gratuites et libres. Chacune est montrée sur votre vrai
+        contenu. « Essayer sur le site » l’applique à toute la version moderne : vous pouvez alors parcourir les pages, et changer
+        d’un clic grâce au bouton en bas à droite. Notez simplement le numéro de celle que vous préférez.
       </p>
 
       <ul className="mt-14 grid gap-6 md:grid-cols-2">

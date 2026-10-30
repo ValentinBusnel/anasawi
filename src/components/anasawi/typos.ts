@@ -1,7 +1,7 @@
 /**
- * LES TYPOGRAPHIES À ESSAYER sur le site moderne — toutes gratuites et
- * libres (licence SIL Open Font License, servies par Google Fonts),
- * choisies pour leur douceur.
+ * LES TYPOGRAPHIES À ESSAYER sur le site moderne — une sélection resserrée
+ * de six paires, toutes gratuites et libres (licence SIL Open Font
+ * License, servies par Google Fonts), retenues pour leur douceur.
  *
  * Banc d'essai : /moderne/typos (spécimens), et sur /moderne le
  * sélecteur en bas à gauche (en développement, ou après une visite de
@@ -72,19 +72,6 @@ export const TYPOS: Typo[] = [
     espace: '-0.02em',
   },
   {
-    id: 'young',
-    nom: 'Young Serif + Figtree',
-    esprit: 'Des serifs ronds et généreux, un côté doux et rassurant.',
-    titre: 'Young Serif',
-    texte: 'Figtree',
-    url: `${G}family=Young+Serif&family=Figtree:wght@400..700&display=swap`,
-    poids: 400,
-    poidsFort: 400,
-    poidsEm: 400,
-    italique: false,
-    espace: '-0.02em',
-  },
-  {
     id: 'lora',
     nom: 'Lora + Mulish',
     esprit: 'Une serif aux courbes calligraphiques, très douce en italique.',
@@ -111,60 +98,22 @@ export const TYPOS: Typo[] = [
     espace: '-0.01em',
   },
   {
-    id: 'dm',
-    nom: 'DM Serif Display + DM Sans',
-    esprit: 'Plus de contraste et de présence, tout en restant arrondie.',
-    titre: 'DM Serif Display',
-    texte: 'DM Sans',
-    url: `${G}family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400..700&display=swap`,
-    poids: 400,
-    poidsFort: 400,
-    poidsEm: 400,
-    italique: true,
-    espace: '-0.015em',
-  },
-  {
     id: 'nunito',
     nom: 'Nunito (tout rond)',
     esprit: 'Sans serif, aux bouts de lettres arrondis : l’effet « cocon ».',
     titre: 'Nunito',
     texte: 'Nunito',
     url: `${G}family=Nunito:ital,wght@0,300..800;1,300..800&display=swap`,
-    poids: 600,
-    poidsFort: 600,
-    poidsEm: 600,
-    italique: false,
-    espace: '-0.03em',
-  },
-  {
-    id: 'quicksand',
-    nom: 'Quicksand + Nunito',
-    esprit: 'Ronde et aérée, très légère, presque dessinée au trait.',
-    titre: 'Quicksand',
-    texte: 'Nunito',
-    url: `${G}family=Quicksand:wght@400..700&family=Nunito:wght@400..700&display=swap`,
     poids: 500,
     poidsFort: 600,
     poidsEm: 500,
     italique: false,
-    espace: '-0.03em',
-  },
-  {
-    id: 'outfit',
-    nom: 'Outfit (tout moderne)',
-    esprit: 'Géométrique et légère : moderne, nette, sans dureté.',
-    titre: 'Outfit',
-    texte: 'Outfit',
-    url: `${G}family=Outfit:wght@200..700&display=swap`,
-    poids: 300,
-    poidsFort: 400,
-    poidsEm: 300,
-    italique: false,
-    espace: '-0.035em',
+    espace: '-0.025em',
   },
 ]
 
-export const typoDe = (id: string | null | undefined) => TYPOS.find((t) => t.id === id) ?? null
+/** La paire d'un identifiant (null si inconnue, ex. une paire retirée). */
+export const typoDe =(id: string | null | undefined) => TYPOS.find((t) => t.id === id) ?? null
 
 /** Les variables CSS qui appliquent une typographie au site moderne. */
 export function variablesDe(t: Typo): Record<string, string> {
