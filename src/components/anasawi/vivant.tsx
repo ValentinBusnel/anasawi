@@ -11,6 +11,8 @@ import type { FaqItem, Media, OpeningHour, ServiceWithMedia } from '@/server/db/
 
 /**
  * Les composants VIVANTS de la nouvelle DA d’Anasawi (couleurs chaudes du classique, accents turquoise).
+ * Les textes qui « s’encrent » sont entièrement lisibles avant que leur
+ * section n’atteigne le milieu de l’écran.
  *
  * Un principe pour tous : le mouvement suit la lecture. Le défilement
  * écrit une seule variable CSS (`--p`, de 0 à 1) sur l'élément, une fois
@@ -445,7 +447,7 @@ export function Encre({ texte, className }: { texte: string; className?: string 
         <span
           key={i}
           className="transition-[opacity] duration-200"
-          style={{ opacity: `clamp(0.16, calc((var(--p) * 2.1 - 0.35 - ${i / n}) * 9), 1)` }}
+          style={{ opacity: `clamp(0.16, calc((var(--p) * 3.2 - 0.25 - ${i / n}) * 9), 1)` }}
         >
           {m}{' '}
         </span>
@@ -471,7 +473,7 @@ export function Chemin({ etapes }: { etapes: { titre: string; texte: string }[] 
     d += ` C ${50 + 30 * sens} ${y0 + pas * 0.25}, ${50 + 30 * sens} ${y0 + pas * 0.25}, 50 ${y0 + pas * 0.5}`
     d += ` C ${50 - 30 * sens} ${y0 + pas * 0.75}, ${50 - 30 * sens} ${y0 + pas * 0.75}, 50 ${y0 + pas}`
   }
-  const avance = 'calc((var(--p) - 0.12) * 1.7)'
+  const avance = 'calc((var(--p) - 0.08) * 2.2)'
   return (
     <ol ref={ref} className="relative [--p:1]">
       <svg
@@ -832,30 +834,18 @@ export function Promenade({ photos, titre }: { photos: Media[]; titre: React.Rea
             style={{ transform: 'translateX(calc(var(--p) * var(--decal, 0px) * -1))' }}
           >
             {photos.map((p, i) => (
-              <figure
-                key={p.id}
-                className={cn('shrink-0', i % 2 ? 'md:mt-24' : 'md:-mt-16')}
-                /* Chaque pièce penche à peine en passant devant nous, comme
-                   des tirages qu'on fait défiler sur une table. */
-                style={{ transform: `rotate(calc((var(--p) - ${photos.length > 1 ? i / (photos.length - 1) : 0.5}) * ${i % 2 ? 5 : -5}deg))` }}
-              >
-                <Incline max={6} className={cn(i % 3 === 0 ? 'h-[300px] w-[240px] md:h-[calc(var(--ad-vh)*52)] md:w-[calc(var(--ad-vh)*30)]' : 'h-[240px] w-[300px] md:h-[calc(var(--ad-vh)*40)] md:w-[calc(var(--ad-vh)*52)]')}>
+              <figure key={p.id} className={cn('shrink-0', i % 2 ? 'md:mt-24' : 'md:-mt-16')}>
                 <div
                   className={cn(
-                    'relative h-full w-full overflow-hidden bg-[var(--ad-sable-fonce)]',
+                    'relative overflow-hidden bg-[var(--ad-sable-fonce)]',
                     formes[i % formes.length],
+                    i % 3 === 0
+                      ? 'h-[300px] w-[240px] md:h-[calc(var(--ad-vh)*52)] md:w-[calc(var(--ad-vh)*30)]'
+                      : 'h-[240px] w-[300px] md:h-[calc(var(--ad-vh)*40)] md:w-[calc(var(--ad-vh)*52)]',
                   )}
                 >
-                  <Image
-                    src={p.url}
-                    alt={p.alt}
-                    fill
-                    sizes="(max-width: 768px) 300px, 50vh"
-                    className="object-cover"
-                    style={{ transform: `translateX(calc((var(--p) - ${i / photos.length}) * -60px)) scale(1.15)` }}
-                  />
+                  <Image src={p.url} alt={p.alt} fill sizes="(max-width: 768px) 300px, 50vh" className="object-cover" />
                 </div>
-                </Incline>
                 {p.caption && (
                   <figcaption className="mt-3 text-[14px] font-medium text-[var(--ad-gris)]">{p.caption}</figcaption>
                 )}
@@ -1859,7 +1849,7 @@ export function Conviction({ mots, className }: { mots: { mot: string; accent?: 
   return (
     <p ref={ref} className={cn('[--p:1]', className)}>
       {mots.map((m, i) => {
-        const allume = `clamp(0, calc((var(--p) * 2.3 - 0.55 - ${i / n}) * 7), 1)`
+        const allume = `clamp(0, calc((var(--p) * 3.4 - 0.35 - ${i / n}) * 7), 1)`
         const style = {
           opacity: `calc(0.1 + ${allume} * 0.9)`,
           transform: `translate3d(0, calc((1 - ${allume}) * 0.12em), 0)`,
