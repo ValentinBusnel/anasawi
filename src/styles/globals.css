@@ -820,7 +820,8 @@
   color: transparent;
   /* L'italique déborde de sa boîte à droite (le « d » final) : sans cette
      marge intérieure, le masque des titres et le dégradé le coupent. */
-  padding-right: 0.16em;
+  padding-right: 0.32em;
+  margin-right: -0.24em;
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
 }

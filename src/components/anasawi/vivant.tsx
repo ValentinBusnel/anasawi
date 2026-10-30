@@ -204,7 +204,7 @@ export function Lignes({
       {lignes.map((l, i) => (
         /* Le masque déborde un peu en haut (et à droite) de la ligne : les
            hampes de la serif (« d », « l ») dépassent la hauteur de ligne. */
-        <span key={i} className="-mt-[0.16em] block overflow-hidden pb-[0.08em] pr-[0.08em] pt-[0.16em]">
+        <span key={i} className="-mt-[0.16em] block overflow-hidden pb-[0.08em] pr-[0.32em] pt-[0.16em]">
           <span
             className={cn(
               'block origin-[0%_100%]',
@@ -298,10 +298,10 @@ export function Seuil({
             opacity: 'clamp(0, calc(1 - var(--e) * 2.2), 1)',
           }}
         >
-          <span className="-mt-[0.16em] block overflow-hidden pb-[0.06em] pr-[0.08em] pt-[0.16em] md:inline-block">
+          <span className="-mr-[0.24em] -mt-[0.16em] block overflow-hidden pb-[0.06em] pr-[0.32em] pt-[0.16em] md:inline-block">
             <span className="block motion-safe:animate-[ad-resserrer_1.6s_var(--ad-ease)_0.15s_backwards]">{prenom}</span>
           </span>{' '}
-          <span className="-mt-[0.16em] block overflow-hidden pb-[0.06em] pr-[0.08em] pt-[0.16em] md:inline-block">
+          <span className="-mr-[0.24em] -mt-[0.16em] block overflow-hidden pb-[0.06em] pr-[0.32em] pt-[0.16em] md:inline-block">
             <em className="block motion-safe:animate-[ad-resserrer_1.6s_var(--ad-ease)_0.32s_backwards]">{nom}</em>
           </span>
         </h1>
