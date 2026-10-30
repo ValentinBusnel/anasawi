@@ -16,7 +16,8 @@ import { cn, toE164 } from '@/lib/utils'
  * ouverture, qui je suis, méthode, accompagnements, questions, photos,
  * textes, contact. Tous animés, tous dans la DA moderne, tous branchés
  * sur le contenu partagé (un champ laissé vide suit le site classique ou
- * les écrans du CMS). Vitrine : /moderne/modeles.
+ * les écrans du CMS). Vitrine : /moderne/modeles. Fond : celui du site,
+ * le même pour toutes les sections.
  */
 
 const t = z.string().default('')
@@ -338,7 +339,7 @@ export const mEngagementsBlock: BlockDefinition<typeof engagementsSchema> = {
     const titre = data.titre
     return (
       <Enveloppe ctx={ctx}>
-        <section className={cn(SECTION, 'bg-[var(--ad-sable)]')}>
+        <section className={SECTION}>
           <div className={CONTENEUR}>
             <Surtitre>Engagements</Surtitre>
             <h2 className={cn(TITRE, 'mb-14')}>
@@ -423,7 +424,7 @@ export const mServicesGrilleBlock: BlockDefinition<typeof titreSeul> = {
     const teintes = ['#efe6d8', '#e6edef', '#f2e8dc', '#e8ebe4', '#ede3d3', '#e4eaec']
     return (
       <Enveloppe ctx={ctx}>
-        <section className={cn(SECTION, 'bg-[var(--ad-sable)]')}>
+        <section className={SECTION}>
           <div className={CONTENEUR}>
             <Surtitre>Accompagnements</Surtitre>
             <h2 className={cn(TITRE, 'mb-12')}>

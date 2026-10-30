@@ -69,7 +69,7 @@ export function SectionSeuil({ c }: P) {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars -- même signature que les autres sections (vitrine)
 export function Respiration(_props: P) {
   return (
-    <section className="relative mx-[2vw] overflow-hidden rounded-[36px] bg-[var(--ad-sable)] py-24 md:rounded-[56px] md:py-32">
+    <section className="relative overflow-hidden py-24 md:py-32">
       <div className="mx-auto grid max-w-[1200px] items-center gap-16 px-[5vw] md:grid-cols-2">
         <div>
           <Surtitre>Avant de commencer</Surtitre>
@@ -165,7 +165,7 @@ export function SectionChemin({ c }: P) {
 
 export function SectionArches({ c }: P) {
   return (
-    <section id="accompagnements" className="scroll-mt-24 bg-[var(--ad-ivoire)] py-24 md:py-36">
+    <section id="accompagnements" className="scroll-mt-24 py-24 md:py-36">
       <div className="mx-auto max-w-[1320px] px-[5vw]">
         <div className="mb-14 flex flex-wrap items-end justify-between gap-6">
           <div>
@@ -318,7 +318,7 @@ export function Phrase({ c }: P) {
 export function SectionPromenade({ c }: P) {
   const photos = c.photos.filter((p) => !/substitution/i.test(p.alt)).slice(0, 9)
   return (
-    <div className="bg-[var(--ad-sable)]">
+    <div>
       <Promenade photos={photos} titre={<>Le <em>cabinet</em></>} />
     </div>
   )
@@ -352,7 +352,7 @@ export function RendezVous({ c }: P) {
     c.adresse && { icone: <MapPin />, texte: c.adresse, href: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.adresse)}` },
   ].filter(Boolean) as { icone: React.ReactNode; texte: string; href: string }[]
   return (
-    <section id="contact" className="scroll-mt-24 rounded-t-[40px] bg-[var(--ad-sable)] py-24 md:rounded-t-[56px] md:py-36">
+    <section id="contact" className="scroll-mt-24 py-24 md:py-36">
       <div className="mx-auto grid max-w-[1200px] gap-16 px-[5vw] lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
         <div>
           <Surtitre>Rendez-vous</Surtitre>
@@ -388,8 +388,8 @@ export function RendezVous({ c }: P) {
 
 export function Horizon({ c, liens }: P & { liens: { href: string; label: string }[] }) {
   return (
-    /* Le fond sable continue celui du rendez-vous derrière la courbe. */
-    <div className="bg-[var(--ad-sable)]">
+    /* Derrière la courbe du pied de page : le fond du site (le même partout). */
+    <div className="bg-[var(--ad-ivoire)]">
     <footer className="relative isolate overflow-hidden rounded-t-[40px] bg-[var(--ad-nuit)] px-[5vw] pb-10 pt-28 text-white md:rounded-t-[56px] md:pt-40">
       <div aria-hidden="true" className="absolute -top-40 left-1/2 -z-10 h-80 w-[60vw] -translate-x-1/2 rounded-full bg-[var(--ad-bleu)]/30 blur-3xl motion-safe:animate-[ad-aurore_16s_ease-in-out_infinite]" />
       {/* Une lumière lagon qui suit la souris dans la nuit. */}
