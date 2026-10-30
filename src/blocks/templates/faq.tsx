@@ -5,7 +5,6 @@ import type { BlockDefinition, BlockProps } from '../types'
 import { Reveal } from '@/components/site/anim'
 import { Emphasis } from '@/components/site/Emphasis'
 import { Eyebrow } from '@/components/site/Eyebrow'
-import { SectionIndex } from '@/components/site/SectionMarks'
 
 /* ════════════════════════════════════════════════════════════════════
    FAQ — Éditoriale (proposition N de la planche)
@@ -28,7 +27,6 @@ function FaqEditoriale({
 }: BlockProps<z.output<typeof faqEditorialeSchema>>) {
   return (
     <div className="container-editorial relative">
-      <SectionIndex index={ctx.index} label="questions" />
 
       <div className="mx-auto max-w-[840px]">
         <div className="text-center">

@@ -6,7 +6,7 @@ import type { BlockDefinition, BlockProps } from '../types'
 import { Counter, Reveal } from '@/components/site/anim'
 import { Emphasis } from '@/components/site/Emphasis'
 import { Eyebrow } from '@/components/site/Eyebrow'
-import { Aster, SectionIndex } from '@/components/site/SectionMarks'
+import { Aster } from '@/components/site/SectionMarks'
 
 /*
  * Inspirer confiance — chiffres, engagements, reconnaissances.
@@ -34,11 +34,9 @@ export const chiffresClefsSchema = z.object({
 
 function ChiffresClefs({
   data,
-  ctx,
 }: BlockProps<z.output<typeof chiffresClefsSchema>>) {
   return (
     <div className="container-editorial relative text-center">
-      <SectionIndex index={ctx.index} label="en chiffres" />
 
       {data.eyebrow && (
         <Reveal>
@@ -131,11 +129,9 @@ export const engagementsSchema = z.object({
 
 function Engagements({
   data,
-  ctx,
 }: BlockProps<z.output<typeof engagementsSchema>>) {
   return (
     <div className="container-editorial relative">
-      <SectionIndex index={ctx.index} label="engagements" />
 
       <div className="mx-auto max-w-[44rem]">
         <div className="text-center">

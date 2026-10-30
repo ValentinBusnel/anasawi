@@ -6,7 +6,7 @@ import { MaskLines, Reveal } from '@/components/site/anim'
 import { ActionLink } from '@/components/site/ActionLink'
 import { Emphasis } from '@/components/site/Emphasis'
 import { Eyebrow } from '@/components/site/Eyebrow'
-import { Aster, SectionIndex } from '@/components/site/SectionMarks'
+import { Aster } from '@/components/site/SectionMarks'
 import {
   addressLines,
   bookingHref,
@@ -124,7 +124,6 @@ function ContactMinimal({
        marge externe ½ section haut/bas, arche pleine largeur (gouttière),
        padding interne 1 section en haut, ½ section en bas. */
     <div className="relative py-[calc(var(--spacing-section)*0.5)]">
-      <SectionIndex index={ctx.index} label="contact" />
 
       {/* La grande arche — `margin: 0 var(--gutter)`, pleine largeur (K).
           Mobile : rayon d'arche réduit (min(120px,22vw)). */}
@@ -266,7 +265,6 @@ function ContactCarte({
 
   return (
     <div className="container-editorial relative">
-      <SectionIndex index={ctx.index} label="contact" />
 
       <div className="grid grid-cols-1 gap-10 md:gap-12 lg:grid-cols-[1.4fr_1fr] lg:gap-24">
         <div className="min-w-0">

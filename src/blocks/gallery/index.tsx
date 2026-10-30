@@ -6,7 +6,6 @@ import { MaskLines, Reveal } from '@/components/site/anim'
 import { BlockImage } from '@/components/site/BlockImage'
 import { Emphasis } from '@/components/site/Emphasis'
 import { Eyebrow } from '@/components/site/Eyebrow'
-import { SectionIndex } from '@/components/site/SectionMarks'
 import { cn } from '@/lib/utils'
 
 export const gallerySchema = z.object({
@@ -32,7 +31,6 @@ function Gallery({ data, ctx }: BlockProps<GalleryPayload>) {
 
   return (
     <div className="container-editorial relative">
-      <SectionIndex index={ctx.index} label="en images" />
 
       {(data.eyebrow || data.title) && (
         <div className="mb-10 max-w-[34rem] md:mb-12">

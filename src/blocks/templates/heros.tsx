@@ -14,7 +14,7 @@ import { BlockImage } from '@/components/site/BlockImage'
 import { Emphasis, stripEmphasis } from '@/components/site/Emphasis'
 import { Eyebrow } from '@/components/site/Eyebrow'
 import { TitreAjuste } from '@/components/site/TitreAjuste'
-import { Aster, SectionIndex } from '@/components/site/SectionMarks'
+import { Aster } from '@/components/site/SectionMarks'
 import type { Settings } from '@/server/db/schema'
 import { optionalSafeHrefSchema } from '@/lib/links'
 
@@ -109,7 +109,6 @@ function HeroPleinEcran({
       className="relative overflow-x-clip px-[var(--spacing-gutter)] pb-[var(--spacing-section)] pt-[var(--spacing-hero-top)] text-center"
       style={{ '--echelle-titre': echelleDuTitre(data.titleSize) } as React.CSSProperties}
     >
-      <SectionIndex index={ctx.index} label="ouverture" />
 
       {data.eyebrow && (
         <Reveal>
@@ -292,7 +291,6 @@ function HeroEditorial({
 
   return (
     <div className="relative flex min-h-[78svh] flex-col justify-center px-[var(--spacing-gutter)] pb-[var(--spacing-section)] pt-[var(--spacing-hero-top)]">
-      <SectionIndex index={ctx.index} label="ouverture" />
 
       <div className="mx-auto w-full max-w-[1560px]">
         {data.eyebrow && (
@@ -423,7 +421,6 @@ function HeroMinimal({
 
   return (
     <div className="relative flex min-h-[76svh] flex-col items-center justify-center px-[var(--spacing-gutter)] pb-[var(--spacing-section)] pt-[var(--spacing-hero-top)] text-center">
-      <SectionIndex index={ctx.index} label="ouverture" />
 
       {data.eyebrow && (
         <Reveal>
@@ -536,7 +533,6 @@ function HeroBandeau({
 
   return (
     <div className="relative">
-      <SectionIndex index={ctx.index} label="ouverture" />
 
       <div className="flex min-h-[66svh] flex-col items-center justify-center px-[var(--spacing-gutter)] pb-[var(--spacing-section)] pt-[var(--spacing-hero-top)] text-center">
         {data.eyebrow && (

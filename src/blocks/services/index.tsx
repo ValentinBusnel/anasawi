@@ -7,7 +7,6 @@ import { BlockImage } from '@/components/site/BlockImage'
 import { Emphasis } from '@/components/site/Emphasis'
 import { Eyebrow } from '@/components/site/Eyebrow'
 import { Prose } from '@/components/site/Prose'
-import { SectionIndex } from '@/components/site/SectionMarks'
 
 export const servicesSchema = z.object({
   eyebrow: z.string().default(''),
@@ -29,7 +28,6 @@ function Services({ data, ctx }: BlockProps<ServicesPayload>) {
 
   return (
     <div className="container-editorial relative">
-      <SectionIndex index={ctx.index} label="accompagnements" />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
         <div className="lg:col-span-4">

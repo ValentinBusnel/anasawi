@@ -7,7 +7,6 @@ import { ActionLink } from '@/components/site/ActionLink'
 import { BlockImage } from '@/components/site/BlockImage'
 import { Emphasis } from '@/components/site/Emphasis'
 import { Eyebrow } from '@/components/site/Eyebrow'
-import { SectionIndex } from '@/components/site/SectionMarks'
 import { optionalSafeHrefSchema } from '@/lib/links'
 
 export const heroSchema = z.object({
@@ -37,7 +36,6 @@ function Hero({ data, ctx }: BlockProps<HeroPayload>) {
     /* `bleed` : hero en première position — padding haut `hero-top`
        (laisse passer la capsule de navigation), bas = section. */
     <div className="relative grid min-h-[80svh] grid-cols-1 items-center gap-y-10 pb-[var(--spacing-section)] pt-[var(--spacing-hero-top)] md:gap-y-12 lg:min-h-[86svh] lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
-      <SectionIndex index={ctx.index} label="ouverture" />
 
       {/* ── Colonne éditoriale ─────────────────────────────────── */}
       <div className="order-2 flex flex-col justify-center px-[var(--spacing-gutter)] lg:order-1">

@@ -7,7 +7,6 @@ import { Emphasis } from '@/components/site/Emphasis'
 import { Eyebrow } from '@/components/site/Eyebrow'
 import { FaqAccordion } from '@/components/site/FaqAccordion'
 import { Prose } from '@/components/site/Prose'
-import { SectionIndex } from '@/components/site/SectionMarks'
 
 export const faqSchema = z.object({
   eyebrow: z.string().default(''),
@@ -20,7 +19,6 @@ export type FaqPayload = z.output<typeof faqSchema>
 function Faq({ data, ctx }: BlockProps<FaqPayload>) {
   return (
     <div className="container-editorial relative">
-      <SectionIndex index={ctx.index} label="questions" />
 
       <div className="grid grid-cols-1 gap-10 md:gap-12 lg:grid-cols-12 lg:gap-x-24">
         <div className="lg:col-span-4">

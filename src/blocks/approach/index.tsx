@@ -7,7 +7,6 @@ import { BlockImage } from '@/components/site/BlockImage'
 import { Emphasis } from '@/components/site/Emphasis'
 import { Eyebrow } from '@/components/site/Eyebrow'
 import { Prose } from '@/components/site/Prose'
-import { SectionIndex } from '@/components/site/SectionMarks'
 
 export const approachSchema = z.object({
   eyebrow: z.string().default(''),
@@ -31,7 +30,6 @@ function Approach({ data, ctx }: BlockProps<ApproachPayload>) {
 
   return (
     <div className="container-editorial relative">
-      <SectionIndex index={ctx.index} label="approche" />
 
       <div className="grid grid-cols-1 gap-10 md:gap-12 lg:grid-cols-12 lg:gap-x-20">
         <div className="lg:col-span-5 lg:col-start-2">

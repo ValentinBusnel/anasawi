@@ -6,7 +6,6 @@ import { MaskLines, Reveal } from '@/components/site/anim'
 import { Emphasis } from '@/components/site/Emphasis'
 import { Eyebrow } from '@/components/site/Eyebrow'
 import { Prose } from '@/components/site/Prose'
-import { SectionIndex } from '@/components/site/SectionMarks'
 import { numberWordFr } from '@/lib/format'
 
 /*
@@ -32,11 +31,9 @@ export const approcheColonnesSchema = z.object({
 
 function ApprocheColonnes({
   data,
-  ctx,
 }: BlockProps<z.output<typeof approcheColonnesSchema>>) {
   return (
     <div className="container-editorial relative">
-      <SectionIndex index={ctx.index} label="approche" />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
         <div className="lg:col-span-5">
@@ -153,11 +150,9 @@ export const processusVerticalSchema = z.object({
 
 function ProcessusVertical({
   data,
-  ctx,
 }: BlockProps<z.output<typeof processusVerticalSchema>>) {
   return (
     <div className="container-editorial relative">
-      <SectionIndex index={ctx.index} label="le chemin" />
 
       <div className="mx-auto max-w-[44rem] text-center">
         {data.eyebrow && (

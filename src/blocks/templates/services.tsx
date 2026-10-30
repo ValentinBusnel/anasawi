@@ -9,7 +9,6 @@ import { Emphasis } from '@/components/site/Emphasis'
 import { Eyebrow } from '@/components/site/Eyebrow'
 import { Prose } from '@/components/site/Prose'
 import { ServiceRows } from '@/components/site/ServiceRows'
-import { SectionIndex } from '@/components/site/SectionMarks'
 import { bookingHref } from '@/lib/settings-helpers'
 import { numberWordFr } from '@/lib/format'
 import { optionalSafeHrefSchema } from '@/lib/links'
@@ -56,7 +55,6 @@ function ServicesListe({
 
   return (
     <div className="relative">
-      <SectionIndex index={ctx.index} label="accompagnements" />
 
       <div className="container-editorial text-center">
         {data.eyebrow && (
@@ -150,7 +148,6 @@ function ServicesNumerotes({
 
   return (
     <div className="container-editorial relative">
-      <SectionIndex index={ctx.index} label="accompagnements" />
 
       <div className="max-w-[46rem]">
         {data.eyebrow && (
@@ -269,7 +266,6 @@ function ServicesImmersifs({
 
   return (
     <div className="container-editorial relative">
-      <SectionIndex index={ctx.index} label="accompagnements" />
 
       {(data.eyebrow || data.title) && (
         <div className="mx-auto max-w-[46rem] text-center">
@@ -402,7 +398,6 @@ function ServicesArches({
 
   return (
     <div className="container-editorial relative">
-      <SectionIndex index={ctx.index} label="accompagnements" />
 
       {(data.eyebrow || data.title) && (
         <div className="mx-auto max-w-[46rem] text-center">
@@ -517,7 +512,6 @@ function ServicesDetail({
 
   return (
     <div className="container-editorial relative">
-      <SectionIndex index={ctx.index} label="à la une" />
 
       <div className="grid grid-cols-1 items-center gap-10 md:gap-12 lg:grid-cols-12 lg:gap-x-16">
         <div className="lg:col-span-5 lg:col-start-2">
@@ -636,11 +630,9 @@ export const tarifsSobreSchema = z.object({
 
 function TarifsSobre({
   data,
-  ctx,
 }: BlockProps<z.output<typeof tarifsSobreSchema>>) {
   return (
     <div className="container-editorial relative">
-      <SectionIndex index={ctx.index} label="tarifs" />
 
       <div className="mx-auto max-w-[44rem]">
         <div className="text-center">
@@ -768,11 +760,9 @@ export const seanceDerouleSchema = z.object({
 
 function SeanceDeroule({
   data,
-  ctx,
 }: BlockProps<z.output<typeof seanceDerouleSchema>>) {
   return (
     <div className="container-editorial relative">
-      <SectionIndex index={ctx.index} label="le déroulé" />
 
       <div className="mx-auto max-w-[40rem]">
         <div className="text-center">

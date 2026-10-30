@@ -56,8 +56,3 @@ export function estCourant(href: string, pathname: string): boolean {
 export function espaceDe(pathname: string): Espace {
   return ESPACES.find((e) => e.href !== '/admin' && estCourant(e.href, pathname)) ?? ESPACES[0]!
 }
-
-/** L'espace d'une adresse précise (`/admin/faq`…). */
-export function espaceParHref(href: string): Espace | undefined {
-  return ESPACES.find((e) => e.href === href)
-}

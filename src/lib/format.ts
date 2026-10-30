@@ -28,24 +28,3 @@ const NUMBER_WORDS_FR = [
 export function numberWordFr(i: number): string {
   return NUMBER_WORDS_FR[i] ?? String(i + 1)
 }
-
-const ROMANS: readonly [number, string][] = [
-  [10, 'x'],
-  [9, 'ix'],
-  [5, 'v'],
-  [4, 'iv'],
-  [1, 'i'],
-]
-
-/** Chiffre romain minuscule — pour l'index de section (« iv — conviction »). */
-export function toRoman(value: number): string {
-  let n = Math.max(1, Math.min(Math.round(value), 40))
-  let out = ''
-  for (const [num, glyph] of ROMANS) {
-    while (n >= num) {
-      out += glyph
-      n -= num
-    }
-  }
-  return out
-}

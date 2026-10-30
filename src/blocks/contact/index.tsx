@@ -8,7 +8,6 @@ import { ContactForm } from '@/components/site/ContactForm'
 import { Emphasis } from '@/components/site/Emphasis'
 import { Eyebrow } from '@/components/site/Eyebrow'
 import { Prose } from '@/components/site/Prose'
-import { SectionIndex } from '@/components/site/SectionMarks'
 import { addressLines as settingsAddressLines } from '@/lib/settings-helpers'
 import { toE164 } from '@/lib/utils'
 import type { OpeningHour } from '@/server/db/schema'
@@ -36,7 +35,6 @@ function Contact({ data, ctx }: BlockProps<ContactSectionPayload>) {
 
   return (
     <div className="container-editorial relative">
-      <SectionIndex index={ctx.index} label="contact" />
 
       <div className="grid grid-cols-1 gap-10 md:gap-12 lg:grid-cols-12 lg:gap-x-24">
         {/* ── Coordonnées ─────────────────────────────────────── */}

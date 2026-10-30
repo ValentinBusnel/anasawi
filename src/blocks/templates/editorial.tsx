@@ -8,7 +8,7 @@ import { BlockImage } from '@/components/site/BlockImage'
 import { Emphasis } from '@/components/site/Emphasis'
 import { Eyebrow } from '@/components/site/Eyebrow'
 import { Parallax } from '@/components/site/Parallax'
-import { Aster, SectionIndex } from '@/components/site/SectionMarks'
+import { Aster } from '@/components/site/SectionMarks'
 import { optionalSafeHrefSchema } from '@/lib/links'
 
 /*
@@ -74,11 +74,9 @@ export const texteCentreSchema = z.object({
 
 function TexteCentre({
   data,
-  ctx,
 }: BlockProps<z.output<typeof texteCentreSchema>>) {
   return (
     <div className="container-editorial relative">
-      <SectionIndex index={ctx.index} label="respiration" />
 
       <div className="mx-auto max-w-[46rem] text-center">
         <Reveal>
@@ -164,13 +162,12 @@ export const manifesteSchema = z.object({
   body: z.string().default(''),
 })
 
-function Manifeste({ data, ctx }: BlockProps<z.output<typeof manifesteSchema>>) {
+function Manifeste({ data }: BlockProps<z.output<typeof manifesteSchema>>) {
   /* `title` porte la conviction ; `body` (héritage) sert de repli. */
   const statement = data.title.trim() || toParagraphs(data.body)[0] || ''
 
   return (
     <div className="container-editorial relative text-center">
-      <SectionIndex index={ctx.index} label="conviction" />
 
       <Reveal>
         <Aster className="text-[26px] text-blue-deep" />
@@ -247,7 +244,6 @@ function LieuArches({
 
   return (
     <div className="container-editorial relative">
-      <SectionIndex index={ctx.index} label="le lieu" />
 
       <div className="grid grid-cols-1 items-center gap-10 md:gap-12 lg:grid-cols-12 lg:gap-x-5">
         {/* Les deux arches sœurs — 1.2fr / 1fr, la seconde remontée.
@@ -388,7 +384,6 @@ function ImagePleine({
 
   return (
     <div className="container-editorial relative">
-      <SectionIndex index={ctx.index} label="en images" />
 
       <div className="relative">
         <BlockImage

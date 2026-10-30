@@ -7,7 +7,6 @@ import { BlockImage } from '@/components/site/BlockImage'
 import { Emphasis } from '@/components/site/Emphasis'
 import { Eyebrow } from '@/components/site/Eyebrow'
 import { Prose } from '@/components/site/Prose'
-import { SectionIndex } from '@/components/site/SectionMarks'
 import { optionalSafeHrefSchema } from '@/lib/links'
 
 /*
@@ -48,7 +47,6 @@ function AproposPortrait({
 
   return (
     <div className="container-editorial relative">
-      <SectionIndex index={ctx.index} label="à propos" />
 
       <div className="grid grid-cols-1 items-center gap-10 md:gap-12 lg:grid-cols-12 lg:gap-x-5">
         {/* Arche portrait + badge du nom. */}
@@ -214,7 +212,6 @@ function AproposAsymetrique({
 
   return (
     <div className="container-editorial relative">
-      <SectionIndex index={ctx.index} label="à propos" />
 
       <div className="grid grid-cols-1 gap-10 md:gap-12 lg:grid-cols-12 lg:gap-x-12">
         {/* Arche descendue — le titre la surplombe. */}
@@ -335,11 +332,9 @@ const PARCOURS_OFFSETS = ['', 'lg:ml-10', 'lg:ml-20', 'lg:ml-28'] as const
 
 function AproposParcours({
   data,
-  ctx,
 }: BlockProps<z.output<typeof aproposParcoursSchema>>) {
   return (
     <div className="container-editorial relative">
-      <SectionIndex index={ctx.index} label="parcours" />
 
       <div className="grid grid-cols-1 gap-10 md:gap-12 lg:grid-cols-12 lg:gap-x-24">
         <div className="lg:sticky lg:top-32 lg:col-span-4 lg:self-start">
@@ -478,11 +473,9 @@ export const aproposMedaillonSchema = z.object({
 
 function AproposMedaillon({
   data,
-  ctx,
 }: BlockProps<z.output<typeof aproposMedaillonSchema>>) {
   return (
     <div className="container-editorial relative">
-      <SectionIndex index={ctx.index} label="en chiffres" />
 
       <div className="grid grid-cols-1 items-center gap-10 md:gap-12 lg:grid-cols-12 lg:gap-x-5">
         <Reveal className="lg:col-span-4 lg:col-start-2 lg:justify-self-center">

@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, inArray, isNull, sql } from 'drizzle-orm'
+import { and, asc, count, desc, eq, inArray, sql } from 'drizzle-orm'
 import { unstable_cache } from 'next/cache'
 import { cache } from 'react'
 
@@ -433,38 +433,6 @@ export async function getUnreadCount(): Promise<number> {
     return row?.n ?? 0
   } catch {
     return 0
-  }
-}
-
-export type DashboardCounts = {
-  sections: number
-  media: number
-  nonLus: number
-  services: number
-  faq: number
-}
-
-/** Les chiffres du tableau de bord : sections de premier niveau de la
-    page donnée, médias, messages non lus, accompagnements, questions. */
-export async function getDashboardCounts(pageId: string | null): Promise<DashboardCounts> {
-  const [sectionRows, mediaRows, unreadRows, serviceRows, faqRows] = await Promise.all([
-    pageId
-      ? db
-          .select({ n: count() })
-          .from(sections)
-          .where(and(eq(sections.pageId, pageId), isNull(sections.parentId)))
-      : Promise.resolve([{ n: 0 }]),
-    db.select({ n: count() }).from(media),
-    db.select({ n: count() }).from(contactMessages).where(eq(contactMessages.isRead, false)),
-    db.select({ n: count() }).from(services),
-    db.select({ n: count() }).from(faqItems),
-  ])
-  return {
-    sections: sectionRows[0]?.n ?? 0,
-    media: mediaRows[0]?.n ?? 0,
-    nonLus: unreadRows[0]?.n ?? 0,
-    services: serviceRows[0]?.n ?? 0,
-    faq: faqRows[0]?.n ?? 0,
   }
 }
 

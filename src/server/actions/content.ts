@@ -124,29 +124,6 @@ export async function toggleService(
   })
 }
 
-export async function reorderServices(
-  orderedIds: string[],
-): Promise<ActionResult<void>> {
-  return adminAction(async () => {
-    const ids = uuidListSchema.safeParse(orderedIds)
-    if (!ids.success) return fail(MESSAGES.accompagnementIntrouvable)
-    if (ids.data.length === 0) return ok()
-
-    const cases = ids.data
-      .map((id, index) => sql`when ${services.id} = ${id} then ${index}`)
-      .reduce((acc, part) => sql`${acc} ${part}`)
-
-    await runBatch([
-      db
-        .update(services)
-        .set({ sortOrder: sql`case ${cases} else ${services.sortOrder} end` }),
-    ])
-
-    refreshSite(tags.services)
-    return ok()
-  })
-}
-
 /* ════════════════════════════════════════════════════════════════════
    Familles d'accompagnements
    ════════════════════════════════════════════════════════════════════ */

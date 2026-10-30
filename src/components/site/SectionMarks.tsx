@@ -30,52 +30,6 @@ export function Aster({ className }: { className?: string }) {
   )
 }
 
-/**
- * Méta-texte de section : « ✳︎  Label » en capitales espacées.
- * C'est le label supérieur de presque toutes les sections de la maquette.
- */
-export function MetaLabel({
-  children,
-  className,
-  tone = 'accent',
-}: {
-  children: React.ReactNode
-  className?: string
-  /** `accent` : bleu profond. `muted` : gris pierre. `light` : sur fond nuit. */
-  tone?: 'accent' | 'muted' | 'light'
-}) {
-  return (
-    <p
-      className={cn(
-        'font-sans text-[11px] font-semibold uppercase tracking-[0.22em]',
-        /* Gris pierre, sans ornement — voir `Eyebrow`. Sur fond nuit,
-           l'ivoire atténué reste. */
-        tone === 'light' ? 'text-ivory/70' : 'text-stone',
-        className,
-      )}
-    >
-      {children}
-    </p>
-  )
-}
-
-/**
- * Index de section (« iv — approche »), en haut à droite de chaque
- * section. N'est plus affiché : répété sur toute la page, il ajoutait un
- * niveau de lecture sans information utile au visiteur. Le composant reste
- * — les templates l'appellent toujours — et ne rend rien.
- */
-export function SectionIndex(props: {
-  index: number
-  label: string
-  /** Sur fond nuit. */
-  light?: boolean
-  className?: string
-}): null {
-  void props
-  return null
-}
-
 /** Les trois points bleus de la maquette — ponctuation entre deux sections. */
 export function Dots({ className }: { className?: string }) {
   return (

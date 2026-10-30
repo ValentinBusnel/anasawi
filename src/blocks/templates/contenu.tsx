@@ -9,7 +9,7 @@ import { CinemaVideo } from '@/components/site/CinemaVideo'
 import { Emphasis } from '@/components/site/Emphasis'
 import { Eyebrow } from '@/components/site/Eyebrow'
 import { GalleryRail } from '@/components/site/GalleryRail'
-import { Aster, Dots, SectionIndex } from '@/components/site/SectionMarks'
+import { Aster, Dots } from '@/components/site/SectionMarks'
 import { cn } from '@/lib/utils'
 
 /*
@@ -166,7 +166,6 @@ function GalerieArches({
 
   return (
     <div className="relative">
-      <SectionIndex index={ctx.index} label="en images" />
 
       {data.eyebrow && (
         <Reveal className="container-editorial">
@@ -293,13 +292,11 @@ export const texteDeuxColonnesSchema = z.object({
 
 function TexteDeuxColonnes({
   data,
-  ctx,
 }: BlockProps<z.output<typeof texteDeuxColonnesSchema>>) {
   const paragraphs = toParagraphs(data.body)
 
   return (
     <div className="container-editorial relative">
-      <SectionIndex index={ctx.index} label="pour aller plus loin" />
 
       <div className="grid grid-cols-1 gap-10 md:gap-12 lg:grid-cols-12 lg:gap-x-24">
         <div className="lg:col-span-4">
@@ -378,11 +375,9 @@ export const listeAtoutsSchema = z.object({
 
 function ListeAtouts({
   data,
-  ctx,
 }: BlockProps<z.output<typeof listeAtoutsSchema>>) {
   return (
     <div className="container-editorial relative">
-      <SectionIndex index={ctx.index} label="ce qui compte" />
 
       {(data.eyebrow || data.title) && (
         <div className="mx-auto max-w-[42rem] text-center">
@@ -489,7 +484,6 @@ function VideoCinema({
 
   return (
     <div className="relative">
-      <SectionIndex index={ctx.index} label="en mouvement" />
 
       {data.eyebrow && (
         <div className="container-editorial">
@@ -700,13 +694,11 @@ export const citationSouligneeSchema = z.object({
 
 function CitationSoulignee({
   data,
-  ctx,
 }: BlockProps<z.output<typeof citationSouligneeSchema>>) {
   if (!data.quote) return null
 
   return (
     <div className="container-editorial relative">
-      <SectionIndex index={ctx.index} label="parole" />
 
       <figure className="mx-auto max-w-[54rem] text-center">
         <Reveal>
