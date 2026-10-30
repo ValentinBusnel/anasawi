@@ -236,7 +236,6 @@ export function Seuil({
   horaires,
   services,
   intro,
-  logo = null,
 }: {
   prenom: string
   nom: string
@@ -247,10 +246,8 @@ export function Seuil({
   rdv: string
   horaires: OpeningHour[]
   services: { titre: string }[]
-  /** Une phrase de présentation, sous le nom. */
+  /** Une phrase de présentation, sous le nom (repli : l’accroche). */
   intro: string
-  /** Le logo des Réglages, mis en avant devant le nom. */
-  logo?: string | null
 }) {
   const ref = useAvancement<HTMLElement>('colle', true)
   const edition = useContext(Edition)
@@ -347,29 +344,9 @@ export function Seuil({
             )}
             <Reflet />
             <div aria-hidden="true" className="absolute inset-0 bg-[var(--ad-nuit)]" style={{ opacity: 'calc(var(--e) * 0.5)' }} />
-            {/* LE LOGO, sur la fenêtre : un médaillon de verre clair au
-                centre de la photo quand elle est sous le nom ; on entre dans
-                la pièce : il grandit et monte se poser au-dessus de la
-                phrase d’accueil, toujours en couleurs. */}
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute left-1/2 z-20 grid place-items-center"
-              style={{
-                top: 'calc(50% - var(--e) * 27%)',
-                width: 'calc(92px + var(--e) * 36px)',
-                height: 'calc(92px + var(--e) * 36px)',
-                transform: 'translate(-50%, -50%)',
-              }}
-            >
-              <span className="absolute inset-0 rounded-full border border-white/70 motion-safe:animate-[ad-pouls_3.6s_ease-out_1.6s_infinite]" style={{ opacity: 'clamp(0, calc(1 - var(--e) * 3), 1)' }} />
-              <span className="absolute inset-0 rounded-full bg-white/80 shadow-[0_24px_50px_-20px_rgba(20,35,46,0.55)] ring-1 ring-white backdrop-blur-xl" />
-              <span className="relative grid h-full w-full place-items-center motion-safe:animate-[ad-sceau_1.5s_var(--ad-ease)_0.9s_backwards]">
-                <LogoMark src={logo} priority resolution={256} className="h-[66%] w-[66%]" />
-              </span>
-            </div>
             {/* La phrase d'accueil, dans la pièce. */}
             <div
-              className="absolute inset-0 z-20 flex flex-col items-center justify-center px-6 pt-[calc(var(--ad-vh)*12)] text-center text-white"
+              className="absolute inset-0 z-20 flex flex-col items-center justify-center px-6 text-center text-white"
               style={{
                 opacity: 'clamp(0, calc((var(--e) - 0.55) * 3), 1)',
                 transform: 'translateY(calc((1 - var(--e)) * 40px))',

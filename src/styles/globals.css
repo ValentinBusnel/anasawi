@@ -1012,15 +1012,3 @@
     filter: blur(4px);
   }
 }
-
-/* Le sceau du logo, sur l’ouverture : il se pose en tournant d’un quart. */
-@keyframes ad-sceau {
-  from {
-    opacity: 0;
-    transform: scale(0.55) rotate(-90deg);
-    filter: blur(8px);
-  }
-  60% {
-    filter: blur(0);
-  }
-}
