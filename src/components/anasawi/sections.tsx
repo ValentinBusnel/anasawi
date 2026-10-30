@@ -60,6 +60,7 @@ export function SectionSeuil({ c }: P) {
       horaires={c.horaires}
       services={c.services.map((s) => ({ titre: s.title }))}
       intro={c.ouverture.intro || c.accroche}
+      logo={c.logo}
     />
   )
 }

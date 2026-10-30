@@ -21,8 +21,11 @@ export function LogoMark({
   className,
   src,
   priority = false,
+  resolution = 128,
 }: {
   className?: string
+  /** Taille du fichier chargé (px) : environ le double de la taille affichée. */
+  resolution?: number
   /** Logo choisi dans les Réglages. Absent : celui livré avec le site. */
   src?: string | null
   /**
@@ -36,14 +39,14 @@ export function LogoMark({
   return (
     <Image
       src={src || logoAnasawi}
-      width={128}
-      height={128}
+      width={resolution}
+      height={resolution}
       alt=""
       aria-hidden="true"
       priority={priority}
       /* 128px : le double de la plus grande taille d'affichage (64px au
          pied de page), pour rester net sur écran à haute densité. */
-      sizes="128px"
+      sizes={`${resolution}px`}
       className={cn('h-9 w-9 select-none object-contain', className)}
     />
   )
