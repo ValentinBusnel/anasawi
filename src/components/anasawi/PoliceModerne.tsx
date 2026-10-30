@@ -1,6 +1,6 @@
 /**
- * Les polices de la VERSION MODERNE — Fraunces (titres, réglée « douce »)
- * et Figtree (texte) —, chargées depuis
+ * Les polices de la VERSION MODERNE — Fraunces (titres, légère, axe
+ * « SOFT » au maximum) et Nunito (texte, terminaisons rondes) —, chargées depuis
  * Google Fonts par une feuille de style (React la remonte dans <head>).
  *
  * Pourquoi pas `next/font` : pour cette police, Google sert des adresses
@@ -20,7 +20,7 @@ export function PoliceModerne(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-page-custom-font */}
       <link
         rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..700,100;1,9..144,300..700,100&family=Figtree:wght@400..700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..700,100;1,9..144,300..700,100&family=Nunito:wght@300..700&display=swap"
         precedence="default"
       />
     </>

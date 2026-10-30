@@ -758,7 +758,7 @@
    chaleureuse d'Anasawi :
    - les couleurs du site classique (ivoire, sable, nuit, bleu profond),
      avec une argile douce pour les accents ;
-   - Fraunces (titres) et Figtree (texte) ;
+   - Fraunces légère et arrondie (titres), Nunito (texte) ;
    - des fenêtres arrondies (28–36 px), plus généreuses que Qeeps.
    (Les noms de variables gardent leur premier sens : `--ad-or` est
    l’accent chaud, `--ad-sable` le fond de bloc.)
@@ -781,10 +781,11 @@
   --ad-or: #b9825f;
   --ad-pierre: #4f524d;
   --ad-gris: #77746c;
-  /* Typographie : Fraunces (serif douce, aux terminaisons arrondies) pour
-     les titres, Figtree (sans moderne, ronde) pour le texte. */
+  /* Typographie DOUCE : Fraunces en version légère et arrondie (axe
+     « SOFT » au maximum) pour les titres, Nunito — une sans-serif aux
+     terminaisons rondes — pour le texte. */
   --ad-titre: 'Fraunces', ui-serif, Georgia, serif;
-  --ad-texte: 'Figtree', ui-sans-serif, system-ui, sans-serif;
+  --ad-texte: 'Nunito', ui-sans-serif, system-ui, sans-serif;
   /* La hauteur d'écran des mises en scène (ouverture, promenade). Dans
      l'aperçu de l'éditeur, le cadre est aussi haut que toute la page :
      on y fige un écran de 860 px (voir \`ModeEdition\`). */
@@ -797,15 +798,21 @@
 }
 .ad :is(h1, h2, h3, h4) {
   font-family: var(--ad-titre);
-  font-weight: 450;
-  line-height: 1.04;
-  letter-spacing: -0.025em;
+  font-weight: 340;
+  line-height: 1.06;
+  letter-spacing: -0.015em;
   font-optical-sizing: auto;
+}
+/* Tout ce qui est écrit dans la police des titres (chiffres, « Chère
+   Anne », jours de la semaine…) garde cette légèreté, même marqué gras. */
+.ad [class*='family-name:var(--ad-titre)'] {
+  font-weight: 380;
+  letter-spacing: -0.01em;
 }
 /* Le mot clé d'un titre : en italique, dans le bleu d'Anasawi. */
 .ad em {
   font-style: italic;
-  font-weight: 400;
+  font-weight: 320;
   background-image: linear-gradient(100deg, var(--ad-bleu) 0%, var(--ad-bleu-clair) 100%);
   -webkit-background-clip: text;
   background-clip: text;
