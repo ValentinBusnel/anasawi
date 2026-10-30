@@ -542,21 +542,76 @@ export function Chemin({ etapes }: { etapes: { titre: string; texte: string }[] 
 
 const TEINTES = ['#e3eef5', '#ddf1ee', '#e7e8f6', '#e9eef3', '#dfedf7', '#e4f3ea']
 
+/* La courbe des arches : un départ et une arrivée très doux, un milieu
+   franc : le rideau glisse, il ne rebondit pas. */
+const RIDEAU = 'cubic-bezier(0.83,0,0.17,1)'
+const SORTIE = 'cubic-bezier(0.16,1,0.3,1)'
+const OUVERTURE = 3.4
+
 export function Arches({ services, rdv }: { services: ServiceWithMedia[]; rdv: string }) {
   const [ouverte, setOuverte] = useState(0)
+  const liste = useRef<HTMLUListElement>(null)
+  const attente = useRef<number | null>(null)
+
+  /* La largeur d'une arche ouverte, mesurée une fois pour toutes (et au
+     redimensionnement) : photo et fiche sont posées à cette largeur dès le
+     départ. L'arche qui s'ouvre les DÉVOILE comme un rideau — rien ne se
+     recompose, aucun texte ne saute pendant l'animation. */
+  useEffect(() => {
+    const ul = liste.current
+    if (!ul) return
+    const mesurer = () => {
+      const n = services.length
+      const gap = parseFloat(getComputedStyle(ul).columnGap) || 0
+      const utile = ul.clientWidth - gap * (n - 1)
+      ul.style.setProperty('--ouvert', `${(utile * OUVERTURE) / (OUVERTURE + n - 1)}px`)
+    }
+    mesurer()
+    const ro = new ResizeObserver(mesurer)
+    ro.observe(ul)
+    return () => ro.disconnect()
+  }, [services.length])
+
+  /* Survol avec intention : traverser la rangée en diagonale n'ouvre pas
+     chaque arche au passage. */
+  const viser = (i: number) => {
+    if (attente.current) window.clearTimeout(attente.current)
+    attente.current = window.setTimeout(() => setOuverte(i), 110)
+  }
+  const renoncer = () => {
+    if (attente.current) window.clearTimeout(attente.current)
+  }
+  useEffect(() => () => renoncer(), [])
+
+  /* La photo de l'arche ouverte suit la souris, d'un rien. */
+  const suivre = (e: React.PointerEvent<HTMLLIElement>) => {
+    if (e.pointerType !== 'mouse') return
+    const r = e.currentTarget.getBoundingClientRect()
+    e.currentTarget.style.setProperty('--mx', ((e.clientX - r.left) / r.width - 0.5).toFixed(3))
+    e.currentTarget.style.setProperty('--my', ((e.clientY - r.top) / r.height - 0.5).toFixed(3))
+  }
+
   return (
-    <ul className="flex flex-col gap-3 md:h-[560px] md:flex-row md:gap-4">
+    <ul ref={liste} onMouseLeave={renoncer} className="flex flex-col gap-3 md:h-[580px] md:flex-row md:gap-3 [--ouvert:100%]">
       {services.map((s, i) => {
         const actif = ouverte === i
+        const mots = s.title.split(' ')
+        const sombre = Boolean(s.media)
         return (
           <li
             key={s.id}
-            onMouseEnter={() => setOuverte(i)}
+            onMouseEnter={() => viser(i)}
+            onPointerMove={actif ? suivre : undefined}
             className={cn(
-              'group relative overflow-hidden rounded-[28px] transition-[flex-grow,height] duration-[1000ms] ease-[cubic-bezier(0.65,0,0.35,1)]',
-              actif ? 'h-[460px] md:h-auto md:flex-[3.4]' : 'h-[120px] md:h-auto md:flex-1',
+              'relative isolate overflow-hidden rounded-[30px] [--mx:0] [--my:0] motion-reduce:!transition-none',
+              actif ? 'h-[480px] md:h-auto' : 'h-[96px] md:h-auto',
             )}
-            style={{ background: TEINTES[i % TEINTES.length] }}
+            style={{
+              flexGrow: actif ? OUVERTURE : 1,
+              flexBasis: 0,
+              background: TEINTES[i % TEINTES.length],
+              transition: `flex-grow 1.05s ${RIDEAU}, height 1.05s ${RIDEAU}`,
+            }}
           >
             <button
               type="button"
@@ -567,66 +622,168 @@ export function Arches({ services, rdv }: { services: ServiceWithMedia[]; rdv: s
             >
               <span className="sr-only">{s.title}</span>
             </button>
+
+            {/* LA PHOTO — à la largeur de l'arche ouverte, centrée : fermée,
+                on n'en voit qu'une tranche ; l'arche s'ouvre comme un rideau. */}
             {s.media && (
-              <Image
-                src={s.media.url}
-                alt=""
-                fill
-                sizes="(max-width: 768px) 100vw, 640px"
-                className={cn(
-                  'object-cover transition-[transform,opacity] duration-[1200ms] ease-[var(--ad-ease)]',
-                  actif ? 'scale-100 opacity-100' : 'scale-110 opacity-60 grayscale-[40%]',
-                )}
-              />
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-y-0 left-1/2 w-full -translate-x-1/2 md:w-[var(--ouvert)]"
+              >
+                <div
+                  className="absolute -inset-6"
+                  style={{
+                    transform: actif
+                      ? 'translate3d(calc(var(--mx) * -18px), calc(var(--my) * -12px), 0) scale(1.02)'
+                      : 'translate3d(0,0,0) scale(1.14)',
+                    filter: actif ? 'saturate(1) brightness(1)' : 'saturate(0.35) brightness(1.08)',
+                    transition: `transform ${actif ? '1.6s' : '1.05s'} ${SORTIE}, filter 1s ${RIDEAU}`,
+                  }}
+                >
+                  <Image src={s.media.url} alt="" fill sizes="(max-width: 768px) 100vw, 720px" className="object-cover" />
+                </div>
+              </div>
             )}
+
+            {/* Fermée : un voile de la teinte de l'arche, qui se lève à l'ouverture. */}
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0"
+              style={{
+                background: TEINTES[i % TEINTES.length],
+                opacity: actif ? 0 : sombre ? 0.78 : 1,
+                transition: `opacity ${actif ? '0.9s' : '0.7s'} ${RIDEAU} ${actif ? '0.1s' : '0s'}`,
+              }}
+            />
+            {/* Ouverte : la nuit monte du bas pour porter le texte. */}
             <div
               aria-hidden="true"
               className={cn(
-                'absolute inset-0 bg-gradient-to-t from-[rgba(46,66,79,0.88)] via-[rgba(46,66,79,0.25)] to-transparent transition-opacity duration-700',
-                s.media ? 'opacity-100' : 'opacity-0',
+                'pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(20,35,46,0.92),rgba(20,35,46,0.35)_45%,transparent_75%)] transition-opacity duration-[900ms]',
+                actif && sombre ? 'opacity-100' : 'opacity-0',
               )}
             />
-            {/* Le repère d'état : « + » fermé, « × » ouvert. */}
+
+            {/* Un trait de lumière traverse l'arche quand elle s'ouvre. */}
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-y-0 left-0 z-[5] w-[60%] -skew-x-[18deg] bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.22),transparent)] mix-blend-overlay md:w-[calc(var(--ouvert)*0.5)]"
+              style={{
+                transform: actif ? 'translateX(260%) skewX(-18deg)' : 'translateX(-120%) skewX(-18deg)',
+                transition: actif ? `transform 1.5s ${SORTIE} 0.25s` : 'none',
+              }}
+            />
+
+            {/* Le grand numéro, en creux, qui glisse dans le fond. */}
             <span
               aria-hidden="true"
               className={cn(
-                'pointer-events-none absolute right-5 top-5 z-20 grid h-10 w-10 place-items-center rounded-full bg-white/85 text-[var(--ad-nuit)] backdrop-blur transition-transform duration-700 ease-[var(--ad-ease)] max-md:hidden',
-                actif && 'rotate-45',
+                'pointer-events-none absolute left-7 top-5 z-[6] font-[family-name:var(--ad-titre)] text-[clamp(90px,11vw,170px)] font-semibold leading-none tracking-[-0.06em] text-transparent max-lg:hidden',
+                sombre ? '[-webkit-text-stroke:1.5px_rgba(255,255,255,0.45)]' : '[-webkit-text-stroke:1.5px_rgba(20,35,46,0.18)]',
               )}
+              style={{
+                opacity: actif ? 1 : 0,
+                transform: actif ? 'translate3d(0,0,0)' : 'translate3d(-40px,0,0)',
+                transition: `opacity 0.8s ${SORTIE} ${actif ? '0.35s' : '0s'}, transform 1.3s ${SORTIE} ${actif ? '0.3s' : '0s'}`,
+              }}
+            >
+              {String(i + 1).padStart(2, '0')}
+            </span>
+
+            {/* Le repère : « + » fermé, il tourne en « × » et s'assombrit. */}
+            <span
+              aria-hidden="true"
+              className={cn(
+                'pointer-events-none absolute right-5 top-5 z-20 grid h-11 w-11 place-items-center rounded-full backdrop-blur-md max-md:hidden',
+                actif ? 'bg-white text-[var(--ad-nuit)]' : 'bg-white/70 text-[var(--ad-nuit)]',
+              )}
+              style={{
+                transform: actif ? 'rotate(135deg) scale(1)' : 'rotate(0deg) scale(0.92)',
+                transition: 'transform 0.9s cubic-bezier(0.34,1.56,0.64,1), background-color 0.5s',
+              }}
             >
               <Plus className="h-4 w-4" />
             </span>
+
             {/* Fermée : le numéro et le titre, debout. */}
             <div
-              className={cn(
-                'pointer-events-none absolute inset-x-0 bottom-0 flex items-end gap-3 p-6 transition-[opacity,transform] duration-500',
-                actif ? 'translate-y-4 opacity-0' : 'opacity-100',
-                s.media ? 'text-white' : 'text-[var(--ad-nuit)]',
-              )}
+              className="pointer-events-none absolute inset-x-0 bottom-0 z-[6] flex items-end gap-3 p-6 text-[var(--ad-nuit)]"
+              style={{
+                opacity: actif ? 0 : 1,
+                transform: actif ? 'translate3d(0,24px,0)' : 'translate3d(0,0,0)',
+                transition: actif
+                  ? `opacity 0.25s ease-out, transform 0.4s ${RIDEAU}`
+                  : `opacity 0.6s ${SORTIE} 0.45s, transform 0.9s ${SORTIE} 0.4s`,
+              }}
             >
-              <span className="font-[family-name:var(--ad-titre)] font-semibold tracking-[-0.03em] text-[18px] opacity-70">{String(i + 1).padStart(2, '0')}</span>
-              <span className="font-[family-name:var(--ad-titre)] font-semibold tracking-[-0.03em] text-[24px] leading-[1.05] md:[writing-mode:vertical-rl] md:rotate-180">{s.title}</span>
+              <span className="font-[family-name:var(--ad-titre)] text-[18px] font-semibold tracking-[-0.03em] opacity-60">{String(i + 1).padStart(2, '0')}</span>
+              <span className="font-[family-name:var(--ad-titre)] text-[24px] font-semibold leading-[1.05] tracking-[-0.03em] md:rotate-180 md:[writing-mode:vertical-rl]">{s.title}</span>
             </div>
-            {/* Ouverte : la fiche. */}
+
+            {/* Ouverte : la fiche, posée à la largeur finale (aucune
+                recomposition), qui se dévoile ligne à ligne. */}
             <div
               className={cn(
-                'absolute inset-x-0 bottom-0 z-20 p-7 transition-[opacity,transform] duration-700 ease-[var(--ad-ease)] md:p-9',
-                actif ? 'translate-y-0 opacity-100 delay-200' : 'pointer-events-none translate-y-6 opacity-0',
-                s.media ? 'text-white' : 'text-[var(--ad-nuit)]',
+                'absolute bottom-0 left-0 z-20 w-full p-7 md:w-[var(--ouvert)] md:p-9',
+                sombre ? 'text-white' : 'text-[var(--ad-nuit)]',
+                !actif && 'pointer-events-none',
               )}
             >
-              <div className="mb-3 flex flex-wrap gap-2 text-[12px] font-medium uppercase tracking-[0.14em]">
-                {s.group && <span className="rounded-full border border-current/40 px-3 py-1 opacity-90">{s.group.label}</span>}
-                {s.duration && <span className="rounded-full border border-current/40 px-3 py-1 opacity-90">{s.duration.split(/[·—]/)[0]}</span>}
+              <div
+                className="mb-4 flex flex-wrap gap-2 text-[12px] font-medium uppercase tracking-[0.14em]"
+                style={{
+                  opacity: actif ? 1 : 0,
+                  transform: actif ? 'none' : 'translate3d(0,14px,0)',
+                  transition: actif ? `opacity 0.7s ${SORTIE} 0.4s, transform 0.9s ${SORTIE} 0.4s` : 'opacity 0.2s, transform 0.3s',
+                }}
+              >
+                {s.group && <span className="rounded-full border border-current/40 px-3 py-1 backdrop-blur-sm">{s.group.label}</span>}
+                {s.duration && <span className="rounded-full border border-current/40 px-3 py-1 backdrop-blur-sm">{s.duration.split(/[·—]/)[0]}</span>}
               </div>
-              <h3 className="text-[40px] md:text-[54px]">{s.title}</h3>
-              <p className="mt-3 max-w-[46ch] text-[15px] leading-[1.65] opacity-85">{s.excerpt.replace(/\*/g, '')}</p>
+              <h3 className="max-w-[14ch] text-[40px] leading-[0.98] md:text-[58px]">
+                {mots.map((mot, k) => (
+                  <span key={k} className="inline-block overflow-hidden pb-[0.1em] align-bottom">
+                    <span
+                      className="inline-block"
+                      style={{
+                        transform: actif ? 'translate3d(0,0,0) rotate(0)' : 'translate3d(0,110%,0) rotate(4deg)',
+                        transformOrigin: 'left bottom',
+                        transition: actif ? `transform 1.1s ${SORTIE} ${0.42 + k * 0.07}s` : `transform 0.35s ${RIDEAU}`,
+                      }}
+                    >
+                      {mot}
+                      {k < mots.length - 1 && ' '}
+                    </span>
+                  </span>
+                ))}
+              </h3>
+              <p
+                className="mt-4 max-w-[46ch] text-[15px] leading-[1.65] opacity-85"
+                style={{
+                  opacity: actif ? 0.85 : 0,
+                  transform: actif ? 'none' : 'translate3d(0,16px,0)',
+                  filter: actif ? 'blur(0)' : 'blur(6px)',
+                  transition: actif
+                    ? `opacity 0.9s ${SORTIE} 0.62s, transform 1s ${SORTIE} 0.62s, filter 0.9s ${SORTIE} 0.62s`
+                    : 'opacity 0.2s, transform 0.3s, filter 0.2s',
+                }}
+              >
+                {s.excerpt.replace(/\*/g, '')}
+              </p>
               <a
                 href={rdv}
-                className="group/lien relative z-30 mt-6 inline-flex items-center gap-2 border-b border-current pb-1 text-[14px] font-medium"
+                tabIndex={actif ? 0 : -1}
+                className="group/lien relative z-30 mt-7 inline-flex items-center gap-3 rounded-full bg-white py-1.5 pl-5 pr-1.5 text-[14px] font-semibold text-[var(--ad-nuit)] shadow-[0_18px_40px_-18px_rgba(0,0,0,0.6)]"
+                style={{
+                  opacity: actif ? 1 : 0,
+                  transform: actif ? 'none' : 'translate3d(0,16px,0) scale(0.96)',
+                  transition: actif ? `opacity 0.8s ${SORTIE} 0.75s, transform 1s cubic-bezier(0.34,1.56,0.64,1) 0.75s` : 'opacity 0.2s, transform 0.3s',
+                }}
               >
                 Réserver cet accompagnement
-                <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover/lien:-translate-y-0.5 group-hover/lien:translate-x-0.5" />
+                <span className="grid h-8 w-8 place-items-center rounded-full bg-[var(--ad-nuit)] text-white transition-transform duration-500 ease-[var(--ad-ease)] group-hover/lien:rotate-45">
+                  <ArrowUpRight className="h-4 w-4" />
+                </span>
               </a>
             </div>
           </li>
