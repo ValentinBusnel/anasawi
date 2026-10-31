@@ -80,6 +80,7 @@ export function SynchroWorkbench({
   const [compris, setCompris] = useState(false)
   const [saisie, setSaisie] = useState('')
   const [progres, setProgres] = useState<{ fait: number; total: number } | null>(null)
+  const [absents, setAbsents] = useState<string[]>([])
   const [erreur, setErreur] = useState<string | null>(null)
   const [sauvegarde, setSauvegarde] = useState<string | null>(null)
   const [aRestaurer, setARestaurer] = useState<string | null>(null)
@@ -93,6 +94,7 @@ export function SynchroWorkbench({
     /* 1. Les fichiers médias, par lots (chaque appel reste court). */
     setEtape('fichiers')
     let depart: number | null = 0
+    const manquants: string[] = []
     while (depart !== null) {
       const r = await envoyerFichiersAction(depart)
       if (!r.ok) {
@@ -101,6 +103,7 @@ export function SynchroWorkbench({
         return
       }
       setProgres({ fait: r.data.suivant ?? r.data.total, total: r.data.total })
+      manquants.push(...r.data.absents)
       depart = r.data.suivant
     }
     /* 2. Sauvegarde du contenu actuel, puis remplacement en une transaction. */
@@ -112,6 +115,7 @@ export function SynchroWorkbench({
       return
     }
     setSauvegarde(r.data.sauvegarde)
+    setAbsents(manquants)
     setEtape('fini')
     void recharger()
   }
@@ -270,6 +274,12 @@ export function SynchroWorkbench({
                 <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" />
                 C’est fait : {config.source} affiche maintenant le contenu d’ici. Son contenu d’avant est sauvegardé
                 {sauvegarde ? ` (${nomSauvegarde(sauvegarde)})` : ''} — vous pouvez le restaurer ci-dessous.
+              </p>
+            )}
+            {etape === 'fini' && absents.length > 0 && (
+              <p className="mt-3 rounded-[14px] bg-[#fdf4e4] px-5 py-4 text-[14px] text-[#8a5f1e]">
+                {absents.length} fichier{absents.length > 1 ? 's' : ''} manquai{absents.length > 1 ? 'ent' : 't'} déjà ici (médias cassés, sans
+                incidence sur l’envoi) : {absents.join(', ')}. Vous pouvez les supprimer ou les remplacer dans Médias.
               </p>
             )}
 

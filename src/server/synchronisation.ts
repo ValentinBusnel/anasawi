@@ -357,22 +357,33 @@ function fichiersDe(c: Pick<Contenu, 'medias'>) {
 
 /** Étape 1 (par lots, appelée en boucle) : les fichiers médias manquants
     sont téléchargés depuis l'autre site et rangés ici. Idempotent. */
-export async function copierFichiers(depart: number, lot = 6): Promise<{ suivant: number | null; total: number; copies: number }> {
+export async function copierFichiers(
+  depart: number,
+  lot = 6,
+): Promise<{ suivant: number | null; total: number; copies: number; absents: string[] }> {
   const config = configSynchro()
   if (!config) throw new Error('Synchronisation non configurée.')
   const cles = fichiersDe({ medias: await baseSource().select().from(media) })
   let copies = 0
+  /* Un fichier déjà absent chez l'envoyeur (média cassé, essai effacé)
+     ne bloque pas l'envoi : il est signalé, la ligne est copiée telle
+     quelle — le site qui reçoit aura le même manque, pas un de plus. */
+  const absents: string[] = []
   for (const cle of cles.slice(depart, depart + lot)) {
     if (await objectExists(cle)) continue
     const mime = mimeTypeForKey(cle)
     if (!mime) continue
     const r = await fetch(`${config.urlSite}/api/media/${encodeURIComponent(cle)}`)
-    if (!r.ok) throw new Error(`Fichier introuvable sur ${config.source} : ${cle} (${r.status}).`)
+    if (r.status === 404) {
+      absents.push(cle)
+      continue
+    }
+    if (!r.ok) throw new Error(`${config.source} n’a pas pu fournir le fichier ${cle} (${r.status}). Réessayez dans un instant.`)
     await putObject(cle, await r.arrayBuffer(), mime)
     copies++
   }
   const suivant = depart + lot < cles.length ? depart + lot : null
-  return { suivant, total: cles.length, copies }
+  return { suivant, total: cles.length, copies, absents }
 }
 
 /** Étape 2 : sauvegarde du contenu actuel, puis remplacement. */

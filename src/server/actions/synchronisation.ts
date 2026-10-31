@@ -30,7 +30,7 @@ export async function etatEnvoiAction(): Promise<ActionResult<Etat>> {
   })
 }
 
-export async function envoyerFichiersAction(depart: number): Promise<ActionResult<{ suivant: number | null; total: number; copies: number }>> {
+export async function envoyerFichiersAction(depart: number): Promise<ActionResult<{ suivant: number | null; total: number; copies: number; absents: string[] }>> {
   return guard(async () => {
     await requireOwner()
     if (!Number.isInteger(depart) || depart < 0) return fail('Étape invalide.')
