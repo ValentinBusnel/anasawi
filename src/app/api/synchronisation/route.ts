@@ -2,7 +2,7 @@ import { revalidatePath, revalidateTag } from 'next/cache'
 import { NextResponse } from 'next/server'
 
 import { tags } from '@/server/queries'
-import { copierFichiers, etatSynchro, remplacerParLaSource, restaurer, secretValide } from '@/server/synchronisation'
+import { copierFichiers, etatSynchro, raison, remplacerParLaSource, restaurer, secretValide } from '@/server/synchronisation'
 
 /**
  * Point d'entrée de la synchronisation, appelé par L'AUTRE site quand on
@@ -52,6 +52,6 @@ export async function POST(request: Request) {
         return NextResponse.json({ ok: false, error: 'Action inconnue.' }, { status: 400 })
     }
   } catch (e) {
-    return NextResponse.json({ ok: false, error: e instanceof Error ? e.message : 'Erreur inconnue.' }, { status: 500 })
+    return NextResponse.json({ ok: false, error: raison(e) }, { status: 500 })
   }
 }

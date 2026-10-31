@@ -276,6 +276,23 @@ async function remplacerPar(c: Contenu) {
   }
 }
 
+/**
+ * La vraie raison d'un échec. Drizzle enveloppe l'erreur de Postgres
+ * (« Failed query: select … ») : la cause utile (mot de passe refusé,
+ * droit manquant, colonne absente…) est dans `cause`.
+ */
+export function raison(e: unknown): string {
+  if (!(e instanceof Error)) return 'erreur inconnue.'
+  const cause = (e as { cause?: unknown }).cause
+  const fond = cause instanceof Error ? cause.message : null
+  const surface = e.message.startsWith('Failed query') ? null : e.message
+  const texte = [surface, fond].filter(Boolean).join(' — ') || e.message.split('\n')[0]!
+  if (/password authentication failed/i.test(texte)) return 'mot de passe refusé — relancez npm run sync:configurer.'
+  if (/permission denied/i.test(texte)) return `droit de lecture manquant (${texte}) — relancez npm run sync:configurer.`
+  if (/does not exist/i.test(texte)) return `${texte} — les deux sites n’ont sans doute pas le même code : publiez-le des deux côtés.`
+  return texte
+}
+
 /* ── API pour l'écran de l'admin ──────────────────────────────────────── */
 
 export type Etat = {
@@ -295,15 +312,29 @@ export async function etatSynchro(): Promise<Etat> {
   if (!config) return { config, source: null, cible, memeSchema: false, fichiersAcopier: 0, sauvegardes, erreur: null }
   try {
     const autre = baseSource()
-    const [contenu, nSource, nCible] = await Promise.all([lire(autre), migrations(autre), migrations(db)])
+    /* La version d'abord : deux schémas différents feraient échouer la
+       lecture avec un message obscur. */
+    const [nSource, nCible] = await Promise.all([migrations(autre), migrations(db)])
+    if (nSource !== nCible) {
+      return {
+        config,
+        source: null,
+        cible,
+        memeSchema: false,
+        fichiersAcopier: 0,
+        sauvegardes,
+        erreur: `Les deux bases n’ont pas la même version (${nSource} migrations pour ${config.source}, ${nCible} ici) : publiez d’abord le même code sur les deux sites.`,
+      }
+    }
+    const contenu = await lire(autre)
     return {
       config,
       source: compter(contenu),
       cible,
-      memeSchema: nSource === nCible,
+      memeSchema: true,
       fichiersAcopier: fichiersDe(contenu).length,
       sauvegardes,
-      erreur: nSource === nCible ? null : `Les deux bases n’ont pas la même version (${nSource} migrations contre ${nCible}) : déployez d’abord le même code sur les deux sites.`,
+      erreur: null,
     }
   } catch (e) {
     return {
@@ -313,7 +344,7 @@ export async function etatSynchro(): Promise<Etat> {
       memeSchema: false,
       fichiersAcopier: 0,
       sauvegardes,
-      erreur: `Impossible de lire ${config.source} : ${e instanceof Error ? e.message : 'erreur inconnue'}.`,
+      erreur: `Impossible de lire ${config.source} : ${raison(e)}`,
     }
   }
 }

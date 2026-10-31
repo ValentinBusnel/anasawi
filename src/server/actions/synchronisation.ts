@@ -2,7 +2,7 @@
 
 import { fail, guard, ok, type ActionResult } from './types'
 import { requireOwner } from '@/lib/auth'
-import { configSynchro, demanderALAutre, type Etat } from '@/server/synchronisation'
+import { configSynchro, demanderALAutre, raison, type Etat } from '@/server/synchronisation'
 
 /**
  * « Envoyer vers l'autre site » — réservé au PROPRIÉTAIRE. Chaque étape
@@ -16,7 +16,7 @@ export async function phraseDeConfirmation(): Promise<string> {
   return config ? `ENVOYER VERS ${config.source.toUpperCase()}` : ''
 }
 
-const message = (e: unknown) => (e instanceof Error ? e.message : 'Erreur inconnue.')
+const message = (e: unknown) => raison(e)
 
 /** L'état vu par l'autre site : nos chiffres (source) et les siens (cible). */
 export async function etatEnvoiAction(): Promise<ActionResult<Etat>> {
